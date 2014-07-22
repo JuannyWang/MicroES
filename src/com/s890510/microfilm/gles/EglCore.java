@@ -1,5 +1,6 @@
 package com.s890510.microfilm.gles;
 
+import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -7,6 +8,7 @@ import android.opengl.EGLDisplay;
 import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.util.Log;
+import android.view.Surface;
 
 public final class EglCore {
 
@@ -54,7 +56,7 @@ public final class EglCore {
         };
         mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], EGL14.EGL_NO_CONTEXT,
                 attrib_list, 0);
-        checkEglError("eglCreateContext");
+        EglUtil.checkEglError("eglCreateContext");
         if (mEGLContext == null) {
             // We change to use ES 2.0.
         	configs = getConfig(flags, 2);
@@ -138,7 +140,30 @@ public final class EglCore {
         }
     }
 
+    /**
+     * Makes our EGL context current, using the supplied "draw" and "read" surfaces.
+     */
+    public void makeCurrent(EGLSurface drawSurface, EGLSurface readSurface) {
+        if (mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
+            // called makeCurrent() before create?
+            Log.d(TAG, "NOTE: makeCurrent w/o display");
+        }
+        if (!EGL14.eglMakeCurrent(mEGLDisplay, drawSurface, readSurface, mEGLContext)) {
+            throw new RuntimeException("eglMakeCurrent(draw,read) failed");
+        }
+    }
+
     public void makeUnCurrent() {
+        if (!EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
+                EGL14.EGL_NO_CONTEXT)) {
+            throw new RuntimeException("eglMakeCurrent failed");
+        }
+    }
+
+    /**
+     * Makes no context current.
+     */
+    public void makeNothingCurrent() {
         if (!EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
                 EGL14.EGL_NO_CONTEXT)) {
             throw new RuntimeException("eglMakeCurrent failed");
@@ -160,12 +185,46 @@ public final class EglCore {
     }
 
     /**
-     * Checks for EGL errors.
+     * Returns true if our context and the specified surface are current.
      */
-    private void checkEglError(String msg) {
-        int error;
-        if ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
-            throw new RuntimeException(msg + ": EGL error: 0x" + Integer.toHexString(error));
+    public boolean isCurrent(EGLSurface eglSurface) {
+        return mEGLContext.equals(EGL14.eglGetCurrentContext()) &&
+            eglSurface.equals(EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW));
+    }
+
+    /**
+     * Performs a simple surface query.
+     */
+    public int querySurface(EGLSurface eglSurface, int what) {
+        int[] value = new int[1];
+        EGL14.eglQuerySurface(mEGLDisplay, eglSurface, what, value, 0);
+        return value[0];
+    }
+
+    public void releaseSurface(EGLSurface eglSurface) {
+        EGL14.eglDestroySurface(mEGLDisplay, eglSurface);
+    }
+
+    /**
+     * Creates an EGL surface associated with a Surface.
+     * <p>
+     * If this is destined for MediaCodec, the EGLConfig should have the "recordable" attribute.
+     */
+    public EGLSurface createWindowSurface(Object surface) {
+        if (!(surface instanceof Surface) && !(surface instanceof SurfaceTexture)) {
+            throw new RuntimeException("invalid surface: " + surface);
         }
+
+        // Create a window surface, and attach it to the Surface we received.
+        int[] surfaceAttribs = {
+                EGL14.EGL_NONE
+        };
+        EGLSurface eglSurface = EGL14.eglCreateWindowSurface(mEGLDisplay, mEGLConfig[0], surface,
+                surfaceAttribs, 0);
+        EglUtil.checkEglError("eglCreateWindowSurface");
+        if (eglSurface == null) {
+            throw new RuntimeException("surface was null");
+        }
+        return eglSurface;
     }
 }
