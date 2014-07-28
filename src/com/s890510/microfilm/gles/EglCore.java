@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Surface;
 
 public final class EglCore {
-
     private static final String TAG = "EglCore";
 
     private static final int EGL_RECORDABLE_ANDROID = 0x3142;
@@ -57,7 +56,7 @@ public final class EglCore {
         mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], EGL14.EGL_NO_CONTEXT,
                 attrib_list, 0);
         EglUtil.checkEglError("eglCreateContext");
-        if (mEGLContext == null) {
+        if (mEGLContext == null || mEGLContext == EGL14.EGL_NO_CONTEXT) {
             // We change to use ES 2.0.
         	configs = getConfig(flags, 2);
 
