@@ -55,7 +55,6 @@ public final class EglCore {
         };
         mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], EGL14.EGL_NO_CONTEXT,
                 attrib_list, 0);
-        EglUtil.checkEglError("eglCreateContext");
         if (mEGLContext == null || mEGLContext == EGL14.EGL_NO_CONTEXT) {
             // We change to use ES 2.0.
         	configs = getConfig(flags, 2);
@@ -67,6 +66,7 @@ public final class EglCore {
         		throw new RuntimeException("null context");
         	}
         }
+        EglUtil.checkEglError("eglCreateContext");
         
         mEGLConfig = configs;
 
@@ -120,6 +120,7 @@ public final class EglCore {
      */
     public void release() {
         if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) {
+        	EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT);
             EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
             EGL14.eglReleaseThread();
             EGL14.eglTerminate(mEGLDisplay);

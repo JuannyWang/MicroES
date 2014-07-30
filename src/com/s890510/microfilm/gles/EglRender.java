@@ -98,11 +98,13 @@ public class EglRender extends Thread {
 		Log.d(TAG, "surfaceChanged " + width + "x" + height);
 		
 		// Use full window.
-        GLES20.glViewport(0, 0, width, height);
+		mGLDraw.setView(width, height);
+		mGLDraw.setEye();
 	}
 
-	public void doFrame(long timestamp) {
+	public void doFrame() {
 		boolean swapResult;
+		Log.w(TAG, "doFrame");
 		
 		EglUtil.checkEglError("draw start");
 		
@@ -117,8 +119,6 @@ public class EglRender extends Thread {
             return;
         }
 	}
-	
-	
 
 	public void shutdown() {
 		Log.d(TAG, "shutdown");

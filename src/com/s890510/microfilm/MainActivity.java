@@ -1,6 +1,7 @@
 package com.s890510.microfilm;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Choreographer;
@@ -13,6 +14,7 @@ import com.s890510.microfilm.gles.EglRenderHandler;
 public class MainActivity extends Activity implements SurfaceHolder.Callback, Choreographer.FrameCallback {
 	private static final String TAG = "MainActivity";
 	private EglRender mEglRander;
+	private GLDraw mGLDraw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,13 +24,14 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Ch
         SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.Activity_surfaceView);
         mSurfaceView.getHolder().addCallback(this);
         
+        mGLDraw = new GLDraw_A(); 
+        
         Log.e(TAG, "Finish MainActivity onCreate");
     }
 
     @Override
     protected void onResume() {
     	super.onResume();
-    	
     	if (mEglRander != null) {
             Log.d(TAG, "onResume re-hooking choreographer");
             Choreographer.getInstance().postFrameCallback(this);
@@ -46,7 +49,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Ch
 		EglRenderHandler rh = mEglRander.getHandler();
         if (rh != null) {
             Choreographer.getInstance().postFrameCallback(this);
-            rh.sendDoFrame(frameTimeNanos);
+            rh.sendDoFrame();
         }
 	}
 
@@ -54,7 +57,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Ch
 	public void surfaceCreated(SurfaceHolder holder) {
 		Log.d(TAG, "surfaceCreated holder=" + holder);
 		SurfaceView mSurfaceView = (SurfaceView) findViewById(R.id.Activity_surfaceView);
-		mEglRander = new EglRender(mSurfaceView.getHolder(), new GLDraw_A());
+		mEglRander = new EglRender(mSurfaceView.getHolder(), mGLDraw);
 		mEglRander.start();
 		mEglRander.waitUntilReady();
 		
@@ -74,10 +77,9 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback, Ch
 		EglRenderHandler rh = mEglRander.getHandler();
         if (rh != null) {
             rh.sendSurfaceChanged(format, width, height);
-        }		
+        }
 	}
-
-
+	
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		EglRenderHandler rh = mEglRander.getHandler();

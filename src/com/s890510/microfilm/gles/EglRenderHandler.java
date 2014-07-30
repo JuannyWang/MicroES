@@ -57,9 +57,8 @@ public class EglRenderHandler extends Handler {
      * <p>
      * Call from UI thread.
      */
-    public void sendDoFrame(long frameTimeNanos) {
-        sendMessage(obtainMessage(EglRenderHandler.MSG_DO_FRAME,
-                (int) (frameTimeNanos >> 32), (int) frameTimeNanos));
+    public void sendDoFrame() {
+        sendMessage(obtainMessage(EglRenderHandler.MSG_DO_FRAME));
     }
 
     /**
@@ -90,9 +89,7 @@ public class EglRenderHandler extends Handler {
                 mEglRander.surfaceChanged(msg.arg1, msg.arg2);
                 break;
             case MSG_DO_FRAME:
-                long timestamp = (((long) msg.arg1) << 32) |
-                                 (((long) msg.arg2) & 0xffffffffL);
-                mEglRander.doFrame(timestamp);
+                mEglRander.doFrame();
                 break;
             case MSG_SHUTDOWN:
                 mEglRander.shutdown();
