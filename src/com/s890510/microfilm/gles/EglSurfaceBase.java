@@ -35,7 +35,7 @@ import java.nio.ByteOrder;
  * There can be multiple surfaces associated with a single context.
  */
 public class EglSurfaceBase {
-    protected static final String TAG = "EglSurfaceBase";
+    protected static final String TAG = GlUtil.TAG;
 
     // EglCore object we're associated with.  It may be associated with multiple surfaces.
     protected EglCore mEglCore;
@@ -63,6 +63,18 @@ public class EglSurfaceBase {
         // out from under us (see e.g. HardwareScalerActivity).
         //mWidth = mEglCore.querySurface(mEGLSurface, EGL14.EGL_WIDTH);
         //mHeight = mEglCore.querySurface(mEGLSurface, EGL14.EGL_HEIGHT);
+    }
+
+    /**
+     * Creates an off-screen surface.
+     */
+    public void createOffscreenSurface(int width, int height) {
+        if (mEGLSurface != EGL14.EGL_NO_SURFACE) {
+            throw new IllegalStateException("surface already created");
+        }
+        mEGLSurface = mEglCore.createOffscreenSurface(width, height);
+        mWidth = width;
+        mHeight = height;
     }
 
     /**
@@ -167,7 +179,7 @@ public class EglSurfaceBase {
         buf.order(ByteOrder.LITTLE_ENDIAN);
         GLES20.glReadPixels(0, 0, width, height,
                 GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
-        EglUtil.checkEglError("glReadPixels");
+        GlUtil.checkGlError("glReadPixels");
         buf.rewind();
 
         BufferedOutputStream bos = null;

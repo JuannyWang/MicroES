@@ -24,7 +24,7 @@ import android.view.Surface;
  * <p>
  * It's good practice to explicitly release() the surface, preferably from a "finally" block.
  */
-public class EglWindowSurface extends EglSurfaceBase {
+public class WindowSurface extends EglSurfaceBase {
     private Surface mSurface;
     private boolean mReleaseSurface;
 
@@ -36,7 +36,7 @@ public class EglWindowSurface extends EglSurfaceBase {
      * manage the Surface themselves (e.g. if you release a SurfaceView's Surface, the
      * surfaceDestroyed() callback won't fire).
      */
-    public EglWindowSurface(EglCore eglCore, Surface surface, boolean releaseSurface) {
+    public WindowSurface(EglCore eglCore, Surface surface, boolean releaseSurface) {
         super(eglCore);
         createWindowSurface(surface);
         mSurface = surface;
@@ -46,7 +46,7 @@ public class EglWindowSurface extends EglSurfaceBase {
     /**
      * Associates an EGL surface with the SurfaceTexture.
      */
-    public EglWindowSurface(EglCore eglCore, SurfaceTexture surfaceTexture) {
+    public WindowSurface(EglCore eglCore, SurfaceTexture surfaceTexture) {
         super(eglCore);
         createWindowSurface(surfaceTexture);
     }

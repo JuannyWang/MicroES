@@ -1,11 +1,4 @@
-/**
- * Handler for RenderThread.  Used for messages sent from the UI thread to the render thread.
- * <p>
- * The object is created on the render thread, and the various "send" methods are called
- * from the UI thread.
- */
-
-package com.s890510.microfilm.gles;
+package com.s890510.microfilm.render;
 
 import java.lang.ref.WeakReference;
 
@@ -13,9 +6,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-public class EglRenderHandler extends Handler {
-	private static final String TAG = "EglRanderHandler";
-    
+/**
+ * Handler for RenderThread.  Used for messages sent from the UI thread to the render thread.
+ * <p>
+ * The object is created on the render thread, and the various "send" methods are called
+ * from the UI thread.
+ */
+public class RenderHandler extends Handler {
+	private static final String TAG = "RenderHandler";
+
     private static final int MSG_SURFACE_CREATED = 0;
     private static final int MSG_SURFACE_CHANGED = 1;
     private static final int MSG_DO_FRAME = 2;
@@ -23,13 +22,13 @@ public class EglRenderHandler extends Handler {
 
     // This shouldn't need to be a weak ref, since we'll go away when the Looper quits,
     // but no real harm in it.
-    private WeakReference<EglRender> mWeakRenderThread;
+    private WeakReference<RenderThread> mWeakRenderThread;
 
     /**
      * Call from render thread.
      */
-    public EglRenderHandler(EglRender rt) {
-        mWeakRenderThread = new WeakReference<EglRender>(rt);
+    public RenderHandler(RenderThread rt) {
+        mWeakRenderThread = new WeakReference<RenderThread>(rt);
     }
 
     /**
@@ -38,7 +37,7 @@ public class EglRenderHandler extends Handler {
      * Call from UI thread.
      */
     public void sendSurfaceCreated() {
-        sendMessage(obtainMessage(EglRenderHandler.MSG_SURFACE_CREATED));
+        sendMessage(obtainMessage(RenderHandler.MSG_SURFACE_CREATED));
     }
 
     /**
@@ -46,10 +45,9 @@ public class EglRenderHandler extends Handler {
      * <p>
      * Call from UI thread.
      */
-    public void sendSurfaceChanged(@SuppressWarnings("unused") int format,
-            int width, int height) {
+    public void sendSurfaceChanged(int format, int width, int height) {
         // ignore format
-        sendMessage(obtainMessage(EglRenderHandler.MSG_SURFACE_CHANGED, width, height));
+        sendMessage(obtainMessage(RenderHandler.MSG_SURFACE_CHANGED, width, height));
     }
 
     /**
@@ -57,8 +55,9 @@ public class EglRenderHandler extends Handler {
      * <p>
      * Call from UI thread.
      */
-    public void sendDoFrame() {
-        sendMessage(obtainMessage(EglRenderHandler.MSG_DO_FRAME));
+    public void sendDoFrame(long frameTimeNanos) {
+        sendMessage(obtainMessage(RenderHandler.MSG_DO_FRAME,
+                (int) (frameTimeNanos >> 32), (int) frameTimeNanos));
     }
 
     /**
@@ -67,32 +66,34 @@ public class EglRenderHandler extends Handler {
      * Call from UI thread.
      */
     public void sendShutdown() {
-        sendMessage(obtainMessage(EglRenderHandler.MSG_SHUTDOWN));
+        sendMessage(obtainMessage(RenderHandler.MSG_SHUTDOWN));
     }
 
-    @Override  // runs on EglRander
+    @Override  // runs on RenderThread
     public void handleMessage(Message msg) {
         int what = msg.what;
         //Log.d(TAG, "RenderHandler [" + this + "]: what=" + what);
 
-        EglRender mEglRander = mWeakRenderThread.get();
-        if (mEglRander == null) {
+        RenderThread renderThread = mWeakRenderThread.get();
+        if (renderThread == null) {
             Log.w(TAG, "RenderHandler.handleMessage: weak ref is null");
             return;
         }
 
         switch (what) {
             case MSG_SURFACE_CREATED:
-                mEglRander.surfaceCreated();
+                renderThread.surfaceCreated();
                 break;
             case MSG_SURFACE_CHANGED:
-                mEglRander.surfaceChanged(msg.arg1, msg.arg2);
+                renderThread.surfaceChanged(msg.arg1, msg.arg2);
                 break;
             case MSG_DO_FRAME:
-                mEglRander.doFrame();
+                long timestamp = (((long) msg.arg1) << 32) |
+                                 (((long) msg.arg2) & 0xffffffffL);
+                renderThread.doFrame(timestamp);
                 break;
             case MSG_SHUTDOWN:
-                mEglRander.shutdown();
+                renderThread.shutdown();
                 break;
            default:
                 throw new RuntimeException("unknown message " + what);

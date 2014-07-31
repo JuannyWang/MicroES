@@ -1,4 +1,4 @@
-package com.s890510.microfilm;
+package com.s890510.microfilm.draw;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -14,6 +14,9 @@ public class GLDraw_A extends GLDraw {
     private FloatBuffer mVertices;
     private int mProgram;
     private int mMVPMatrixHandle;
+    private int mAlphaHandle;
+    private float mAlpha = 1;
+    private boolean mAlphaAdd = false;
 
 	@Override
 	public void prepare() {
@@ -33,8 +36,9 @@ public class GLDraw_A extends GLDraw {
 
         final String fragmentShaderSource =
                 "precision mediump float;" +
+                "uniform float mAlpha;	 " +
                 "void main() {" +
-                "    gl_FragColor = vec4(1.0, 0.0, 1.0, 1.0);" +
+                "    gl_FragColor = vec4(1.0, 0.0, 1.0, mAlpha);" +
                 "}";
         
         final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, vertexShaderSource);
@@ -51,6 +55,8 @@ public class GLDraw_A extends GLDraw {
         mVertices = ByteBuffer.allocateDirect(mVerticesData.length * 4)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
+        
+        mAlphaHandle = GLES20.glGetUniformLocation(mProgram, "mAlpha");
 	}
 
 	@Override
@@ -66,12 +72,30 @@ public class GLDraw_A extends GLDraw {
         Matrix.setIdentityM(mMVPMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mMVPMatrix, 0, mProjectionMatrix, 0);
         
+        if(mAlphaAdd) {
+        	mAlpha += 0.01;
+        	if(mAlpha >= 1) {
+        		mAlphaAdd = false;
+        	}
+        } else {
+        	mAlpha -= 0.01;
+        	if(mAlpha <= 0) {
+        		mAlphaAdd = true;
+        	}
+        }
+        
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
+        GLES20.glUniform1f(mAlphaHandle, mAlpha);
 
-        GLES20.glClearColor(0.0f, 0.0f, 0.0f, 0);
+        GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+        
+        GLES20.glEnable(GLES20.GL_BLEND);
+        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-        //GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
+        GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);       
+        
+        GLES20.glDisable(GLES20.GL_BLEND);
     }
 
 	@Override
