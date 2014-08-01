@@ -91,7 +91,7 @@ public class GLDraw_A extends GLDraw {
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         
         GLES20.glEnable(GLES20.GL_BLEND);
-        GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+        GLES20.glBlendFunc(GLES20.GL_DST_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);       
         

@@ -29,51 +29,6 @@ import com.s890510.microfilm.draw.GLDraw_A;
 import com.s890510.microfilm.render.RenderHandler;
 import com.s890510.microfilm.render.RenderThread;
 
-/**
- * Demonstrates efficient display + recording of OpenGL rendering using an FBO.  This
- * records only the GL surface (i.e. not the app UI, nav bar, status bar, or alert dialog).
- * <p>
- * This uses a plain SurfaceView, rather than GLSurfaceView, so we have full control
- * over the EGL config and rendering.  When available, we use GLES 3, which allows us
- * to do recording with one extra copy instead of two.
- * <p>
- * We use Choreographer so our animation matches vsync, and a separate rendering
- * thread to keep the heavy lifting off of the UI thread.  Ideally we'd let the render
- * thread receive the Choreographer events directly, but that appears to be creating
- * a permanent JNI global reference to the render thread object, preventing it from
- * being garbage collected (which, in turn, causes the Activity to be retained).  So
- * instead we receive the vsync on the UI thread and forward it.
- * <p>
- * If the rendering is fairly simple, it may be more efficient to just render the scene
- * twice (i.e. configure for display, call draw(), configure for video, call draw()).  If
- * the video being created is at a lower resolution than the display, rendering at the lower
- * resolution may produce better-looking results than a downscaling blit.
- * <p>
- * To reduce the impact of recording on rendering (which is probably a fancy-looking game),
- * we want to perform the recording tasks on a separate thread.  The actual video encoding
- * is performed in a separate process by the hardware H.264 encoder, so feeding input into
- * the encoder requires little effort.  The MediaMuxer step runs on the CPU and performs
- * disk I/O, so we really want to drain the encoder on a separate thread.
- * <p>
- * Some other examples use a pair of EGL contexts, configured to share state.  We don't want
- * to do that here, because GLES3 allows us to improve performance by using glBlitFramebuffer(),
- * and framebuffer objects aren't shared.  So we use a single EGL context for rendering to
- * both the display and the video encoder.
- * <p>
- * It might appear that shifting the rendering for the encoder input to a different thread
- * would be advantageous, but in practice all of the work is done by the GPU, and submitting
- * the requests from different CPU cores isn't going to matter.
- * <p>
- * As always, we have to be careful about sharing state across threads.  By fully configuring
- * the encoder before starting the encoder thread, we ensure that the new thread sees a
- * fully-constructed object.  The encoder object then "lives" in the encoder thread.  The main
- * thread doesn't need to talk to it directly, because all of the input goes through Surface.
- * <p>
- * TODO: add another bouncing rect that uses decoded video as a texture.  Useful for
- * evaluating simultaneous video playback and recording.
- * <p>
- * TODO: show the MP4 file name somewhere in the UI so people can find it in the player
- */
 public class MainActivity extends Activity implements SurfaceHolder.Callback,
         Choreographer.FrameCallback {
     private static final String TAG = "RecordFBOActivity";
@@ -84,6 +39,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DoingEncoder mEncoder = new DoingEncoder();
+        mEncoder.Start();
         setContentView(R.layout.activity_main);
 
         SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
