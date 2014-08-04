@@ -17,39 +17,73 @@
 package com.s890510.microfilm;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Choreographer;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.s890510.microfilm.draw.GLDraw;
-import com.s890510.microfilm.draw.GLDraw_A;
 import com.s890510.microfilm.render.RenderHandler;
 import com.s890510.microfilm.render.RenderThread;
+import com.s890510.microfilm.util.ThreadPool;
 
-public class MainActivity extends Activity implements SurfaceHolder.Callback,
+public class MicroFilmActivity extends Activity implements SurfaceHolder.Callback,
         Choreographer.FrameCallback {
-    private static final String TAG = "RecordFBOActivity";
+    private static final String TAG = "MainActivity";
 
     private RenderThread mRenderThread;
     private GLDraw mGLDraw;
+    
+    private ProgressDialog mProgressDialog;
+    
+    private ThreadPool mLocationThreadPool;
+    private ThreadPool mBitmapThreadPool;
+    
+    interface ISaveCallback{
+        void onSaveDone();
+    }
+    private SaveCallback mSaveCallback;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DoingEncoder mEncoder = new DoingEncoder();
-        mEncoder.Start();
         setContentView(R.layout.activity_main);
 
         SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
         sv.getHolder().addCallback(this);
         sv.getHolder().setFormat(PixelFormat.TRANSPARENT);
         
-        mGLDraw = new GLDraw_A();
+        mGLDraw = new GLDraw();
+        mSaveCallback = new SaveCallback();
 
         Log.d(TAG, "onCreate done");
+    }
+
+    @Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+    @Override
+    public boolean onMenuItemSelected(int featureId, MenuItem item) {
+    	final DoingEncoder mEncoder = new DoingEncoder();
+    	mProgressDialog = ProgressDialog.show(this, "Encoding", "Please wait...");
+    	new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+				mEncoder.Start(mSaveCallback);				
+			}
+		}).start();
+    	
+    	return super.onMenuItemSelected(featureId, item);
     }
 
     @Override
@@ -84,7 +118,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
 
         SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
         mRenderThread = new RenderThread(sv.getHolder(), MiscUtils.getDisplayRefreshNsec(this), mGLDraw);
-        mRenderThread.setName("RecordFBO GL render");
+        mRenderThread.setName("GL render");
         mRenderThread.start();
         mRenderThread.waitUntilReady();
 
@@ -149,5 +183,27 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback,
             Choreographer.getInstance().postFrameCallback(this);
             rh.sendDoFrame(frameTimeNanos);
         }
+    }
+    
+    public class SaveCallback implements ISaveCallback {
+
+		@Override
+		public void onSaveDone() {
+			mProgressDialog.dismiss();			
+		}
+    }
+    
+    public synchronized ThreadPool getLocationThreadPool() {
+        if (mLocationThreadPool == null) {
+            mLocationThreadPool = new ThreadPool(1, 1, "Event-Location-pool");
+        }
+        return mLocationThreadPool;
+    }
+
+    public synchronized ThreadPool getBitmapThreadPool() {
+        if (mBitmapThreadPool == null) {
+            mBitmapThreadPool = new ThreadPool(4, 8, "Event-Bitmap-pool");
+        }
+        return mBitmapThreadPool;
     }
 }

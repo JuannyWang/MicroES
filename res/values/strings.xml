@@ -17,4 +17,5 @@
 
 <resources>
     <string name="app_name">MicroFilm</string>
+    <string name="action_encoding">Encoding</string>
 </resources>
