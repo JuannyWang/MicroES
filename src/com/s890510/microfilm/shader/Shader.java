@@ -3,13 +3,13 @@ package com.s890510.microfilm.shader;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.draw.GLUtil;
 
 public abstract class Shader {
     private static final String TAG = "Shader";
 
-    protected MicroFilmActivity mActivity;
+    protected MicroMovieActivity mActivity;
 
     public static final int NONE            = 0;
 
@@ -160,7 +160,7 @@ public abstract class Shader {
     public static final String Slogan_TypeE             = "Slogan_TypeE";
     public static final String Slogan_TypeF             = "Slogan_TypeF";
 
-    public Shader(MicroFilmActivity activity){
+    public Shader(MicroMovieActivity activity){
         mActivity = activity;
     }
 

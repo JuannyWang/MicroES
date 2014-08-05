@@ -3,7 +3,7 @@ package com.s890510.microfilm.mask;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.draw.GLUtil;
 
 public abstract class Mask {
@@ -28,11 +28,11 @@ public abstract class Mask {
     public static final int TRANS_OUT_FULL  = 8;
     public static final int GONE            = 9;
 
-    protected MicroFilmActivity mActivity;
+    protected MicroMovieActivity mActivity;
 
     abstract public void Reset();
 
-    public Mask(MicroFilmActivity activity){
+    public Mask(MicroMovieActivity activity){
         mActivity = activity;
     }
 

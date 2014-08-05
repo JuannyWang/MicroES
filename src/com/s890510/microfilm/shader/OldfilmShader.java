@@ -7,9 +7,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class OldfilmShader extends Shader {
@@ -39,11 +39,11 @@ public class OldfilmShader extends Shader {
     private float mRandomVaule;
     private Random mRandom = new Random();
     
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public OldfilmShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public OldfilmShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -65,7 +65,7 @@ public class OldfilmShader extends Shader {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         GLES20.glUniform1f(mAlphaHandle, mAlpha);
-        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
 
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);

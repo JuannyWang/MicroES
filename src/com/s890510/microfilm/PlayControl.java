@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import android.util.Log;
 
 import com.s890510.microfilm.script.Timer;
-
 public class PlayControl {
     private static String TAG = "PlayControl";
-    private MicroFilmSurfaceView mSurfaceView;
+    private MicroMovieSurfaceView mSurfaceView;
     private ThemeControl mThemeControl = null;
 
-    public PlayControl(MicroFilmSurfaceView surfaceview) {
+    public PlayControl(MicroMovieSurfaceView surfaceview) {
         mSurfaceView = surfaceview;
     }
 
@@ -72,7 +71,7 @@ public class PlayControl {
         private Object mPauseLock;
         private int mSleep = 0;
         private Timer mTimer;
-        private MicroFilmSurfaceView mSurfaceView;
+        private MicroMovieSurfaceView mSurfaceView;
         private ArrayList<ElementInfo> mFileOrder;
         private boolean firstStrat = true;
         private boolean mIsDone = false;
@@ -83,7 +82,7 @@ public class PlayControl {
         private int mLossTime = 0;
         private boolean misVideo = false;
 
-        public ThemeControl(ArrayList<ElementInfo> FileOrder, MicroFilmSurfaceView surfaceview) {
+        public ThemeControl(ArrayList<ElementInfo> FileOrder, MicroMovieSurfaceView surfaceview) {
             mPauseLock = new Object();
             mSurfaceView = surfaceview;
             mFileOrder = FileOrder;
@@ -151,13 +150,13 @@ public class PlayControl {
                             playIndex++;
 
                             //Need to find sometime to rewrite...
-                            if(eInfo.Type == MicroFilmSurfaceView.INFO_TYPE_BITMAP) {
+                            if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
                                 mSurfaceView.changeBitmap(eInfo, true);
                                 if(misVideo) {
                                     mSurfaceView.stopMediaPlayer();
                                     misVideo = false;
                                 }
-                            } else if(eInfo.Type == MicroFilmSurfaceView.INFO_TYPE_VIDEO) {
+                            } else if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
                                 if(mSleep > 0) {
                                     Log.e(TAG, "We need to seek the video!");
                                     int time = eInfo.time - mSleep;
@@ -218,7 +217,7 @@ public class PlayControl {
 
             if(!mIsDone) {
                 mSurfaceView.IsPlayFin(true);
-                mSurfaceView.SendMSG(MicroFilmSurfaceView.MSG_PLAYFIN);
+                mSurfaceView.SendMSG(MicroMovieSurfaceView.MSG_PLAYFIN);
             }
 
             mSurfaceView = null;

@@ -8,8 +8,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.s890510.microfilm.MicroFilmActivity;
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class SplitMask extends Mask {
@@ -29,7 +29,7 @@ public class SplitMask extends Mask {
     private float RPosition = 0.0f; //Rotate
     private boolean mInit = false;
 
-    public SplitMask(MicroFilmActivity activity) {
+    public SplitMask(MicroMovieActivity activity) {
         super(activity);
     }
 
@@ -114,7 +114,7 @@ public class SplitMask extends Mask {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);

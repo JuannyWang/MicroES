@@ -18,4 +18,31 @@
 <resources>
     <string name="app_name">MicroFilm</string>
     <string name="action_encoding">Encoding</string>
+    <string name="loading">Loading\u2026</string>
+    <string name="photoeditor_dialog_title_save">Save</string>
+    
+    <string name="kids" description="" maxwidth="">Kids</string>
+    <string name="memory" description="" maxwidth="">Memory</string>
+    <string name="life" description="" maxwidth="">Life</string>
+    <string name="sports" description="" maxwidth="">Sports</string>
+    <string name="city" description="" maxwidth="">City</string>
+    <string name="lover" description="" maxwidth="">Lover</string>
+    <string name="fashion" description="" maxwidth="">Fashion</string>
+    <string name="country" description="" maxwidth="">Country</string>
+    <string name="carnival" description="" maxwidth="">Carnival</string>
+
+    <string name="micromovie_title" description="" maxwidth="">MicroFilm</string>
+    
+    <string name="leave_dialog_content" description="" maxwidth="">Are you sure you want to leave?</string>
+    <string name="transcoding" description="" maxwidth="">Transcoding...</string>
+    <string name="micromovie_cancel_save_title" description="" maxwidth="">Stop transcoding</string>
+    <string name="micromovie_not_complete" description="" maxwidth="">MicroFilm is not completed.</string>
+    
+    <string name="remix" description="photos will be rearranged, shuffle randomly" maxwidth="">Remix</string>
+    <string name="not_compelete" description="" maxwidth="">Cannot complete</string>
+    <string name="no_storage_save_microfilm" description="" maxwidth="">There is not enough storage available to save MicroFilm.</string>
+    <string name="delete_redundant_content" description="" maxwidth="">Please delete redundant files and try again.</string>
+    <string name="transcoding_fail" description="" maxwidth="">Transcoding was stopped unexpectedly, please try again or restart system.</string>
+    <string name="cancel_and_restart" description="" maxwidth="">Process was canceled. Restart transcoding?</string>
+    <string name="stop_another_transcoding" description="" maxwidth="-1">Transcoding for another Microfilm will be stopped. Are you sure you want to continue with this action?</string>
 </resources>

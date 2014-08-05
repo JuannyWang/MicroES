@@ -2,7 +2,7 @@ package com.s890510.microfilm.script.effects;
 
 import java.util.ArrayList;
 
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.shader.Shader;
 
 public class EffectLib {
@@ -117,7 +117,7 @@ public class EffectLib {
         return mComboEffect;
     }
 
-    public static Effect Scale_Fade(GLDraw gldraw, int[] Duration, int Sleep, String mShader, boolean[] Trans, int[] mUtil, int ConvertType, int ConvertSize,
+    public static Effect Scale_Fade(ProcessGL processGL, int[] Duration, int Sleep, String mShader, boolean[] Trans, int[] mUtil, int ConvertType, int ConvertSize,
             float[] StartScale, float[] EndScale, float[] StartAlpha, float[] EndAlpha, float WRatio, float HRatio, int[] mMask, int[] mType) {
         ArrayList<Effect> mElements = new ArrayList<Effect>();
 
@@ -129,9 +129,9 @@ public class EffectLib {
             } else if(mType[i] == 2) {
                 mEffect = new EffectScale(Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i], mMask[i], mUtil[i]);
             } else if(mType[i] == 3) {
-                mEffect = new EffectShowInLeftHalf(gldraw, Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i]);
+                mEffect = new EffectShowInLeftHalf(processGL, Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i]);
             } else if(mType[i] == 4) {
-                mEffect = new EffectShowInRightHalf(gldraw, Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i]);
+                mEffect = new EffectShowInRightHalf(processGL, Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i]);
             } else if(mType[i] == 5) {
                 mEffect = new EffectScale(Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i], mMask[i], mUtil[i]);
                 mEffect.setshowBackground(true);
@@ -142,7 +142,7 @@ public class EffectLib {
                 mEffect.setBGColor(new float[]{1.0f, 1.0f, 1.0f, 1.0f}); //white
             } else if(mType[i] >= 8 && mType[i] <= 16) {
                 float PosX = 0;
-                float ratio = gldraw.ScreenRatio;
+                float ratio = processGL.ScreenRatio;
                 if(mType[i] == 8 || mType[i] == 11 || mType[i] == 14) {
                     PosX = -ratio * 2.0f/3.0f;
                 } else if(mType[i] == 10 || mType[i] == 13 || mType[i] == 16) {
@@ -224,7 +224,7 @@ public class EffectLib {
         return mComboEffect;
     }
 
-    public static Effect Translate(GLDraw gldraw, int[] Duration, int Sleep, String mShader, boolean[] Trans, int[] mUtil, int ConvertType, int ConvertSize,
+    public static Effect Translate(ProcessGL processGL, int[] Duration, int Sleep, String mShader, boolean[] Trans, int[] mUtil, int ConvertType, int ConvertSize,
             boolean IsInCount, float[] StartPos, float[] EndPos, float[] StartScale, float[] EndScale, float[] StartAlpha, float[] EndAlpha, float WRatio,
             float HRatio, int[] mMask, int[] mType) {
         ArrayList<Effect> mElements = new ArrayList<Effect>();
@@ -238,14 +238,14 @@ public class EffectLib {
             } else if(mType[i] == 3) {
                 mEffect = new EffectShowInCenter(Duration[i], 1, StartPos[i], 0, mMask[i]);
             } else if(mType[i] == 4) {
-                mEffect = new EffectTranslateOutToLeft(gldraw, Duration[i], mUtil[i]);
+                mEffect = new EffectTranslateOutToLeft(processGL, Duration[i], mUtil[i]);
             } else if(mType[i] == 5) {
                 mEffect = new EffectTransInFromLeftBottom(Duration[i], StartPos[i], EndPos[i]);
             } else if(mType[i] == 6) {
                 mEffect = new EffectTranslateY(Duration[i], StartPos[i], EndPos[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i], 0, mMask[i]);
             } else if(mType[i] >= 8 && mType[i] <= 13) {
                 float PosX = 0;
-                float ratio = gldraw.ScreenRatio;
+                float ratio = processGL.ScreenRatio;
                 if(mType[i] == 8 || mType[i] == 11) {
                     PosX = -ratio * 2.0f/3.0f;
                 } else if(mType[i] == 10 || mType[i] == 13) {
@@ -312,7 +312,7 @@ public class EffectLib {
         return mComboEffect;
     }
 
-    public static Effect Bound(GLDraw gldraw, int[] Duration, int Sleep, String mShader, int ConvertType, int ConvertSize, float[] StartPosX, float[] EndPosX, float[] StartPosY, float[] EndPosY, float ShowPos, float EndPos,
+    public static Effect Bound(ProcessGL processGL, int[] Duration, int Sleep, String mShader, int ConvertType, int ConvertSize, float[] StartPosX, float[] EndPosX, float[] StartPosY, float[] EndPosY, float ShowPos, float EndPos,
             float[] StartScale, float[] EndScale, float[] StartAlpha, float[] EndAlpha, float WRatio, float HRatio, boolean[] Trans, int[] Bound, int[] mType) {
         ArrayList<Effect> mElements = new ArrayList<Effect>();
 
@@ -328,7 +328,7 @@ public class EffectLib {
                 mEffect.setshowBackground(true);
                 mEffect.setBGColor(new float[]{1.0f, 0.84f, 0.52f, 1.0f});
             } else if(mType[i] == 4) {
-                mEffect = new EffectShowInRightHalf(gldraw, Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i]);
+                mEffect = new EffectShowInRightHalf(processGL, Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i]);
             } else if(mType[i] == 5) {
                 mEffect = new EffectBySetting(Duration[i], StartScale[i], EndScale[i], StartAlpha[i], EndAlpha[i], StartPosX[i], StartPosY[i], EndPosX[i], EndPosY[i]);
                 mEffect.setRunPos(ShowPos, EndPos);

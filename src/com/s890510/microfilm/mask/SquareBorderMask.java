@@ -9,8 +9,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.util.Easing;
 
@@ -30,11 +30,11 @@ public class SquareBorderMask extends Mask {
     private float[] mModelMatrix = new float[16];
 
     private float mScale = 0.0f;
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public SquareBorderMask(MicroFilmActivity activity, GLDraw gldraw) {
+    public SquareBorderMask(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -71,7 +71,7 @@ public class SquareBorderMask extends Mask {
             GLES20.glUniform1f(mSizeHandle, 0.75f);
         }
 
-        GLES20.glUniform1f(mRatioHandle, mGLDraw.ScreenRatio);
+        GLES20.glUniform1f(mRatioHandle, mProcessGL.ScreenRatio);
 
         Matrix.setIdentityM(mModelMatrix, 0);
 
@@ -111,7 +111,7 @@ public class SquareBorderMask extends Mask {
     }
 
     public void CalcVertices() {
-        float mRatio = mGLDraw.ScreenRatio;
+        float mRatio = mProcessGL.ScreenRatio;
         final float[] mTriangleVerticesData = {
                 // X, Y, Z,
                 // R, G, B, A
@@ -129,7 +129,7 @@ public class SquareBorderMask extends Mask {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);

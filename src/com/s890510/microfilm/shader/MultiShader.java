@@ -3,29 +3,29 @@ package com.s890510.microfilm.shader;
 import java.util.ArrayList;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 
 public class MultiShader {
     private static final String TAG = "MultiShader";
-    private MicroFilmActivity mActivity;
+    private MicroMovieActivity mActivity;
     private ArrayList<Integer> mTextureId = new ArrayList<Integer>();
     private ArrayList<ElementInfo> mElementInfo = new ArrayList<ElementInfo>();
 
     private LatticeShader mLatticeShader;
     private FadeShader mFadeShader;
     private ShuttersShader mShuttersShader;
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public MultiShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public MultiShader(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
     }
 
     public void initMultipleShader() {
-        mLatticeShader = new LatticeShader(mActivity, mGLDraw);
-        mFadeShader = new FadeShader(mActivity, mGLDraw);
-        mShuttersShader = new ShuttersShader(mActivity, mGLDraw);
+        mLatticeShader = new LatticeShader(mActivity, mProcessGL);
+        mFadeShader = new FadeShader(mActivity, mProcessGL);
+        mShuttersShader = new ShuttersShader(mActivity, mProcessGL);
     }
 
     public void SetContainer(int TId, ElementInfo Info) {

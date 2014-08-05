@@ -1,6 +1,6 @@
 package com.s890510.microfilm.filter;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 
 public class FilterChooser {
     public static final int DEFAULT = 0;
@@ -11,7 +11,7 @@ public class FilterChooser {
     public static final int COLOR = 5;
     public static final int LATTICE = 6;
 
-    public static Filter getFilter(MicroFilmActivity activity, int id){
+    public static Filter getFilter(MicroMovieActivity activity, int id){
         switch(id){
             case SEPIA:
                 return new SepiaFilter(activity);

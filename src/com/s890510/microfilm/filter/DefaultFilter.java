@@ -1,11 +1,11 @@
 package com.s890510.microfilm.filter;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.R;
 
 public class DefaultFilter extends Filter {
 
-	public DefaultFilter(MicroFilmActivity activity) {
+	public DefaultFilter(MicroMovieActivity activity) {
 		super(activity);
 	}
 

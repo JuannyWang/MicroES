@@ -2,7 +2,7 @@ package com.s890510.microfilm.filter;
 
 import android.opengl.GLES20;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.R;
 
 public class ColorFilter extends DefaultFilter {
@@ -20,7 +20,7 @@ public class ColorFilter extends DefaultFilter {
     private float TimaA = 3.5f;
     private float TimeB = -0.2f;
 
-    public ColorFilter(MicroFilmActivity activity) {
+    public ColorFilter(MicroMovieActivity activity) {
         super(activity);
     }
 

@@ -5,7 +5,7 @@ import java.util.Random;
 
 import android.opengl.GLES20;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 
 public class LomoFilter extends DefaultFilter {
     private int mBSeedHandle;
@@ -30,7 +30,7 @@ public class LomoFilter extends DefaultFilter {
     private float[] mScale;
 
     
-    public LomoFilter(MicroFilmActivity activity) {
+    public LomoFilter(MicroMovieActivity activity) {
 		super(activity);
 		
 		mScale = new float[2];

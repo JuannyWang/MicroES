@@ -5,9 +5,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class ColorShader extends Shader {
@@ -26,15 +26,15 @@ public class ColorShader extends Shader {
     private float[] mMVPMatrix = new float[16];
 
     private float mAlpha = 1.0f;
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
     private float[] mSepiaWeight = { 805.0f / 2048.0f, 715.0f / 2048.0f, 557.0f / 2048.0f,
             1575.0f / 2048.0f, 1405.0f / 2048.0f, 1097.0f / 2048.0f,
             387.0f / 2048.0f, 344.0f / 2048.0f, 268.0f / 2048.0f };
 
-    public ColorShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public ColorShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -56,7 +56,7 @@ public class ColorShader extends Shader {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         GLES20.glUniform1f(mAlphaHandle, mAlpha);
-        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
 
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);

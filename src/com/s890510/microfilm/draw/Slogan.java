@@ -20,7 +20,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.effects.Effect;
@@ -48,15 +49,15 @@ public class Slogan {
     private Bitmap mLogoBBitmap;
     private Context mContext;
     private Script mScript;
-    private MicroFilmActivity mActivity;
-    private GLDraw mProcessGL;
+    private MicroMovieActivity mActivity;
+    private ProcessGL mProcessGL;
 
     public static int SLOGAN_LINE   = 1;
     public static int SLOGAN_TEXT   = 2;
     public static int SLOGAN_DATE   = 3;
     public static int SLOGAN_ALL    = 4;
 
-    public Slogan(MicroFilmActivity activity, GLDraw processGL) {
+    public Slogan(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
         mContext = mActivity.getApplicationContext();
         mProcessGL = processGL;
@@ -151,7 +152,7 @@ public class Slogan {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);

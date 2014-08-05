@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="micromovie_seekbar_toppadding">3dp</dimen>
+    <dimen name="micromovie_seekbar_bottompadding">6dp</dimen>
+    <dimen name="micromovie_elpasetime_left_padding">12dp</dimen>
+    <dimen name="micromovie_elpasetime_right_padding">14dp</dimen>
+    <dimen name="micromovie_totaltime_left_padding">14dp</dimen>
+    <dimen name="micromovie_totaltime_right_padding">8dp</dimen>
+    <dimen name="micromovie_control_seekbar">80dp</dimen>
+
+    <dimen name="micromovie_listview_size">140dp</dimen>
+    <dimen name="micromovie_margintop">5dp</dimen>
+    <dimen name="micromovie_marginside">20dp</dimen>
+    <dimen name="micromovie_marginright">2dp</dimen>
+    <dimen name="micromovie_dotview_size">24dp</dimen>
+    <dimen name="micromovie_dotview_right_margin">5dp</dimen>
+    <dimen name="micromovie_theme_size">100dp</dimen>
+    <dimen name="micromovie_text_size">14sp</dimen>
+    <dimen name="micromovie_text_paddingbottom">6dp</dimen>    
+</resources>

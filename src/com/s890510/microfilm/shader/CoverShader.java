@@ -13,9 +13,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.mask.Mask;
 import com.s890510.microfilm.script.effects.Effect;
@@ -51,11 +51,11 @@ public class CoverShader extends Shader {
     private Bitmap mBitmap = null;
     private int mColor = Color.WHITE;
 
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public CoverShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public CoverShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -69,8 +69,8 @@ public class CoverShader extends Shader {
         if(mEffect == null) return;
         else mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
-        float[] mLeft = mGLDraw.getLeftFilter();
-        float[] mRight = mGLDraw.getRightFilter();
+        float[] mLeft = mProcessGL.getLeftFilter();
+        float[] mRight = mProcessGL.getRightFilter();
 
         GLES20.glUseProgram(mProgram);
 
@@ -105,12 +105,12 @@ public class CoverShader extends Shader {
             GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
             if(mCoverType == Shader.STRING_LEFT) {
-            	mGLDraw.mStringLoader.mStringTextureCoords.position(0);
-                GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringTextureCoords);
+            	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
+                GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
                 GLES20.glEnableVertexAttribArray(mTextureHandle);
 
-                mGLDraw.mStringLoader.mStringVertices.position(0);
-                GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringVertices);
+                mProcessGL.mStringLoader.mStringVertices.position(0);
+                GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringVertices);
                 GLES20.glEnableVertexAttribArray(mPositionHandle);
 
                 mCoverType = Shader.LEFT;
@@ -127,7 +127,7 @@ public class CoverShader extends Shader {
             GLES20.glUniform1f(mIsEmptyHandle, 0.0f);
         }
 
-        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
         GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
         GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
         if(mEffect.getTransition(mElapseTime)) {
@@ -147,15 +147,15 @@ public class CoverShader extends Shader {
                 }
 
                 if(mCoverType == Shader.LEFT || mCoverType == Shader.GFRAG_LEFT) {
-                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mGLDraw.ScreenRatio*2, duration) - mGLDraw.ScreenRatio);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio*2, duration) - mProcessGL.ScreenRatio);
                 } else if(mCoverType == Shader.RIGHT) {
-                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, mGLDraw.ScreenRatio*2, duration) - mGLDraw.ScreenRatio));
+                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio*2, duration) - mProcessGL.ScreenRatio));
                 } else if(mCoverType == Shader.HALF_LEFT) {
-                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mGLDraw.ScreenRatio, duration) - mGLDraw.ScreenRatio/2.0f);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio, duration) - mProcessGL.ScreenRatio/2.0f);
                 } else if(mCoverType == Shader.HALF_LEFT_Q) {
                     GLES20.glUniform1f(mSizeHandle, Easing.easeOutCubic(elapse, 0, mElementInfo.x*2, duration) - mElementInfo.x);
                 } else if(mCoverType == Shader.HALF_RIGHT) {
-                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, mGLDraw.ScreenRatio, duration) - mGLDraw.ScreenRatio/2.0f));
+                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio, duration) - mProcessGL.ScreenRatio/2.0f));
                 } else if(mCoverType == Shader.HALF_RIGHT_Q) {
                     GLES20.glUniform1f(mSizeHandle, -(Easing.easeOutCubic(elapse, 0, mElementInfo.x*2, duration) - mElementInfo.x));
                 }
@@ -182,7 +182,7 @@ public class CoverShader extends Shader {
             } else if(mCoverType == Shader.PERCENT_L) {
                 GLES20.glUniform1f(mDirectHandle, 0.0f);
                 float[] mPos = mEffect.getRunPos(mElapseTime);
-                GLES20.glUniform1f(mSizeHandle, (mPos[0] + ((mPos[1] - mPos[0])*Easing.easeInOutCubic(elapse, 0, 1, duration)))*mGLDraw.ScreenRatio*2 - mPos[1]*mGLDraw.ScreenRatio);
+                GLES20.glUniform1f(mSizeHandle, (mPos[0] + ((mPos[1] - mPos[0])*Easing.easeInOutCubic(elapse, 0, 1, duration)))*mProcessGL.ScreenRatio*2 - mPos[1]*mProcessGL.ScreenRatio);
             } else if(mCoverType == Shader.PERCENT_B) {
                 GLES20.glUniform1f(mDirectHandle, 3.0f);
                 float[] mPos = mEffect.getRunPos(mElapseTime);
@@ -207,7 +207,7 @@ public class CoverShader extends Shader {
             GLES20.glUniform1f(mDirectHandle, 0.0f);
             GLES20.glUniform1f(mTransHandle, 1.0f);
             float[] mPos = mEffect.getRunPos(mElapseTime);
-            GLES20.glUniform1f(mSizeHandle, mPos[0]*mGLDraw.ScreenRatio*2 - mPos[1]*mGLDraw.ScreenRatio);
+            GLES20.glUniform1f(mSizeHandle, mPos[0]*mProcessGL.ScreenRatio*2 - mPos[1]*mProcessGL.ScreenRatio);
         } else {
             GLES20.glUniform1f(mTransHandle, 0.0f);
         }
@@ -223,7 +223,7 @@ public class CoverShader extends Shader {
         } else if(mBound == Shader.LIMIT_COVER_X) {
             float[] mPos = mEffect.getRunPos(mElapseTime);
             float[] bound = new float[2];
-            bound[0] = mPos[0]*mGLDraw.ScreenRatio*2 - mGLDraw.ScreenRatio;
+            bound[0] = mPos[0]*mProcessGL.ScreenRatio*2 - mProcessGL.ScreenRatio;
             bound[1] = 0;
             GLES20.glUniform1f(mSetBoundHandle, 4.0f);
             GLES20.glUniform1fv(mBoundHandle, bound.length, bound, 0);
@@ -232,7 +232,7 @@ public class CoverShader extends Shader {
         }
 
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
-        GLES20.glUniform1f(mThemeHandle, mGLDraw.getScriptFilter());
+        GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
 
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
@@ -287,7 +287,7 @@ public class CoverShader extends Shader {
     }
 
     public void CalcVertices() {
-        float mRatio = mGLDraw.ScreenRatio;
+        float mRatio = mProcessGL.ScreenRatio;
         final float[] mTriangleVerticesData = {
             // X, Y, Z, U, V
             -mRatio, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -297,7 +297,7 @@ public class CoverShader extends Shader {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);
@@ -305,7 +305,7 @@ public class CoverShader extends Shader {
 
     private void CreateBitmap() {
         if(mBitmap == null)
-            mBitmap = Bitmap.createBitmap(mGLDraw.ScreenWidth, mGLDraw.ScreenHeight, Bitmap.Config.ARGB_8888);
+            mBitmap = Bitmap.createBitmap(mProcessGL.ScreenWidth, mProcessGL.ScreenHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvasTemp = new Canvas(mBitmap);
         canvasTemp.drawColor(mColor);

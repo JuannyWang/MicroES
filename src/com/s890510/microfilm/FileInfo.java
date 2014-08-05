@@ -2,7 +2,6 @@ package com.s890510.microfilm;
 
 import java.util.ArrayList;
 
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -54,12 +53,12 @@ public class FileInfo {
     public GeoInfo mGeoInfo = null;
     public long mDate;
 
-    private MicroFilmActivity mActivity;
+    private MicroMovieActivity mActivity;
     private Future<Bitmap> mBitmapLookupJob;
     private final Handler mHandler;
     private final int MAX_FACES = 10;
 
-    public FileInfo(MicroFilmActivity activity) {
+    public FileInfo(MicroMovieActivity activity) {
         mHandler = new Handler(Looper.getMainLooper());
         mActivity = activity;
     }

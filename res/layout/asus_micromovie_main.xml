@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@color/black"
+    android:layout_weight="1" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="@dimen/micromovie_marginside"
+        android:layout_marginTop="@dimen/micromovie_margintop"
+        android:layout_marginEnd="@dimen/micromovie_marginright"
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_weight="1" >
+
+        <LinearLayout
+            android:id="@+id/asus_micromovie_preview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+
+            <RelativeLayout
+                android:id="@+id/micromovie_player"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="@dimen/micromovie_seekbar_toppadding"
+            android:paddingBottom="@dimen/micromovie_seekbar_bottompadding"
+            android:layout_weight="0">
+            <LinearLayout
+                android:id="@+id/micromovie_control_panel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_alignParentBottom="true"
+                android:background="@color/black">
+                <ImageButton
+                    android:id="@+id/micromovie_control_btn"
+                    android:background="@color/black"
+                    android:src="@drawable/asus_micromovie_play_icon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <TextView
+                    android:id="@+id/micromovie_eclipsetime"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="@dimen/micromovie_elpasetime_left_padding"
+                    android:paddingRight="@dimen/micromovie_elpasetime_right_padding"
+                    android:textColor="@color/white" />
+                <SeekBar
+                    android:id="@+id/micromovie_seekbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_gravity="center_vertical"
+                    android:progressDrawable="@drawable/asus_micromovie_seekbar"
+                    android:thumb="@drawable/asus_micromovie_thumb" />
+                <TextView
+                    android:id="@+id/micromovie_eclipsetime_total"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="@dimen/micromovie_totaltime_left_padding"
+                    android:paddingRight="@dimen/micromovie_totaltime_right_padding"
+                    android:textColor="@color/white" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/asus_micromovie_themeselector"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/micromovie_margintop"
+        android:layout_weight="0" >
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+	        <ScrollView
+	            android:id="@+id/asus_micromovie_scrollview"
+	            android:layout_centerVertical="true"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:scrollbars="none" >
+		        <com.asus.gallery.micromovie.ThemeLayout
+		            android:id="@+id/micromovie_themelayout"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"/>
+	        </ScrollView>
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

@@ -5,7 +5,7 @@ import java.util.Random;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.R;
 
 public class OldFilmFilter extends DefaultFilter {
@@ -49,7 +49,7 @@ public class OldFilmFilter extends DefaultFilter {
     private float mRandomVaule1 = 0;
     private float mRandomVaule2 = 0;
 
-    public OldFilmFilter(MicroFilmActivity activity) {
+    public OldFilmFilter(MicroMovieActivity activity) {
 		super(activity);
 	}
     

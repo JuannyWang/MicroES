@@ -19,7 +19,7 @@ import android.net.NetworkInfo;
 import com.s890510.microfilm.util.BlobCache;
 import com.s890510.microfilm.util.CacheManager;
 
-public class MicroFilmGeocoder {
+public class MicroMovieGeocoder {
     @SuppressWarnings("unused")
     private static final String TAG = "ReverseGeocoder";
     public static final int EARTH_RADIUS_METERS = 6378137;
@@ -60,7 +60,7 @@ public class MicroFilmGeocoder {
     private ConnectivityManager mConnectivityManager;
     private static Address sCurrentAddress; // last known address
 
-    public MicroFilmGeocoder(Context context) {
+    public MicroMovieGeocoder(Context context) {
         mContext = context;
         mGeocoder = new Geocoder(mContext, Locale.ENGLISH);
         mGeoCache = CacheManager.getCache(context, GEO_CACHE_FILE,

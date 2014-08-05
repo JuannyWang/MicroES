@@ -5,9 +5,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
@@ -27,11 +27,11 @@ public class PhotoShader extends Shader {
     private int mSetBoundHandle;
     private float[] mMVPMatrix = new float[16];
     
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public PhotoShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public PhotoShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -60,10 +60,10 @@ public class PhotoShader extends Shader {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
-        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
 
         float scale = mElementInfo.effect.getScaleSize(mElementInfo.timer.getElapse());
-        float ratio_a = (float)mGLDraw.ScreenHeight/(float)mGLDraw.ScreenWidth;
+        float ratio_a = (float)mProcessGL.ScreenHeight/(float)mProcessGL.ScreenWidth;
         int mBound = mEffect.getFixBound(mElapseTime);
         if(mBound == Shader.BOUNDING) {
             float[] mGap = new float[2]; //0: X, 1: Y

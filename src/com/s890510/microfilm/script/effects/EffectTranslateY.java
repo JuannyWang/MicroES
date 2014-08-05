@@ -2,7 +2,7 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.ProcessGL;
 
 public class EffectTranslateY extends BasicEffect
 {
@@ -18,18 +18,18 @@ public class EffectTranslateY extends BasicEffect
     private float[] mMVPMatrix = new float[16]; //the texture
     private float scale = 1.0f;
 
-    public EffectTranslateY(GLDraw gldraw) {
+    public EffectTranslateY(ProcessGL processGL) {
         mDuration = DURATION;
         mSleep = DURATION;
-        mStartTrans = gldraw.ScreenRatio;
-        mEndTrans = gldraw.ScreenRatio;
+        mStartTrans = processGL.ScreenRatio;
+        mEndTrans = processGL.ScreenRatio;
     }
 
-    public EffectTranslateY(GLDraw gldraw, int duration) {
+    public EffectTranslateY(ProcessGL processGL, int duration) {
         mDuration = duration;
         mSleep = duration;
-        mStartTrans = gldraw.ScreenRatio;
-        mEndTrans = gldraw.ScreenRatio;
+        mStartTrans = processGL.ScreenRatio;
+        mEndTrans = processGL.ScreenRatio;
     }
 
     public EffectTranslateY(int duration, float StartPos, float EndPos) {

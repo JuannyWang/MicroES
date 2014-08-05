@@ -1,6 +1,6 @@
 package com.s890510.microfilm.filter;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.draw.GLUtil;
 
 
@@ -8,10 +8,10 @@ public abstract class Filter {
 	public static int TYPE_BITMAP = 0;
 	public static int TYPE_EOS = 1;
 	
-	protected MicroFilmActivity mActivity;
+	protected MicroMovieActivity mActivity;
 	protected long mTimer;
 	
-	public Filter(MicroFilmActivity activity){
+	public Filter(MicroMovieActivity activity){
 		mActivity = activity;
 	}
 	

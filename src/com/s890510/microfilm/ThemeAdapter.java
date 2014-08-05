@@ -29,9 +29,9 @@ public class ThemeAdapter extends BaseAdapter {
     public static final int TYPE_SPORTS = 8;
 
     private Context mContext;
-    private MicroFilmActivity mActivity;
+    private MicroMovieActivity mActivity;
     private int ThemePosition = -1;
-    private MicroFilmListener mUpdatelistener;
+    private MicroMovieListener mUpdatelistener;
     private final Handler mHandler;
     private View mView = null;
     public static final int MSG_UPDATE = 0;
@@ -61,12 +61,12 @@ public class ThemeAdapter extends BaseAdapter {
     };
 
     public boolean[] mThemeState = {
-    		false,
+    		true,
             true,
             true,
-            false,
             true,
-            false,
+            true,
+            true,
             true,
             false,
             true
@@ -74,7 +74,7 @@ public class ThemeAdapter extends BaseAdapter {
 
     public int[] mOrder = {0, 8, 1, 4, 2, 5, 3, 6, 7};
 
-    public ThemeAdapter(MicroFilmActivity activity) {
+    public ThemeAdapter(MicroMovieActivity activity) {
         mContext = activity.getApplicationContext();
         mActivity = activity;
 
@@ -84,7 +84,7 @@ public class ThemeAdapter extends BaseAdapter {
                 switch (msg.what) {
                     case MSG_UPDATE:
                         if(mUpdatelistener!=null)
-                            mUpdatelistener.doUpdate(MicroFilmListener.UPDATE_THEME);
+                            mUpdatelistener.doUpdate(MicroMovieListener.UPDATE_THEME);
                         break;
                 }
             }
@@ -105,7 +105,7 @@ public class ThemeAdapter extends BaseAdapter {
         mTextView.setTypeface(Typefaces.get(mContext, "fonts/Roboto-Regular.ttf"));
     }
 
-    public void setUpdateLintener(MicroFilmListener updateListener) {
+    public void setUpdateLintener(MicroMovieListener updateListener) {
         mUpdatelistener = updateListener;
     }
 

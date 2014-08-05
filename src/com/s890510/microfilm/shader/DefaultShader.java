@@ -5,9 +5,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.draw.StringLoader;
 import com.s890510.microfilm.script.effects.Effect;
@@ -34,13 +34,13 @@ public class DefaultShader extends Shader {
     private int mLeftFilterHandle;
     private int mRightFilterHandle;
     private float[] mMVPMatrix = new float[16];
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
     private float mAlpha = 1.0f;
 
-    public DefaultShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public DefaultShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -54,8 +54,8 @@ public class DefaultShader extends Shader {
         if(mEffect == null) return;
         else mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
-        float[] mLeft = mGLDraw.getLeftFilter();
-        float[] mRight = mGLDraw.getRightFilter();
+        float[] mLeft = mProcessGL.getLeftFilter();
+        float[] mRight = mProcessGL.getRightFilter();
 
         GLES20.glUseProgram(mProgram);
 
@@ -64,12 +64,12 @@ public class DefaultShader extends Shader {
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
         if(mType == Shader.STRING) {
-        	mGLDraw.mStringLoader.mStringTextureCoords.position(0);
-            GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringTextureCoords);
+        	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
+            GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
             GLES20.glEnableVertexAttribArray(mTextureHandle);
 
-            mGLDraw.mStringLoader.mStringVertices.position(0);
-            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringVertices);
+            mProcessGL.mStringLoader.mStringVertices.position(0);
+            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringVertices);
             GLES20.glEnableVertexAttribArray(mPositionHandle);
         } else {
             mElementInfo.mSTextureCoords.position(0);
@@ -82,7 +82,7 @@ public class DefaultShader extends Shader {
         }
 
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
-        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
         GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
         GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
 
@@ -106,9 +106,9 @@ public class DefaultShader extends Shader {
                     GLES20.glUniform1f(mStringBKHandle, 1);
                 }
 
-                GLES20.glUniform1f(mStringBKRHandle, mGLDraw.mScript.ColorRed());
-                GLES20.glUniform1f(mStringBKGHandle, mGLDraw.mScript.ColorGreen());
-                GLES20.glUniform1f(mStringBKBHandle, mGLDraw.mScript.ColorBlue());
+                GLES20.glUniform1f(mStringBKRHandle, mProcessGL.mScript.ColorRed());
+                GLES20.glUniform1f(mStringBKGHandle, mProcessGL.mScript.ColorGreen());
+                GLES20.glUniform1f(mStringBKBHandle, mProcessGL.mScript.ColorBlue());
             } else if(SType == StringLoader.STRING_FADE || SType == StringLoader.STRING_FADE_LIGHT) {
                 GLES20.glUniform1f(mStringBKHandle, 4);
             } else {
@@ -116,7 +116,7 @@ public class DefaultShader extends Shader {
             }
             Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         } else {
-            GLES20.glUniform1f(mThemeHandle, mGLDraw.getScriptFilter());
+            GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
             GLES20.glUniform1f(mStringBKHandle, 0);
             Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         }

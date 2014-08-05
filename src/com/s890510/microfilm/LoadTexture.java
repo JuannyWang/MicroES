@@ -11,12 +11,12 @@ import android.util.Log;
 
 public class LoadTexture {
     private String TAG = "LoadTexture";
-    private MicroFilmActivity mActivity;
+    private MicroMovieActivity mActivity;
     private int[] textureHandle = null;
     private int width;
     private int height;
 
-    public LoadTexture(MicroFilmActivity activity) {
+    public LoadTexture(MicroMovieActivity activity) {
         mActivity = activity;
         width = mActivity.mVisioWidth;
         height = mActivity.mVisioHeight;

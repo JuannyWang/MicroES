@@ -20,11 +20,11 @@ public class GeoInfo {
     private final Handler mHandler;
     private boolean mHAddress = false;
     private Context mContext;
-    private MicroFilmActivity mActivity;
+    private MicroMovieActivity mActivity;
     private Future<Address> mAddressLookupJob;
     private ArrayList<String> mLocation;
 
-    public GeoInfo(Context context, MicroFilmActivity activity, double[] latlng) {
+    public GeoInfo(Context context, MicroMovieActivity activity, double[] latlng) {
         mHandler = new Handler(Looper.getMainLooper());
         mContext = context;
         mlatlng = latlng;
@@ -106,7 +106,7 @@ public class GeoInfo {
 
         @Override
         public Address run(JobContext jc) {
-            MicroFilmGeocoder geocoder = new MicroFilmGeocoder(mContext.getApplicationContext());
+            MicroMovieGeocoder geocoder = new MicroMovieGeocoder(mContext.getApplicationContext());
             return geocoder.lookupAddress(mLatlng[0], mLatlng[1], true);
         }
     }

@@ -1,12 +1,12 @@
 package com.s890510.microfilm.shader;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 
 public class SingleShader {
     private static final String TAG = "SingleShader";
-    private MicroFilmActivity mActivity;
+    private MicroMovieActivity mActivity;
 
     private DefaultShader mDefaultShader;
     private CoverShader mCoverShader;
@@ -15,21 +15,21 @@ public class SingleShader {
     private RotateShader mRotateShader;
     private LineShader mLineShader;
     private PhotoShader mPhotoShader;
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public SingleShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public SingleShader(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
     }
 
     public void initSingleShader() {
-        mDefaultShader = new DefaultShader(mActivity, mGLDraw);
-        mCoverShader = new CoverShader(mActivity, mGLDraw);
-        mLatticeShader = new LatticeShader(mActivity, mGLDraw);
-        mMirrorShader = new MirrorShader(mActivity, mGLDraw);
-        mRotateShader = new RotateShader(mActivity, mGLDraw);
-        mLineShader = new LineShader(mActivity, mGLDraw);
-        mPhotoShader = new PhotoShader(mActivity, mGLDraw);
+        mDefaultShader = new DefaultShader(mActivity, mProcessGL);
+        mCoverShader = new CoverShader(mActivity, mProcessGL);
+        mLatticeShader = new LatticeShader(mActivity, mProcessGL);
+        mMirrorShader = new MirrorShader(mActivity, mProcessGL);
+        mRotateShader = new RotateShader(mActivity, mProcessGL);
+        mLineShader = new LineShader(mActivity, mProcessGL);
+        mPhotoShader = new PhotoShader(mActivity, mProcessGL);
     }
 
     public void DrawRandar(int ShaderMode, int mTextureId, ElementInfo mElementInfo,

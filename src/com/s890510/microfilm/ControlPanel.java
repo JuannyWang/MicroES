@@ -9,7 +9,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.s890510.microfilm.MicroFilmActivity.SaveCallback;
+import com.s890510.microfilm.MicroMovieActivity.SaveCallback;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Timer;
 
@@ -20,8 +20,8 @@ public class ControlPanel extends LinearLayout {
     private ImageButton mButton;
 
     private Context mContext;
-    private MicroFilmActivity mActivity;
-    private MicroFilmSurfaceView mMovieSurfaceView;
+    private MicroMovieActivity mActivity;
+    private MicroMovieSurfaceView mMovieSurfaceView;
     private TextView mElpaseTime, mElpaseTime_total;
 
     private final int SEEKBAR_UPDATE_INTERVAL = 100;
@@ -54,7 +54,7 @@ public class ControlPanel extends LinearLayout {
         super(context);
     }
 
-    public ControlPanel(MicroFilmActivity activity, MicroFilmSurfaceView videoView, LinearLayout control_panel) {
+    public ControlPanel(MicroMovieActivity activity, MicroMovieSurfaceView videoView, LinearLayout control_panel) {
         super(activity.getApplicationContext());
         mContext = activity.getApplicationContext();
         mActivity = activity;

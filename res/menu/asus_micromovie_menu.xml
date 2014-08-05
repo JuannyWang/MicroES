@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+    <item android:id="@+id/MicroMovie_refresh_button"
+          android:icon="@drawable/asus_micromovie_icon_shuffle"
+          android:title="@string/remix"
+          android:showAsAction="ifRoom" />
+    <item android:id="@+id/MicroMovie_save_button"
+          android:icon="@drawable/asus_micromovie_icon_save"
+          android:title="@string/photoeditor_dialog_title_save"
+          android:showAsAction="ifRoom" />
+</menu>

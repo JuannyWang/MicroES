@@ -2,7 +2,7 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.util.Easing;
 
 public class EffectTranslateOutToLeft extends BasicEffect
@@ -11,19 +11,19 @@ public class EffectTranslateOutToLeft extends BasicEffect
     private float scaleX = 0;
     private float[] mMVPMatrix = new float[16]; //the texture
     private int mUtil;
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public EffectTranslateOutToLeft(GLDraw gldraw) {
+    public EffectTranslateOutToLeft(ProcessGL processGL) {
         mDuration = DURATION;
         mSleep = DURATION;
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
     }
 
-    public EffectTranslateOutToLeft(GLDraw gldraw, int duration, int util) {
+    public EffectTranslateOutToLeft(ProcessGL processGL, int duration, int util) {
         mDuration = duration;
         mSleep = duration;
         mUtil = util;
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
     }
 
     @Override
@@ -34,7 +34,7 @@ public class EffectTranslateOutToLeft extends BasicEffect
     @Override
     public float[] getMVPMatrixByElapse(long elapse) {
         Matrix.setIdentityM(mMVPMatrix, 0);
-        scaleX = -Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, mGLDraw.ScreenRatio*2, mDuration);
+        scaleX = -Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, mProcessGL.ScreenRatio*2, mDuration);
         Matrix.translateM(mMVPMatrix, 0, scaleX, 0, 0);
         return mMVPMatrix;
     }

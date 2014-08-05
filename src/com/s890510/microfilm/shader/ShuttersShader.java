@@ -7,9 +7,9 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
@@ -34,18 +34,18 @@ public class ShuttersShader extends Shader {
     private float mYPos = 2.0f;
     private float mSize = 0.0f;
     
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public ShuttersShader(MicroFilmActivity activity, GLDraw gldraw) {
+    public ShuttersShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
     public void DrawRandar(float[] mViewMatrix, float[] mProjectionMatrix,
             ArrayList<Integer> mTextureId, ArrayList<ElementInfo> mElementInfo) {
 
-        if(mYPos > 0.0 && mElementInfo.size() > 1 && (!mActivity.checkPause() || mGLDraw.isEncode())) {
+        if(mYPos > 0.0 && mElementInfo.size() > 1 && (!mActivity.checkPause() || mProcessGL.isEncode())) {
             Effect mEffect = mElementInfo.get(0).effect;
             float percent = (float)(mEffect.getDuration() - mElementInfo.get(0).timer.getElapse()) / (mEffect.getDuration() - mEffect.getSleep());
             mYPos = percent*2.0f;

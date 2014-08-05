@@ -8,11 +8,9 @@ import java.util.ArrayList;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.asus.gallery.micromovie.StringLoader;
 import com.s890510.microfilm.FileInfo;
 import com.s890510.microfilm.MicroFilmActivity;
 import com.s890510.microfilm.script.Script;
-import com.s890510.microfilm.script.Script1;
 
 public class GLDraw {
 	public static final String TAG = "GLDraw";
@@ -48,7 +46,6 @@ public class GLDraw {
 
     public GLDraw(MicroFilmActivity activity, boolean isEncode) {
     	mActivity = activity;
-    	mScript = new Script1(mActivity, this);
     	mIsEncode = isEncode;
 	}
 

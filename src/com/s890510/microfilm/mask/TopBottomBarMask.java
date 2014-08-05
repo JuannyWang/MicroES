@@ -9,8 +9,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class TopBottomBarMask extends Mask {
@@ -25,11 +25,11 @@ public class TopBottomBarMask extends Mask {
     private FloatBuffer mTriangleVertices;
     private float[] mMVPMatrix = new float[16];
     private float[] mModelMatrix = new float[16];
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public TopBottomBarMask(MicroFilmActivity activity, GLDraw gldraw) {
+    public TopBottomBarMask(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -109,7 +109,7 @@ public class TopBottomBarMask extends Mask {
     }
 
     public void CalcVertices() {
-        float mRatio = mGLDraw.ScreenRatio;
+        float mRatio = mProcessGL.ScreenRatio;
         float mheight = 0.12f;
         final float[] mTriangleVerticesData = {
                 // X, Y, Z,
@@ -128,7 +128,7 @@ public class TopBottomBarMask extends Mask {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);

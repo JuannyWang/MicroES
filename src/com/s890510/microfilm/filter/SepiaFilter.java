@@ -2,11 +2,11 @@ package com.s890510.microfilm.filter;
 
 import android.opengl.GLES20;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 
 public class SepiaFilter extends DefaultFilter {
     
-    public SepiaFilter(MicroFilmActivity activity) {
+    public SepiaFilter(MicroMovieActivity activity) {
 		super(activity);
 	}
 

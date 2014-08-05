@@ -9,8 +9,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
-import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
@@ -25,11 +25,11 @@ public class FilterMask extends Mask {
     private float[] mMVPMatrix = new float[16];
 
     public FloatBuffer mVertices = null;
-    private GLDraw mGLDraw;
+    private ProcessGL mProcessGL;
 
-    public FilterMask(MicroFilmActivity activity, GLDraw gldraw) {
+    public FilterMask(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
-        mGLDraw = gldraw;
+        mProcessGL = processGL;
         CreateProgram();
     }
 
@@ -87,7 +87,7 @@ public class FilterMask extends Mask {
     }
 
     public void CalcVertices() {
-        float mRatio = mGLDraw.ScreenRatio;
+        float mRatio = mProcessGL.ScreenRatio;
         float[] mVerticesData = new float[]{
                 -mRatio, -1.0f, 0.0f,
                  mRatio, -1.0f, 0.0f,
@@ -96,7 +96,7 @@ public class FilterMask extends Mask {
         };
 
         mVertices = ByteBuffer.allocateDirect(
-                mVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+                mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
     }

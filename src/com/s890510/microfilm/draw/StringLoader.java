@@ -23,10 +23,11 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
 import com.s890510.microfilm.ElementInfo;
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
+import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.R;
-import com.s890510.microfilm.util.Easing;
 import com.s890510.microfilm.util.Typefaces;
+import com.s890510.microfilm.util.Easing;
 import com.s890510.microfilm.util.WeatherQuery;
 
 public class StringLoader {
@@ -39,8 +40,8 @@ public class StringLoader {
     private int LType = 0;
     public FloatBuffer mStringVertices;
     public FloatBuffer mStringTextureCoords;
-    private GLDraw mGLDraw;
-    private MicroFilmActivity mActivity;
+    private ProcessGL mProcessGL;
+    private MicroMovieActivity mActivity;
 
     public static int STRING_NONE                   = 0;
     public static int STRING_NOBK                   = 1;        //String Alpha = 1
@@ -76,10 +77,10 @@ public class StringLoader {
     public static int STRING_KIDS_ICON_A            = 31;
     public static int STRING_KIDS_ICON_B            = 32;
 
-    public StringLoader(MicroFilmActivity activity, GLDraw processGL) {
+    public StringLoader(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
         mContext = mActivity.getApplicationContext();
-        mGLDraw = processGL;
+        mProcessGL = processGL;
     }
 
     public boolean BindTexture(int mTextureId, ElementInfo mElementInfo) {
@@ -97,9 +98,9 @@ public class StringLoader {
                 return false;
             }
         } else if((mType == STRING_ANIM_CITY_BLUE || mType == STRING_ANIM_CITY_TRANS || mType == STRING_ANIM_CITY_BLACK) && mElementInfo.effect.getString() == null) {
-            if(mGLDraw.getFirstLocation() != null) {
+            if(mProcessGL.getFirstLocation() != null) {
                 string = new ArrayList<String>();
-                string.add(mGLDraw.getFirstLocation());
+                string.add(mProcessGL.getFirstLocation());
             } else {
                 string = new ArrayList<String>();
                 string.add("My Journey");
@@ -141,11 +142,11 @@ public class StringLoader {
             mString_Past = null;
         }
 
-        if(mBitmap == null || mCount != 0 || mGLDraw.mSpecialHash != mBitmap.hashCode() || !mString.equals(string) || LType != mType) {
+        if(mBitmap == null || mCount != 0 || mProcessGL.mSpecialHash != mBitmap.hashCode() || !mString.equals(string) || LType != mType) {
             mString = string;
             generateString(mElementInfo.effect.getDuration(timer), mElementInfo.timer.getElapse(),
                 mElementInfo.effect.getProgressByElapse(timer), mType, mCount, mElementInfo.effect.getTextSize(timer), mElementInfo);
-            mGLDraw.setSpecialHash(mBitmap.hashCode());
+            mProcessGL.setSpecialHash(mBitmap.hashCode());
         }
 
         //Bind Texture
@@ -159,10 +160,10 @@ public class StringLoader {
     }
 
     private void generateString(int duration, long elapse, float progress, int mType, int mCount, float mTextSize, ElementInfo mElementInfo) {
-        float mFontSize = (float)mGLDraw.ScreenWidth/1280.0f * mTextSize;
+        float mFontSize = (float)mProcessGL.ScreenWidth/1280.0f * mTextSize;
 
         if(mType == STRING_BK_SCALE) {
-            mFontSize = (float)mGLDraw.ScreenWidth/1280.0f * mTextSize * progress;
+            mFontSize = (float)mProcessGL.ScreenWidth/1280.0f * mTextSize * progress;
         }
 
         Paint mPaint=new Paint();
@@ -211,11 +212,11 @@ public class StringLoader {
             mtemp = null;
         }
 
-        int xPos = mGLDraw.ScreenWidth/2;
-        int yPos = (int)((mGLDraw.ScreenHeight/2) - ((mPaint.descent() + mPaint.ascent())/2) - ((mFontSize/mString.size())*(mString.size()-1)));
+        int xPos = mProcessGL.ScreenWidth/2;
+        int yPos = (int)((mProcessGL.ScreenHeight/2) - ((mPaint.descent() + mPaint.ascent())/2) - ((mFontSize/mString.size())*(mString.size()-1)));
 
-        if(mBitmap == null || (mGLDraw.ScreenWidth > 0 && mGLDraw.ScreenWidth != mBitmap.getWidth()) || (mGLDraw.ScreenHeight > 0 && mGLDraw.ScreenHeight != mBitmap.getHeight()))
-            mBitmap = Bitmap.createBitmap(mGLDraw.ScreenWidth, mGLDraw.ScreenHeight, Bitmap.Config.ARGB_8888);
+        if(mBitmap == null || (mProcessGL.ScreenWidth > 0 && mProcessGL.ScreenWidth != mBitmap.getWidth()) || (mProcessGL.ScreenHeight > 0 && mProcessGL.ScreenHeight != mBitmap.getHeight()))
+            mBitmap = Bitmap.createBitmap(mProcessGL.ScreenWidth, mProcessGL.ScreenHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvasTemp = new Canvas(mBitmap);
         if(mType == STRING_WHITE_NOBK || mType == STRING_WHITE_NOBK_GEO || mType == STRING_DATE_CITY || mType == STRING_YEAR_COUNTRY ||
@@ -231,7 +232,7 @@ public class StringLoader {
         } else if(mType == STRING_KIDS_END) {
             canvasTemp.drawARGB(255, 87, 184, 253);
         } else {
-            canvasTemp.drawARGB(255, (int)(mGLDraw.mScript.GetRed()), (int)(mGLDraw.mScript.GetGreen()), (int)(mGLDraw.mScript.GetBlue())); //Default White
+            canvasTemp.drawARGB(255, (int)(mProcessGL.mScript.GetRed()), (int)(mProcessGL.mScript.GetGreen()), (int)(mProcessGL.mScript.GetBlue())); //Default White
         }
 
         for(int length=0; length<mString.size(); length++) {
@@ -283,59 +284,59 @@ public class StringLoader {
                 canvasTemp.drawText(mString.get(length), xPos, yPos+(mFontSize*length), mPaint);
             } else if(mType == STRING_ANIM_TD) {
                 if(length == 0) {
-                    xPos = mGLDraw.ScreenWidth/2 - mTextWidth/2;
+                    xPos = mProcessGL.ScreenWidth/2 - mTextWidth/2;
                     mtemp = mString.get(length) + " ";
                 } else {
                     mPaint.getTextBounds(mtemp, 0, mtemp.length(), rect);
-                    xPos = (mGLDraw.ScreenWidth/2 - mTextWidth/2) + (rect.width());
+                    xPos = (mProcessGL.ScreenWidth/2 - mTextWidth/2) + (rect.width());
                     mtemp += mString.get(length) + " ";
                 }
 
-                yPos = (int)((mGLDraw.ScreenHeight/2) - ((mPaint.descent() + mPaint.ascent())/2));
+                yPos = (int)((mProcessGL.ScreenHeight/2) - ((mPaint.descent() + mPaint.ascent())/2));
 
                 if(progress < 0.15) {
                     yPos = (int) ((yPos + ((mPaint.descent() + mPaint.ascent()))) * (progress * (10/1.5)));
                     if(length != 0)
-                        yPos = mGLDraw.ScreenHeight - yPos - (int)(mPaint.descent() + mPaint.ascent());
+                        yPos = mProcessGL.ScreenHeight - yPos - (int)(mPaint.descent() + mPaint.ascent());
                 } else if(progress > 0.15 && progress < 0.85) {
                     yPos = (int) ((yPos + ((mPaint.descent() + mPaint.ascent()))) - (((mPaint.descent() + mPaint.ascent()) * 2) * ((progress - 0.15) * (10/7))));
                     if(length != 0)
-                        yPos = mGLDraw.ScreenHeight - yPos - (int)(mPaint.descent() + mPaint.ascent());
+                        yPos = mProcessGL.ScreenHeight - yPos - (int)(mPaint.descent() + mPaint.ascent());
                 } else if(progress > 0.85) {
                     int i = (int) (yPos - (mPaint.descent() + mPaint.ascent()));
-                    yPos = (int) (i + ((mGLDraw.ScreenHeight - i/2) * ((progress - 0.85) * (10/1.5))));
+                    yPos = (int) (i + ((mProcessGL.ScreenHeight - i/2) * ((progress - 0.85) * (10/1.5))));
                     if(length != 0)
-                        yPos = mGLDraw.ScreenHeight - yPos - (int)(mPaint.descent() + mPaint.ascent());
+                        yPos = mProcessGL.ScreenHeight - yPos - (int)(mPaint.descent() + mPaint.ascent());
                 }
 
                 mPaint.setARGB(255, 0, 0, 0);
                 canvasTemp.drawText(mString.get(length), xPos+(mFontSize*length), yPos, mPaint);
             } else if(mType == STRING_ANIM_LR) {
                 if(length == 0) {
-                    mPaint.setTextSize((float)mGLDraw.ScreenWidth/1280.0f * 70);
+                    mPaint.setTextSize((float)mProcessGL.ScreenWidth/1280.0f * 70);
                 } else {
-                    mPaint.setTextSize((float)mGLDraw.ScreenWidth/1280.0f * 62);
+                    mPaint.setTextSize((float)mProcessGL.ScreenWidth/1280.0f * 62);
                 }
                 mPaint.getTextBounds(mString.get(length), 0, mString.get(length).length(), rect);
                 mTextWidth = rect.width();
-                xPos = mGLDraw.ScreenWidth/2 - mTextWidth/2;
+                xPos = mProcessGL.ScreenWidth/2 - mTextWidth/2;
 
                 if(progress < 0.15) {
                     if(length == 0) {
-                        xPos = (int) ((xPos - mGLDraw.ScreenWidth*0.005f)* (progress * (10/1.5)));
+                        xPos = (int) ((xPos - mProcessGL.ScreenWidth*0.005f)* (progress * (10/1.5)));
                     } else {
-                        xPos = (int) (mGLDraw.ScreenWidth - (mGLDraw.ScreenWidth - (xPos+mGLDraw.ScreenWidth*0.005f)) * (progress * (10/1.5f)));
+                        xPos = (int) (mProcessGL.ScreenWidth - (mProcessGL.ScreenWidth - (xPos+mProcessGL.ScreenWidth*0.005f)) * (progress * (10/1.5f)));
                     }
                 } else if(progress > 0.15 && progress < 0.85) {
                     if(length == 0)
-                        xPos = (int) ((xPos - mGLDraw.ScreenWidth*0.005f) + (mGLDraw.ScreenWidth*0.01f*((progress - 0.15) * (10/7))));
+                        xPos = (int) ((xPos - mProcessGL.ScreenWidth*0.005f) + (mProcessGL.ScreenWidth*0.01f*((progress - 0.15) * (10/7))));
                     else
-                        xPos = (int) (xPos+mGLDraw.ScreenWidth*0.005f - (mGLDraw.ScreenWidth*0.01f)*((progress - 0.15) * (10/7)));
+                        xPos = (int) (xPos+mProcessGL.ScreenWidth*0.005f - (mProcessGL.ScreenWidth*0.01f)*((progress - 0.15) * (10/7)));
                 } else if(progress > 0.85) {
                     if(length == 0)
-                        xPos = (int) ((xPos + mGLDraw.ScreenWidth*0.005f) + ((mGLDraw.ScreenWidth-(xPos + mGLDraw.ScreenWidth*0.005f))*((progress - 0.85) * (10/1.5))));
+                        xPos = (int) ((xPos + mProcessGL.ScreenWidth*0.005f) + ((mProcessGL.ScreenWidth-(xPos + mProcessGL.ScreenWidth*0.005f))*((progress - 0.85) * (10/1.5))));
                     else
-                        xPos = (int) (xPos-mGLDraw.ScreenWidth*0.005f - (xPos-mGLDraw.ScreenWidth*0.005f)*((progress - 0.85) * (10/1.5)));
+                        xPos = (int) (xPos-mProcessGL.ScreenWidth*0.005f - (xPos-mProcessGL.ScreenWidth*0.005f)*((progress - 0.85) * (10/1.5)));
                 }
 
                 mPaint.setARGB(255, 0, 0, 0);
@@ -394,19 +395,19 @@ public class StringLoader {
                 mPaint_1.setColor(Color.WHITE);
                 mPaint_1.setStyle(Paint.Style.FILL);
 
-                int Wtotal = (int) (mGLDraw.ScreenWidth * 0.5f);
-                int WStart = (mGLDraw.ScreenWidth - Wtotal)/2;
+                int Wtotal = (int) (mProcessGL.ScreenWidth * 0.5f);
+                int WStart = (mProcessGL.ScreenWidth - Wtotal)/2;
 
-                int HTPos = (int) (mGLDraw.ScreenHeight * 0.395f);
-                int HBPos = mGLDraw.ScreenHeight - HTPos;
+                int HTPos = (int) (mProcessGL.ScreenHeight * 0.395f);
+                int HBPos = mProcessGL.ScreenHeight - HTPos;
                 float mElapse = progress*duration;
 
                 mPaint_1.setAlpha((int) (255*progress));
                 float temp = Easing.Easing(2, mElapse, 0, Wtotal, duration);
                 canvasTemp.drawRect(WStart, HTPos, WStart+temp, HTPos+mPaint.descent()/4, mPaint_1);
-                canvasTemp.drawRect(mGLDraw.ScreenWidth-WStart-temp, HBPos-mPaint.descent()/4, WStart+Wtotal, HBPos, mPaint_1);
+                canvasTemp.drawRect(mProcessGL.ScreenWidth-WStart-temp, HBPos-mPaint.descent()/4, WStart+Wtotal, HBPos, mPaint_1);
             } else if(mType == STRING_WHITE_NOBK_GEO) {
-                xPos = (int)((mGLDraw.ScreenWidth/2*(1-mElementInfo.effect.getTextureWidthScaleRatio())) + mTextWidth*3/5);
+                xPos = (int)((mProcessGL.ScreenWidth/2*(1-mElementInfo.effect.getTextureWidthScaleRatio())) + mTextWidth*3/5);
                 mPaint.setARGB(255, 255, 255, 255);
 
                 Paint mPaint_1=new Paint();
@@ -414,7 +415,7 @@ public class StringLoader {
                 mPaint_1.setStyle(Paint.Style.FILL);
 
                 //First we need to check text length
-                if(xPos+(mTextWidth)/2 > mGLDraw.ScreenWidth/3 && mString.size() > 1) {
+                if(xPos+(mTextWidth)/2 > mProcessGL.ScreenWidth/3 && mString.size() > 1) {
 
                     mPaint.getTextBounds(mString.get(0), 0, mString.get(0).length(), rect);
                     int a = rect.width();
@@ -425,7 +426,7 @@ public class StringLoader {
                     if(a > b) mTextWidth = a;
                     else mTextWidth = b;
 
-                    xPos = (int)((mGLDraw.ScreenWidth/2*(1-mElementInfo.effect.getTextureWidthScaleRatio())) + mTextWidth*3/5);
+                    xPos = (int)((mProcessGL.ScreenWidth/2*(1-mElementInfo.effect.getTextureWidthScaleRatio())) + mTextWidth*3/5);
 
                     canvasTemp.drawText(mString.get(0), xPos-(mTextWidth)/2, yPos+(mFontSize*length)-mPaint.descent()*1.5f, mPaint);
 
@@ -451,14 +452,14 @@ public class StringLoader {
                 if(mType == STRING_DATE_CITY_TRANS) {
                     //old one
                     if(mString_Past != null) {
-                        canvasTemp.drawText(mString_Past.get(length), mGLDraw.ScreenWidth*0.88f, mGLDraw.ScreenHeight*0.9f-tmp-(progress*mTextHeight*1.5f), mPaint);
-                        canvasTemp.drawRect(mGLDraw.ScreenWidth*0.88f-mTextWidth, mGLDraw.ScreenHeight*0.9f, mGLDraw.ScreenWidth*0.88f+mTextWidth*2, mGLDraw.ScreenHeight*0.9f-mTextHeight*2, mMask);
+                        canvasTemp.drawText(mString_Past.get(length), mProcessGL.ScreenWidth*0.88f, mProcessGL.ScreenHeight*0.9f-tmp-(progress*mTextHeight*1.5f), mPaint);
+                        canvasTemp.drawRect(mProcessGL.ScreenWidth*0.88f-mTextWidth, mProcessGL.ScreenHeight*0.9f, mProcessGL.ScreenWidth*0.88f+mTextWidth*2, mProcessGL.ScreenHeight*0.9f-mTextHeight*2, mMask);
                     }
                     //new one
-                    canvasTemp.drawText(mString.get(length), mGLDraw.ScreenWidth*0.88f, mGLDraw.ScreenHeight*0.9f-tmp+((1-progress)*mTextHeight*1.5f), mPaint);
-                    canvasTemp.drawRect(mGLDraw.ScreenWidth*0.88f-mTextWidth, mGLDraw.ScreenHeight*0.9f-tmp, mGLDraw.ScreenWidth*0.88f+mTextWidth*2, mGLDraw.ScreenHeight*0.9f-tmp+mTextHeight*2, mMask);
+                    canvasTemp.drawText(mString.get(length), mProcessGL.ScreenWidth*0.88f, mProcessGL.ScreenHeight*0.9f-tmp+((1-progress)*mTextHeight*1.5f), mPaint);
+                    canvasTemp.drawRect(mProcessGL.ScreenWidth*0.88f-mTextWidth, mProcessGL.ScreenHeight*0.9f-tmp, mProcessGL.ScreenWidth*0.88f+mTextWidth*2, mProcessGL.ScreenHeight*0.9f-tmp+mTextHeight*2, mMask);
                 } else if(mType == STRING_DATE_CITY) {
-                    canvasTemp.drawText(mString.get(length), mGLDraw.ScreenWidth*0.88f, mGLDraw.ScreenHeight*0.9f-tmp, mPaint);
+                    canvasTemp.drawText(mString.get(length), mProcessGL.ScreenWidth*0.88f, mProcessGL.ScreenHeight*0.9f-tmp, mPaint);
                 }
 
 
@@ -466,12 +467,12 @@ public class StringLoader {
                 Paint mLinePaint = new Paint();
                 mLinePaint.setARGB(255, 50, 50, 50);
                 mLinePaint.setStyle(Paint.Style.FILL);
-                int totalLine = (int) (mGLDraw.ScreenWidth * 0.66f);
-                float LineHeight = (float)(mGLDraw.ScreenHeight/720.0);
+                int totalLine = (int) (mProcessGL.ScreenWidth * 0.66f);
+                float LineHeight = (float)(mProcessGL.ScreenHeight/720.0);
                 if(LineHeight < 0.5f) LineHeight = 0.5f;
 
-                canvasTemp.drawRect(mGLDraw.ScreenWidth * 0.17f, mGLDraw.ScreenHeight/2-LineHeight, mGLDraw.ScreenWidth * 0.17f + totalLine*progress,
-                		mGLDraw.ScreenHeight/2+LineHeight, mLinePaint);
+                canvasTemp.drawRect(mProcessGL.ScreenWidth * 0.17f, mProcessGL.ScreenHeight/2-LineHeight, mProcessGL.ScreenWidth * 0.17f + totalLine*progress,
+                		mProcessGL.ScreenHeight/2+LineHeight, mLinePaint);
             } else if(mType == STRING_WHITE_NOBK_LOVER) {
                 if(progress <= 0.4) {
                     mPaint.setARGB((int) Math.floor(255*(progress*10/4)), 255, 255, 255);
@@ -490,10 +491,10 @@ public class StringLoader {
                 mPaint_1.setStyle(Paint.Style.FILL);
 
                 int Wtotal = (int) (mTextWidth * 1.4);
-                int WStart = (int) (mGLDraw.ScreenWidth/2 - Wtotal/2);
+                int WStart = (int) (mProcessGL.ScreenWidth/2 - Wtotal/2);
 
                 int Htotal = (int) (mTextHeight * 1.4);
-                int HStart = (int) (mGLDraw.ScreenHeight/2 - Htotal/2);
+                int HStart = (int) (mProcessGL.ScreenHeight/2 - Htotal/2);
 
                 float LineWidth = mPaint.descent()/4;
 
@@ -522,17 +523,17 @@ public class StringLoader {
                     canvasTemp.drawRect(WStart, HStart, WStart+LineWidth, HStart+Htotal, mPaint_1);
                 }
             } else if(mType == STRING_DATE_LOVER) {
-                float mPosX = mGLDraw.ScreenWidth*mElementInfo.effect.getTextureWidthScaleRatio();
-                float mPosY = mGLDraw.ScreenHeight*mElementInfo.effect.getTextureHightScaleRatio();
+                float mPosX = mProcessGL.ScreenWidth*mElementInfo.effect.getTextureWidthScaleRatio();
+                float mPosY = mProcessGL.ScreenHeight*mElementInfo.effect.getTextureHightScaleRatio();
 
                 mPaint.setARGB(255, 0, 0, 0);
                 canvasTemp.drawText(mString.get(length), mPosX, mPosY, mPaint);
             } else if(mType == STRING_KIDS_ICON_A || mType == STRING_KIDS_ICON_B) {
 
                 //Date
-                float tmp = mGLDraw.ScreenHeight*0.5f;
-                float mTextPosY = mGLDraw.ScreenHeight*0.75f-mPaint.descent();
-                float mDPosX = mGLDraw.ScreenWidth*0.265f - mTextWidth/2;
+                float tmp = mProcessGL.ScreenHeight*0.5f;
+                float mTextPosY = mProcessGL.ScreenHeight*0.75f-mPaint.descent();
+                float mDPosX = mProcessGL.ScreenWidth*0.265f - mTextWidth/2;
                 float mDPosY = 0;
 
                 if(progress < 0.15f) {
@@ -552,7 +553,7 @@ public class StringLoader {
 
                 Paint mWeatherPaint = new Paint();
                 WeatherQuery mWeather = new WeatherQuery();
-                float mBitmapPosY = mGLDraw.ScreenHeight*0.25f;
+                float mBitmapPosY = mProcessGL.ScreenHeight*0.25f;
                 float mBPosY = 0;
 
                 if(progress < 0.15f) {
@@ -565,7 +566,7 @@ public class StringLoader {
 
                 if(mWeather.queryWeather(mContext, String.valueOf(mElementInfo.mDate))) {
                     Bitmap bmp = BitmapFactory.decodeResource(mContext.getResources(), mWeather.getWeatherResId(mWeather.getWeatherCode()));
-                    float scale = (((float)mGLDraw.ScreenHeight/720f)*270f)/bmp.getHeight();
+                    float scale = (((float)mProcessGL.ScreenHeight/720f)*270f)/bmp.getHeight();
 
                     Matrix matrix = new Matrix();
                     matrix.postScale(scale, scale);
@@ -575,7 +576,7 @@ public class StringLoader {
 
                     bmp = Bitmap.createBitmap(bmp, 0, 0, bwidth, bheight, matrix, true);
 
-                    canvasTemp.drawBitmap(bmp, mGLDraw.ScreenWidth*0.16f, mBPosY, mWeatherPaint);
+                    canvasTemp.drawBitmap(bmp, mProcessGL.ScreenWidth*0.16f, mBPosY, mWeatherPaint);
                 } else {
                     Bitmap bmp;
                     if(mType == STRING_KIDS_ICON_A) {
@@ -584,7 +585,7 @@ public class StringLoader {
                         bmp = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.asus_micromovie_icon_kids_b);
                     }
 
-                    float scale = (((float)mGLDraw.ScreenHeight/720f)*270f)/bmp.getHeight();
+                    float scale = (((float)mProcessGL.ScreenHeight/720f)*270f)/bmp.getHeight();
 
                     Matrix matrix = new Matrix();
                     matrix.postScale(scale, scale);
@@ -594,7 +595,7 @@ public class StringLoader {
 
                     bmp = Bitmap.createBitmap(bmp, 0, 0, bwidth, bheight, matrix, true);
 
-                    canvasTemp.drawBitmap(bmp, mGLDraw.ScreenWidth*0.165f, mBPosY, mWeatherPaint);
+                    canvasTemp.drawBitmap(bmp, mProcessGL.ScreenWidth*0.165f, mBPosY, mWeatherPaint);
                 }
             } else {
                 if(mType == STRING_WHITE || mType == STRING_WHITE_NOBK || mType == STRING_KIDS_END) {
@@ -616,16 +617,16 @@ public class StringLoader {
                         mPaint.getTextBounds(mString.get(0), 0, mString.get(0).length(), rect);
                         int a = rect.width();
                         if(length == 0)
-                            xPos = (int) (mGLDraw.ScreenWidth*0.48f - a*2/3);
+                            xPos = (int) (mProcessGL.ScreenWidth*0.48f - a*2/3);
                         else
-                            xPos = (int) (mGLDraw.ScreenWidth*0.48f - a/4);
+                            xPos = (int) (mProcessGL.ScreenWidth*0.48f - a/4);
                     } else {
                         mPaint.getTextBounds(mString.get(length), 0, mString.get(length).length(), rect);
                         int a = rect.width();
-                        xPos = (int) (mGLDraw.ScreenWidth*0.48f + a*2/3);
+                        xPos = (int) (mProcessGL.ScreenWidth*0.48f + a*2/3);
                     }
 
-                    yPos = (int)((mGLDraw.ScreenHeight*0.4) - ((mPaint.descent() + mPaint.ascent())/2) - ((mFontSize/mString.size())*(mString.size()-1)));
+                    yPos = (int)((mProcessGL.ScreenHeight*0.4) - ((mPaint.descent() + mPaint.ascent())/2) - ((mFontSize/mString.size())*(mString.size()-1)));
 
                 } else if(mType == STRING_BLUE) {
                     mPaint.setARGB(255, 129, 200, 249);
@@ -638,7 +639,7 @@ public class StringLoader {
     }
 
     public void StringVertex() {
-        float mRatio = mGLDraw.ScreenRatio;
+        float mRatio = mProcessGL.ScreenRatio;
         float[] mVerticesData = new float[]{
                 -mRatio, -1.0f, 0.0f,
                  mRatio, -1.0f, 0.0f,
@@ -654,12 +655,12 @@ public class StringLoader {
         };
 
         mStringVertices = ByteBuffer.allocateDirect(
-                mVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
+                mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mStringVertices.put(mVerticesData).position(0);
 
         mStringTextureCoords = ByteBuffer.allocateDirect(
-                mTextCoordsData.length * GLDraw.FLOAT_SIZE_BYTES)
+                mTextCoordsData.length * ProcessGL.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mStringTextureCoords.put(mTextCoordsData).position(0);
     }

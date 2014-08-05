@@ -1,10 +1,10 @@
 package com.s890510.microfilm.filter;
 
-import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MicroMovieActivity;
 
 public class GrayFilter extends DefaultFilter {
 
-    public GrayFilter(MicroFilmActivity activity) {
+    public GrayFilter(MicroMovieActivity activity) {
 		super(activity);
 	}
 

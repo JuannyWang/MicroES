@@ -5,10 +5,9 @@ import java.util.Random;
 
 import android.util.Log;
 
-import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.script.Script;
 
-public class MicroFilmOrder {
+public class MicroMovieOrder {
     private static String TAG = "MicroMovieOrder";
     private int[][] mOrderList = new int[ThemeAdapter.TYPE_Count][];
     private float[][] mCenterX = new float[ThemeAdapter.TYPE_Count][];
@@ -17,7 +16,7 @@ public class MicroFilmOrder {
     private final int mRange = 3;
     private final int mSpacing = (mRange * 2) + 1;
 
-    public MicroFilmOrder(MicroFilmActivity activity) {
+    public MicroMovieOrder(MicroMovieActivity activity) {
         Reset();
     }
 
@@ -69,7 +68,7 @@ public class MicroFilmOrder {
         mCenterY[i] = y;
     }
 
-    public ArrayList<ElementInfo> gettimeandorder(GLDraw gldraw, ArrayList<FileInfo> FileInfo, Script mScript, boolean IsShuffle) {
+    public ArrayList<ElementInfo> gettimeandorder(ProcessGL processGL, ArrayList<FileInfo> FileInfo, Script mScript, boolean IsShuffle) {
         ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
         ArrayList<Integer> mFileBucket = new ArrayList<Integer>();
         ArrayList<Integer> mRandomBucket = new ArrayList<Integer>();
@@ -150,14 +149,14 @@ public class MicroFilmOrder {
             FileInfo info = null;
 
             if(mScript.CheckNoItem(i)) {
-                eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_BITMAP;
-                eInfo.height = gldraw.ScreenHeight;
-                eInfo.width = gldraw.ScreenWidth;
+                eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
+                eInfo.height = processGL.ScreenHeight;
+                eInfo.width = processGL.ScreenWidth;
                 mOrder[i] = -1;
             } else if(!mScript.CheckInCount(i)) {
                 //Random and push in...
                 info = FileInfo.get(mRandom.nextInt(FileInfo.size()));
-                eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_BITMAP;
+                eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
                 eInfo.height = info.mBHeight;
                 eInfo.width = info.mBWidth;
                 eInfo.mFaceCount = info.mFaceCount;
@@ -251,10 +250,10 @@ public class MicroFilmOrder {
                     mSpaceBucket.add(info.CountId);
                 }
 
-                if(info.Type == MicroFilmSurfaceView.INFO_TYPE_VIDEO) {
+                if(info.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
                     //First, Continuous, Last can't be Video
                     if((i == 0 || mPastVideo || mEffectCount == i+1)) {
-                        eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_BITMAP;
+                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
 
                         //Get the fake fileinfo
                         FileInfo Finfo = FileInfo.get(info.VId.get(info.Count)[1]);
@@ -272,15 +271,15 @@ public class MicroFilmOrder {
 
                         mPastVideo = false;
                     } else {
-                        eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_VIDEO;
+                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_VIDEO;
                         eInfo.TextureId = info.TextureId;
                         eInfo.Videopart = ElementCount[info.CountId];
                         eInfo.InfoId = info.CountId;
                         eInfo.mDate = info.mDate;
                         mPastVideo = true;
                     }
-                } else if(info.Type == MicroFilmSurfaceView.INFO_TYPE_BITMAP) {
-                    eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_BITMAP;
+                } else if(info.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+                    eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
                     eInfo.height = info.mBHeight;
                     eInfo.width = info.mBWidth;
                     eInfo.mFaceCount = info.mFaceCount;
@@ -327,8 +326,8 @@ public class MicroFilmOrder {
             for(int j=0; j < FileInfo.size();j++){
                 if(FileInfo.get(j).CountId == infoId){
                     FileInfo tmp = FileInfo.get(j);
-                    if(tmp.Type == MicroFilmSurfaceView.INFO_TYPE_BITMAP){
-                        if(oldEInfo.Type == MicroFilmSurfaceView.INFO_TYPE_BITMAP){
+                    if(tmp.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP){
+                        if(oldEInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP){
 
                             eInfo.height = tmp.mBHeight;
                             eInfo.width = tmp.mBWidth;
@@ -337,15 +336,15 @@ public class MicroFilmOrder {
                                 eInfo.mLocation = tmp.mGeoInfo.getLocation();
                         }
 
-                        eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_BITMAP;
+                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
                         eInfo.mFaceCount = tmp.mFaceCount;
                         eInfo.mFBorder = tmp.mFBorder;
                         eInfo.InfoId = tmp.CountId;
                         eInfo.mDate = tmp.mDate;
                         eInfo.mFaceRect = tmp.mFaceRect;
 
-                    }else if(tmp.Type == MicroFilmSurfaceView.INFO_TYPE_VIDEO){
-                        eInfo.Type = MicroFilmSurfaceView.INFO_TYPE_VIDEO;
+                    }else if(tmp.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO){
+                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_VIDEO;
                         eInfo.TextureId = tmp.TextureId;
                         eInfo.Videopart = oldEInfo.Videopart;
                         eInfo.InfoId = tmp.CountId;
