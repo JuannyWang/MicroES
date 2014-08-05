@@ -6,11 +6,11 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 
 public class OldfilmShader extends Shader {
     private static final String TAG = "OldfilmShader";
@@ -39,11 +39,11 @@ public class OldfilmShader extends Shader {
     private float mRandomVaule;
     private Random mRandom = new Random();
     
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public OldfilmShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public OldfilmShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -65,7 +65,7 @@ public class OldfilmShader extends Shader {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         GLES20.glUniform1f(mAlphaHandle, mAlpha);
-        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
 
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
@@ -90,12 +90,12 @@ public class OldfilmShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("OldfilmShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;

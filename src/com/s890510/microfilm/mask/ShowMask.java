@@ -1,29 +1,29 @@
 package com.s890510.microfilm.mask;
 
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
 
 public class ShowMask {
     private final String TAG = "ShowMask";
-    private MicroMovieActivity mActivity;
+    private MicroFilmActivity mActivity;
 
     private SquareBorderMask mSquareBorderMask;
     private CircleBorderMask mCircleBorderMask;
     private TopBottomBarMask mTopBottomBarMask;
     private FilterMask mFilterMask;
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public ShowMask(MicroMovieActivity activity, ProcessGL processGL) {
+    public ShowMask(MicroFilmActivity activity, GLDraw gldraw) {
         mActivity = activity;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
     public void initMask() {
-        mSquareBorderMask = new SquareBorderMask(mActivity, mProcessGL);
-        mCircleBorderMask = new CircleBorderMask(mActivity, mProcessGL);
-        mTopBottomBarMask = new TopBottomBarMask(mActivity, mProcessGL);
-        mFilterMask = new FilterMask(mActivity, mProcessGL);
+        mSquareBorderMask = new SquareBorderMask(mActivity, mGLDraw);
+        mCircleBorderMask = new CircleBorderMask(mActivity, mGLDraw);
+        mTopBottomBarMask = new TopBottomBarMask(mActivity, mGLDraw);
+        mFilterMask = new FilterMask(mActivity, mGLDraw);
     }
 
     public void CalcVertices() {

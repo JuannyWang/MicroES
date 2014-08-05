@@ -3,8 +3,8 @@ package com.s890510.microfilm.mask;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.RawReader;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLUtil;
 
 public abstract class Mask {
     private static final String TAG = "Mask";
@@ -28,11 +28,11 @@ public abstract class Mask {
     public static final int TRANS_OUT_FULL  = 8;
     public static final int GONE            = 9;
 
-    protected MicroMovieActivity mActivity;
+    protected MicroFilmActivity mActivity;
 
     abstract public void Reset();
 
-    public Mask(MicroMovieActivity activity){
+    public Mask(MicroFilmActivity activity){
         mActivity = activity;
     }
 
@@ -45,6 +45,6 @@ public abstract class Mask {
     }
 
     protected String getShaderRaw(final int ResourcesId) {
-        return RawReader.readTextFileFromRawResource(mActivity.getApplicationContext(), ResourcesId);
+        return GLUtil.readTextFileFromRawResource(mActivity.getApplicationContext(), ResourcesId);
     }
 }

@@ -1,7 +1,8 @@
 package com.s890510.microfilm.script;
 
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
+
 
 public class Timer {
     private static String TAG = "Timer";
@@ -9,15 +10,15 @@ public class Timer {
     private long mTotal;
     private long mElpaseOffset = 0;
     private long mSystemTime = 0;
-    private MicroMovieActivity mActivity;
+    private MicroFilmActivity mActivity;
 
     private long mElapseForEncode = 0;
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public Timer(long total, MicroMovieActivity activity, ProcessGL processGL) {
+    public Timer(long total, MicroFilmActivity activity, GLDraw processGL) {
         mActivity = activity;
         mTotal =  total;
-        mProcessGL = processGL;
+        mGLDraw = processGL;
         resetTimer();
     }
 
@@ -37,12 +38,12 @@ public class Timer {
     }
 
     public long getElapse() {
-        if(mProcessGL.isEncode()){     	
+        if(mGLDraw.isEncode()){     	
             return mElapseForEncode;
         } else if(mActivity.checkPause()) {
             mSystemTime = System.currentTimeMillis();
             return mSystemTime - mStartTime + mElpaseOffset;
-        } else if(mProcessGL.getVideoWait()) {      	
+        } else if(mGLDraw.getVideoWait()) {      	
             return mTotal;
         } else {
             mSystemTime = System.currentTimeMillis();

@@ -13,12 +13,12 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
+import com.s890510.microfilm.util.Easing;
 
 public class CircleBorderMask extends Mask {
     private static final String TAG = "CircleBorderMask";
@@ -36,11 +36,11 @@ public class CircleBorderMask extends Mask {
     private int LType;
 
     private int mTextureHandle;
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public CircleBorderMask(MicroMovieActivity activity, ProcessGL processGL) {
+    public CircleBorderMask(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -97,12 +97,12 @@ public class CircleBorderMask extends Mask {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("BorderMask");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
@@ -118,7 +118,7 @@ public class CircleBorderMask extends Mask {
     }
 
     public void CalcVertices() {
-        float mRatio = mProcessGL.ScreenRatio;
+        float mRatio = mGLDraw.ScreenRatio;
         final float[] mTriangleVerticesData = {
                 // X, Y, Z, U, V
                 -mRatio, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -128,7 +128,7 @@ public class CircleBorderMask extends Mask {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);
@@ -138,7 +138,7 @@ public class CircleBorderMask extends Mask {
     private void generateMask(float progress, float elapse, float duration, boolean transition, int mMask) {
 
         if(mBitmap == null)
-            mBitmap = Bitmap.createBitmap(mProcessGL.ScreenWidth, mProcessGL.ScreenHeight, Bitmap.Config.ARGB_8888);
+            mBitmap = Bitmap.createBitmap(mGLDraw.ScreenWidth, mGLDraw.ScreenHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvasTemp = new Canvas(mBitmap);
         canvasTemp.drawARGB(255, 255, 255, 255);
@@ -149,24 +149,24 @@ public class CircleBorderMask extends Mask {
 
         float radius;
         if(mMask == TRANS_IN_SMALL) {
-            radius = mProcessGL.ScreenHeight/2*Util.easeInOutBack(elapse, 0.0f, 0.8f, duration);
+            radius = mGLDraw.ScreenHeight/2*Easing.easeInOutBack(elapse, 0.0f, 0.8f, duration);
         } else if(mMask == TRANS_IN_BIG) {
-            radius = mProcessGL.ScreenHeight/2*(mProcessGL.ScreenRatio - Util.easeOutExpo(elapse, 0.0f, mProcessGL.ScreenRatio, duration));
+            radius = mGLDraw.ScreenHeight/2*(mGLDraw.ScreenRatio - Easing.easeOutExpo(elapse, 0.0f, mGLDraw.ScreenRatio, duration));
         } else if(mMask == TRANS_OUT) {
-            radius = mProcessGL.ScreenHeight/2*Util.easeInExpo(elapse, 0.8f, mProcessGL.ScreenRatio, duration);
+            radius = mGLDraw.ScreenHeight/2*Easing.easeInExpo(elapse, 0.8f, mGLDraw.ScreenRatio, duration);
         } else if(mMask == TRANS_OUT_FULL) {
-            radius = mProcessGL.ScreenHeight/2*Util.easeInExpo(elapse, 0.0f, mProcessGL.ScreenRatio, duration);
+            radius = mGLDraw.ScreenHeight/2*Easing.easeInExpo(elapse, 0.0f, mGLDraw.ScreenRatio, duration);
         } else if(mMask == TRANS_OUT_BACK) {
             if(progress < 0.2) {
-                radius = mProcessGL.ScreenHeight/2*(0.8f-Util.easeInExpo((progress*10/2)*duration, 0.0f, 0.1f, duration));
+                radius = mGLDraw.ScreenHeight/2*(0.8f-Easing.easeInExpo((progress*10/2)*duration, 0.0f, 0.1f, duration));
             } else {
-                radius = mProcessGL.ScreenHeight/2*Util.easeInExpo(((progress-0.2f)*10/8)*duration, 0.7f, mProcessGL.ScreenRatio, duration);
+                radius = mGLDraw.ScreenHeight/2*Easing.easeInExpo(((progress-0.2f)*10/8)*duration, 0.7f, mGLDraw.ScreenRatio, duration);
             }
         } else {
-            radius = mProcessGL.ScreenHeight/2*0.8f;
+            radius = mGLDraw.ScreenHeight/2*0.8f;
         }
 
-        canvasTemp.drawCircle(mProcessGL.ScreenWidth/2, mProcessGL.ScreenHeight/2, radius, mPaint);
+        canvasTemp.drawCircle(mGLDraw.ScreenWidth/2, mGLDraw.ScreenHeight/2, radius, mPaint);
 
         LType = mMask;
     }

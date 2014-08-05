@@ -8,11 +8,11 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class RotateShader extends Shader {
@@ -31,13 +31,13 @@ public class RotateShader extends Shader {
     private int mRightFilterHandle;
     private FloatBuffer mCircleVertices;
     private float[] mMVPMatrix = new float[16];
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
     private int vCount = 3 * 72;
 
-    public RotateShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public RotateShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
         Vertices();
     }
@@ -58,8 +58,8 @@ public class RotateShader extends Shader {
         float elapse = progress*duration;
         boolean trans = mEffect.getTransition(mElapseTime);
 
-        float[] mLeft = mProcessGL.getLeftFilter();
-        float[] mRight = mProcessGL.getRightFilter();
+        float[] mLeft = mGLDraw.getLeftFilter();
+        float[] mRight = mGLDraw.getRightFilter();
 
         GLES20.glUseProgram(mProgram);
 
@@ -76,8 +76,8 @@ public class RotateShader extends Shader {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
-        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
-        GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
+        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
+        GLES20.glUniform1f(mThemeHandle, mGLDraw.getScriptFilter());
         GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
         GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
 
@@ -97,12 +97,12 @@ public class RotateShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("DefaultShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
@@ -153,7 +153,7 @@ public class RotateShader extends Shader {
         }
 
         mCircleVertices = ByteBuffer.allocateDirect(
-                vertices.length * ProcessGL.FLOAT_SIZE_BYTES)
+                vertices.length * GLDraw.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mCircleVertices.put(vertices).position(0);
     }

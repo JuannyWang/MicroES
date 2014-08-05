@@ -15,12 +15,10 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
-import com.asus.gallery.face.FaceUtils;
-import com.asus.gallery.provider.FaceImageMap;
-import com.asus.gallery.util.Future;
-import com.asus.gallery.util.FutureListener;
-import com.asus.gallery.util.ThreadPool.Job;
-import com.asus.gallery.util.ThreadPool.JobContext;
+import com.s890510.microfilm.util.Future;
+import com.s890510.microfilm.util.FutureListener;
+import com.s890510.microfilm.util.ThreadPool.Job;
+import com.s890510.microfilm.util.ThreadPool.JobContext;
 
 public class FileInfo {
     private static final String TAG = "FileInfo";
@@ -61,7 +59,7 @@ public class FileInfo {
     private final Handler mHandler;
     private final int MAX_FACES = 10;
 
-    public FileInfo(MicroMovieActivity activity) {
+    public FileInfo(MicroFilmActivity activity) {
         mHandler = new Handler(Looper.getMainLooper());
         mActivity = activity;
     }
@@ -106,6 +104,7 @@ public class FileInfo {
 
         }
 
+        /*
         private void getFaceInfo(Cursor mFaceCursor, Bitmap bitmap) {
             float[] tmp = new float[2];
             int index = mFaceCursor.getColumnIndex(FaceImageMap.COLUMN_TOP);
@@ -182,8 +181,10 @@ public class FileInfo {
 
             mFaceRect.add(new long[]{left, right, top, bottom});
         }
+        */
 
         private void LoadFaceInfo(Bitmap bitmap) {
+        	/*
             if(!mActivity.getEPhotoApp().getEPhotoStampManager().isNeedDetectedByPath(com.asus.gallery.data.Path.fromString(PathString)) && FaceUtils.IsSoFileExist()) {
                 Cursor mFaceCursor = null;
                 try{
@@ -212,6 +213,7 @@ public class FileInfo {
                         mFaceCursor.close();
                 }
             } else { //We use google face detect api
+            */
                 try {
                     Class.forName("android.media.FaceDetector");
                     boolean IsLarge = (bitmap.getHeight() > 640 || bitmap.getWidth() > 640) ? true : false;
@@ -280,7 +282,7 @@ public class FileInfo {
                 } catch (ClassNotFoundException e) {
                     e.printStackTrace();
                 }
-            }
+            //}
         }
 
         @Override

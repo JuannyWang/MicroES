@@ -10,6 +10,8 @@ import android.util.Log;
 
 import com.s890510.microfilm.ElementInfo;
 import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 
 public class BackgroundShader extends Shader {
     private static final String TAG = "BackgroundShader";
@@ -24,11 +26,11 @@ public class BackgroundShader extends Shader {
 
     private FloatBuffer mVertices = null;
     
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public BackgroundShader(MicroFilmActivity activity, ProcessGL processGL) {
+    public BackgroundShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -57,12 +59,12 @@ public class BackgroundShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("BackgroundShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
@@ -98,7 +100,7 @@ public class BackgroundShader extends Shader {
     }
 
     public void CalcVertices() {
-        float mRatio = mProcessGL.ScreenRatio;
+        float mRatio = mGLDraw.ScreenRatio;
         float[] mVerticesData = new float[]{
                 -mRatio, -1.0f, 0.0f,
                  mRatio, -1.0f, 0.0f,
@@ -107,7 +109,7 @@ public class BackgroundShader extends Shader {
         };
 
         // Initialize the buffers.
-        mVertices = ByteBuffer.allocateDirect(mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+        mVertices = ByteBuffer.allocateDirect(mVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mVertices.put(mVerticesData).position(0);

@@ -8,9 +8,9 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 
 public class SplitMask extends Mask {
     private static final String TAG = "SplitMask";
@@ -29,7 +29,7 @@ public class SplitMask extends Mask {
     private float RPosition = 0.0f; //Rotate
     private boolean mInit = false;
 
-    public SplitMask(MicroMovieActivity activity) {
+    public SplitMask(MicroFilmActivity activity) {
         super(activity);
     }
 
@@ -74,12 +74,12 @@ public class SplitMask extends Mask {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("SplitMaskshader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
@@ -114,7 +114,7 @@ public class SplitMask extends Mask {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);

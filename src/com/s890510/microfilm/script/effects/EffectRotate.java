@@ -2,7 +2,7 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.util.Easing;
 
 public class EffectRotate extends BasicEffect
 {
@@ -49,7 +49,7 @@ public class EffectRotate extends BasicEffect
         float progress = getProgressByElapse(elapse);
         Matrix.setIdentityM(mMVPMatrix, 0);
         if(mUtil != 0) {
-            scale = mStartScale + Util.Easing(mUtil, progress*mDuration, 0, 1, mDuration) * (mEndScale - mStartScale);
+            scale = mStartScale + Easing.Easing(mUtil, progress*mDuration, 0, 1, mDuration) * (mEndScale - mStartScale);
         } else {
             scale = mStartScale + progress * (mEndScale - mStartScale);
         }
@@ -58,7 +58,7 @@ public class EffectRotate extends BasicEffect
         if(mRotate) {
             float rotate;
             if(mUtil != 0) {
-                rotate = mStartRotate + Util.Easing(mUtil, progress*mDuration, 0, 1, mDuration) * (mEndRotate - mStartRotate);
+                rotate = mStartRotate + Easing.Easing(mUtil, progress*mDuration, 0, 1, mDuration) * (mEndRotate - mStartRotate);
             } else {
                 rotate = mStartRotate + progress * (mEndRotate - mStartRotate);
             }

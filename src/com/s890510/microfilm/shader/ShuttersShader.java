@@ -6,11 +6,11 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class ShuttersShader extends Shader {
@@ -34,18 +34,18 @@ public class ShuttersShader extends Shader {
     private float mYPos = 2.0f;
     private float mSize = 0.0f;
     
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public ShuttersShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public ShuttersShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
     public void DrawRandar(float[] mViewMatrix, float[] mProjectionMatrix,
             ArrayList<Integer> mTextureId, ArrayList<ElementInfo> mElementInfo) {
 
-        if(mYPos > 0.0 && mElementInfo.size() > 1 && (!mActivity.checkPause() || mProcessGL.isEncode())) {
+        if(mYPos > 0.0 && mElementInfo.size() > 1 && (!mActivity.checkPause() || mGLDraw.isEncode())) {
             Effect mEffect = mElementInfo.get(0).effect;
             float percent = (float)(mEffect.getDuration() - mElementInfo.get(0).timer.getElapse()) / (mEffect.getDuration() - mEffect.getSleep());
             mYPos = percent*2.0f;
@@ -86,12 +86,12 @@ public class ShuttersShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("LatticeShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;

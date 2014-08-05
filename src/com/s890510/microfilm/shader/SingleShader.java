@@ -1,12 +1,12 @@
 package com.s890510.microfilm.shader;
 
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
 
 public class SingleShader {
     private static final String TAG = "SingleShader";
-    private MicroMovieActivity mActivity;
+    private MicroFilmActivity mActivity;
 
     private DefaultShader mDefaultShader;
     private CoverShader mCoverShader;
@@ -15,21 +15,21 @@ public class SingleShader {
     private RotateShader mRotateShader;
     private LineShader mLineShader;
     private PhotoShader mPhotoShader;
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public SingleShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public SingleShader(MicroFilmActivity activity, GLDraw gldraw) {
         mActivity = activity;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
     public void initSingleShader() {
-        mDefaultShader = new DefaultShader(mActivity, mProcessGL);
-        mCoverShader = new CoverShader(mActivity, mProcessGL);
-        mLatticeShader = new LatticeShader(mActivity, mProcessGL);
-        mMirrorShader = new MirrorShader(mActivity, mProcessGL);
-        mRotateShader = new RotateShader(mActivity, mProcessGL);
-        mLineShader = new LineShader(mActivity, mProcessGL);
-        mPhotoShader = new PhotoShader(mActivity, mProcessGL);
+        mDefaultShader = new DefaultShader(mActivity, mGLDraw);
+        mCoverShader = new CoverShader(mActivity, mGLDraw);
+        mLatticeShader = new LatticeShader(mActivity, mGLDraw);
+        mMirrorShader = new MirrorShader(mActivity, mGLDraw);
+        mRotateShader = new RotateShader(mActivity, mGLDraw);
+        mLineShader = new LineShader(mActivity, mGLDraw);
+        mPhotoShader = new PhotoShader(mActivity, mGLDraw);
     }
 
     public void DrawRandar(int ShaderMode, int mTextureId, ElementInfo mElementInfo,

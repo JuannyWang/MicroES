@@ -4,11 +4,11 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class PhotoShader extends Shader {
@@ -27,11 +27,11 @@ public class PhotoShader extends Shader {
     private int mSetBoundHandle;
     private float[] mMVPMatrix = new float[16];
     
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public PhotoShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public PhotoShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -60,10 +60,10 @@ public class PhotoShader extends Shader {
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
-        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
 
         float scale = mElementInfo.effect.getScaleSize(mElementInfo.timer.getElapse());
-        float ratio_a = (float)mProcessGL.ScreenHeight/(float)mProcessGL.ScreenWidth;
+        float ratio_a = (float)mGLDraw.ScreenHeight/(float)mGLDraw.ScreenWidth;
         int mBound = mEffect.getFixBound(mElapseTime);
         if(mBound == Shader.BOUNDING) {
             float[] mGap = new float[2]; //0: X, 1: Y
@@ -106,12 +106,12 @@ public class PhotoShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("PhotoShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;

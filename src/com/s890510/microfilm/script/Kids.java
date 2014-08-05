@@ -2,17 +2,17 @@ package com.s890510.microfilm.script;
 
 import java.util.ArrayList;
 
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.MusicManager;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.Slogan;
-import com.asus.gallery.micromovie.StringLoader;
-import com.asus.gallery.micromovie.ThemeAdapter;
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MusicManager;
+import com.s890510.microfilm.ThemeAdapter;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.Slogan;
+import com.s890510.microfilm.draw.StringLoader;
 import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.mask.Mask;
 import com.s890510.microfilm.script.effects.EffectLib;
 import com.s890510.microfilm.shader.Shader;
+import com.s890510.microfilm.util.Easing;
 
 public class Kids extends BasicScript {
     private float mRed = 255;
@@ -23,13 +23,13 @@ public class Kids extends BasicScript {
     private float[] mRight = {51, 102, 204, 255};
     private float mFAlpha = 0.7f;
 
-    public Kids(boolean isFromEncode, MicroMovieActivity activity, ProcessGL processGL) {
-        this(activity, processGL);
+    public Kids(boolean isFromEncode, MicroFilmActivity activity, GLDraw gldraw) {
+        this(activity, gldraw);
         mIsFromEncode = isFromEncode;
     }
 
-    public Kids(MicroMovieActivity activity, ProcessGL processGL) {
-        super(activity, processGL);
+    public Kids(MicroFilmActivity activity, GLDraw gldraw) {
+        super(activity, gldraw);
 
         for(int i=0; i<mLeft.length; i++) {
             mLeft[i] = (mLeft[i]*(1-mFAlpha) + 255*mFAlpha)/255;
@@ -45,35 +45,35 @@ public class Kids extends BasicScript {
         ArrayList<String> mString_2 = new ArrayList<String>();
         mString_2.add(":D / Happy Day!");
 
-        float mRatio = processGL.ScreenRatio;
+        float mRatio = gldraw.ScreenRatio;
 
         mEffects.add(EffectLib.String(new int[]{700, 700, 700}, 2000, new boolean[]{false, false, false}, Shader.String, mString_1,
-                new boolean[]{false, false, false}, new int[]{Util.easeOutBack, 0, Util.easeInBack},
+                new boolean[]{false, false, false}, new int[]{Easing.easeOutBack, 0, Easing.easeInBack},
                 new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, 1.0f, 1.0f,
                 new int[]{StringLoader.STRING_BLUE, StringLoader.STRING_BLUE, StringLoader.STRING_BLUE}, new int[]{3, 3, 3}, 96, 0));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{600, 2300}, 2400, Shader.Circle_Mask,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{600, 2300}, 2400, Shader.Circle_Mask,
                 new boolean[]{false, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.0f, 0.97932f}, new float[]{0.97932f, 0.9f}, new float[]{0.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 1.0f, 1.0f, new int[]{Mask.TRANS_IN_SMALL, Mask.SHOWN}, new int[]{7, 2}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{500, 1000}, 1000, Shader.Circle_Mask_Cover,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{500, 1000}, 1000, Shader.Circle_Mask_Cover,
                 new boolean[]{true, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.1f, 1.067f}, new float[]{1.067f, 1.0f}, new float[]{1.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 0.8f, 0.8f, new int[]{Mask.SHOWN, Mask.SHOWN}, new int[]{2, 2}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{500, 1000}, 800, Shader.Circle_Mask_Cover,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{500, 1000}, 800, Shader.Circle_Mask_Cover,
                 new boolean[]{true, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.1f, 1.067f}, new float[]{1.067f, 1.0f}, new float[]{1.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 0.8f, 0.8f, new int[]{Mask.SHOWN, Mask.SHOWN}, new int[]{2, 2}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{700, 1000, 500}, 1700, Shader.Circle_Mask_Cover,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{700, 1000, 500}, 1700, Shader.Circle_Mask_Cover,
                 new boolean[]{true, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.0737f, 1.0106f}, new float[]{1.0737f, 1.0106f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 1.0f, 1.0f, new int[]{Mask.TRANS_OUT, Mask.GONE, Mask.GONE}, new int[]{2, 2, 2}));
 
         mEffects.add(EffectLib.Rotate_Translate(new int[]{700, 1200, 1000}, 700, Shader.Rotate,
-                new boolean[]{false, false, false}, new int[]{Util.easeInExpo, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInExpo, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{0.0f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, mRatio*-1.5f},
                 new float[]{0.0f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 1.5f},
                 new float[]{2.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.2f},
@@ -82,7 +82,7 @@ public class Kids extends BasicScript {
                 1.0f, 1.0f, new int[]{0, 0, 0}, new int[]{0, -1, -1}, new int[]{3, 1, 4}));
 
         mEffects.add(EffectLib.String_Translate(new int[]{100, 1100, 1000}, 1200, new boolean[]{false, false, false}, Shader.String, null,
-                new boolean[]{false, false, false}, new int[]{0, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{0, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{mRatio*0.65f, mRatio*0.65f, mRatio*0.65f}, new float[]{mRatio*0.65f, mRatio*0.65f, mRatio*-0.85f},
                 new float[]{0.0f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 1.5f},
                 new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, 1.0f, 1.0f,
@@ -90,7 +90,7 @@ public class Kids extends BasicScript {
 
         //--#8
         mEffects.add(EffectLib.Rotate_Translate(new int[]{1000, 1000, 1000}, 0, Shader.Rotate,
-                new boolean[]{false, false, false}, new int[]{Util.easeInOutExpo, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInOutExpo, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{mRatio*1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, mRatio*1.5f},
                 new float[]{-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 1.5f},
                 new float[]{1.2f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.2f},
@@ -99,7 +99,7 @@ public class Kids extends BasicScript {
                 1.0f, 1.0f, new int[]{0, 0, 0}, new int[]{-1, -1, -1}, new int[]{5, 1, 4}));
 
         mEffects.add(EffectLib.String_Translate(new int[]{1000, 1000, 1000}, 2000, new boolean[]{false, false, false}, Shader.String, null,
-                new boolean[]{false, false, false}, new int[]{Util.easeInOutExpo, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInOutExpo, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{mRatio*2.15f, mRatio*0.65f, mRatio*0.65f}, new float[]{mRatio*0.65f, mRatio*0.65f, mRatio*2.15f},
                 new float[]{-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 1.5f},
                 new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, 1.0f, 1.0f,
@@ -107,7 +107,7 @@ public class Kids extends BasicScript {
 
         //--#9
         mEffects.add(EffectLib.Rotate_Translate(new int[]{1000, 1000, 1000}, 0, Shader.Rotate,
-                new boolean[]{false, false, false}, new int[]{Util.easeInOutExpo, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInOutExpo, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{mRatio*-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, mRatio*-1.5f},
                 new float[]{-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 1.5f},
                 new float[]{1.2f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.2f},
@@ -116,7 +116,7 @@ public class Kids extends BasicScript {
                 1.0f, 1.0f, new int[]{0, 0, 0}, new int[]{-1, -1, -1}, new int[]{5, 1, 4}));
 
         mEffects.add(EffectLib.String_Translate(new int[]{1000, 1000, 1000}, 2000, new boolean[]{false, false, false}, Shader.String, null,
-                new boolean[]{false, false, false}, new int[]{Util.easeInOutExpo, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInOutExpo, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{mRatio*-0.85f, mRatio*0.65f, mRatio*0.65f}, new float[]{mRatio*0.65f, mRatio*0.65f, mRatio*-0.85f},
                 new float[]{-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 1.5f},
                 new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, 1.0f, 1.0f,
@@ -124,7 +124,7 @@ public class Kids extends BasicScript {
 
         //--#10
         mEffects.add(EffectLib.Rotate_Translate(new int[]{1000, 700, 600}, 0, Shader.Rotate,
-                new boolean[]{false, false, false}, new int[]{Util.easeInOutExpo, 0, Util.easeInExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInOutExpo, 0, Easing.easeInExpo}, 0, 0,
                 new float[]{mRatio*1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 0.0f},
                 new float[]{-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 0.0f},
                 new float[]{1.2f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
@@ -133,14 +133,14 @@ public class Kids extends BasicScript {
                 1.0f, 1.0f, new int[]{0, 0, 0}, new int[]{-1, -1, 1}, new int[]{5, 1, 2}));
 
         mEffects.add(EffectLib.String_Translate(new int[]{1000, 700, 100}, 2300, new boolean[]{false, false, false}, Shader.String, null,
-                new boolean[]{false, false, false}, new int[]{Util.easeInOutExpo, 0, Util.easeInOutExpo}, 0, 0,
+                new boolean[]{false, false, false}, new int[]{Easing.easeInOutExpo, 0, Easing.easeInOutExpo}, 0, 0,
                 new float[]{mRatio*2.15f, mRatio*0.65f, mRatio*0.65f}, new float[]{mRatio*0.65f, mRatio*0.65f, mRatio*0.65f},
                 new float[]{-1.5f, 0.0f, 0.0f}, new float[]{0.0f, 0.0f, 0.0f},
                 new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f}, 1.0f, 1.0f,
                 new int[]{StringLoader.STRING_KIDS_CIRCLE_DATE, StringLoader.STRING_KIDS_CIRCLE_DATE, StringLoader.STRING_KIDS_CIRCLE_DATE}, new int[]{1, 1, 1}, 33, 1));
 
         //--#11, 13/
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{200, 2900, 600, 400}, 400, Shader.Lattice_Blue_Bar_Mask,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{200, 2900, 600, 400}, 400, Shader.Lattice_Blue_Bar_Mask,
                 new boolean[]{false, false, true, false}, new int[]{0, 0, 0, 0}, 0, 0,
                 new float[]{0.0f, 1.0f, 1.166f, 0.0f}, new float[]{1.0f, 1.166f, 1.2f, 0.0f}, new float[]{0.0f, 1.0f, 1.0f, 0.0f}, new float[]{1.0f, 1.0f, 1.0f, 0.0f},
                 1.0f, 1.0f, new int[]{Mask.TRANS_OUT_FULL, 0, 0, 0}, new int[]{2, 2, 2, 2}));
@@ -153,7 +153,7 @@ public class Kids extends BasicScript {
 
         //--20s
         //--#13/, 14, 16/
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{400, 600, 2400, 600, 400}, 0, Shader.Lattice_Blue_Bar,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{400, 600, 2400, 600, 400}, 0, Shader.Lattice_Blue_Bar,
                 new boolean[]{false, true, false, true, false}, new int[]{0, 0, 0, 0, 0}, 0, 0,
                 new float[]{1.0f, 1.0f, 1.033f, 1.166f, 0.0f}, new float[]{1.0f, 1.033f, 1.166f, 1.2f, 0.0f}, new float[]{0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, new float[]{0.0f, 1.0f, 1.0f, 1.0f, 0.0f},
                 1.0f, 1.0f, new int[]{0, Shader.LATTICE_BLUE_BAR_GONE, 0, 0, 0}, new int[]{5, 5, 2, 5, 5}));
@@ -165,7 +165,7 @@ public class Kids extends BasicScript {
                 new int[]{StringLoader.STRING_KIDS_ICON_B, StringLoader.STRING_KIDS_ICON_B}, new int[]{9, 9, 9}, 40, 1));
 
         //--#16/, 17, 19/
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{400, 600, 1900, 600, 400}, 0, Shader.Lattice_Blue_Bar,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{400, 600, 1900, 600, 400}, 0, Shader.Lattice_Blue_Bar,
                 new boolean[]{false, true, false, true, false}, new int[]{0, 0, 0, 0, 0}, 0, 0,
                 new float[]{1.0f, 1.0f, 1.038f, 1.161f, 0.0f}, new float[]{1.0f, 1.038f, 1.161f, 1.2f, 0.0f}, new float[]{0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, new float[]{0.0f, 1.0f, 1.0f, 1.0f, 0.0f},
                 1.0f, 1.0f, new int[]{0, Shader.LATTICE_BLUE_BAR_GONE, 0, 0, 0}, new int[]{5, 5, 2, 5, 5}));
@@ -176,7 +176,7 @@ public class Kids extends BasicScript {
                 new int[]{StringLoader.STRING_KIDS_ICON_A, StringLoader.STRING_KIDS_ICON_A}, new int[]{9, 9, 9}, 40, 1));
 
         //--#19/, 20, 22/
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{400, 600, 1500, 600, 400}, 0, Shader.Lattice_Blue_Bar,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{400, 600, 1500, 600, 400}, 0, Shader.Lattice_Blue_Bar,
                 new boolean[]{false, true, false, true, false}, new int[]{0, 0, 0, 0, 0}, 0, 0,
                 new float[]{1.0f, 1.0f, 1.044f, 1.155f, 0.0f}, new float[]{1.0f, 1.044f, 1.155f, 1.2f, 0.0f}, new float[]{0.0f, 0.0f, 1.0f, 1.0f, 0.0f}, new float[]{0.0f, 1.0f, 1.0f, 1.0f, 0.0f},
                 1.0f, 1.0f, new int[]{0, Shader.LATTICE_BLUE_BAR_GONE, 0, 0, 0}, new int[]{5, 5, 2, 5, 5}));

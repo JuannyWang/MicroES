@@ -2,8 +2,8 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.util.Easing;
 
 public class EffectTranslateX extends BasicEffect
 {
@@ -19,18 +19,18 @@ public class EffectTranslateX extends BasicEffect
     private float[] mMVPMatrix = new float[16]; //the texture
     private float scale = 1.0f;
 
-    public EffectTranslateX(ProcessGL processGL) {
+    public EffectTranslateX(GLDraw gldraw) {
         mDuration = DURATION;
         mSleep = DURATION;
-        mStartTrans = processGL.ScreenRatio;
-        mEndTrans = processGL.ScreenRatio;
+        mStartTrans = gldraw.ScreenRatio;
+        mEndTrans = gldraw.ScreenRatio;
     }
 
-    public EffectTranslateX(ProcessGL processGL, int duration) {
+    public EffectTranslateX(GLDraw gldraw, int duration) {
         mDuration = duration;
         mSleep = duration;
-        mStartTrans = processGL.ScreenRatio;
-        mEndTrans = processGL.ScreenRatio;
+        mStartTrans = gldraw.ScreenRatio;
+        mEndTrans = gldraw.ScreenRatio;
     }
 
     public EffectTranslateX(int duration, float StartPos, float EndPos) {
@@ -103,9 +103,9 @@ public class EffectTranslateX extends BasicEffect
         if(mUtil != 0) {
             //mTransX = mStartTrans * getProgressByElapse(elapse) - mEndTrans;
             if(mEndTrans < 0) {
-                mTransX = -Util.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
+                mTransX = -Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
             } else {
-                mTransX = Util.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
+                mTransX = Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
             }
         } else {
             mTransX = mStartTrans * getProgressByElapse(elapse) - mEndTrans;

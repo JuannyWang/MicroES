@@ -2,7 +2,7 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.util.Easing;
 
 public class EffectScale extends BasicEffect
 {
@@ -85,9 +85,9 @@ public class EffectScale extends BasicEffect
         Matrix.setIdentityM(mMVPMatrix, 0);
         if(mUtil != 0 && mStartScale != mEndScale) {
             if(mStartScale < mEndScale) {
-                scale = Util.Easing(mUtil, getProgressByElapse(elapse)*mDuration, mStartScale, (mEndScale - mStartScale), mDuration);
+                scale = Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, mStartScale, (mEndScale - mStartScale), mDuration);
             } else {
-                scale = mStartScale - Util.Easing(mUtil, getProgressByElapse(elapse)*mDuration, mEndScale, mStartScale, mDuration);
+                scale = mStartScale - Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, mEndScale, mStartScale, mDuration);
             }
         } else {
             scale = mStartScale + getProgressByElapse(elapse) * (mEndScale - mStartScale);

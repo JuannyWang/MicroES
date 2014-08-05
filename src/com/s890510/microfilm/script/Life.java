@@ -2,12 +2,12 @@ package com.s890510.microfilm.script;
 
 import java.util.ArrayList;
 
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.MusicManager;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.Slogan;
-import com.asus.gallery.micromovie.StringLoader;
-import com.asus.gallery.micromovie.ThemeAdapter;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MusicManager;
+import com.s890510.microfilm.ThemeAdapter;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.Slogan;
+import com.s890510.microfilm.draw.StringLoader;
 import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.script.effects.EffectLib;
 import com.s890510.microfilm.shader.Shader;
@@ -21,13 +21,13 @@ public class Life extends BasicScript {
     private float[] mRight = {51, 153, 255, 255};
     private float mFAlpha = 0.35f;
 
-    public Life(boolean isFromEncode, MicroMovieActivity activity, ProcessGL processGL) {
-        this(activity, processGL);
+    public Life(boolean isFromEncode, MicroFilmActivity activity, GLDraw gldraw) {
+        this(activity, gldraw);
         mIsFromEncode = isFromEncode;
     }
 
-    public Life(MicroMovieActivity activity, ProcessGL processGL) {
-        super(activity, processGL);
+    public Life(MicroFilmActivity activity, GLDraw gldraw) {
+        super(activity, gldraw);
 
         for(int i=0; i<mLeft.length; i++) {
             mLeft[i] = (mLeft[i]*(1-mFAlpha) + 255*mFAlpha)/255;
@@ -40,7 +40,7 @@ public class Life extends BasicScript {
         ArrayList<String> mString_1 = new ArrayList<String>();
         mString_1.add("You & Me");
 
-        mEffects.add(EffectLib.Translate(processGL, new int[]{3600, 1400, 1000}, 0, Shader.Mirror_Tilted_Mask,
+        mEffects.add(EffectLib.Translate(gldraw, new int[]{3600, 1400, 1000}, 0, Shader.Mirror_Tilted_Mask,
                 new boolean[]{true, false, false}, new int[]{2, 0, 0}, 0, 0, true,
                 new float[]{-0.9f, 0, 0}, new float[]{0.9f, 0, 0},
                 new float[]{-1.0f, 1.0f, 0.9709f}, new float[]{-1.0f, 0.9709f, 0.95f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f},
@@ -51,7 +51,7 @@ public class Life extends BasicScript {
                 new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, 0.75f, 1.0f,
                 new int[]{StringLoader.STRING_WHITE_NOBK_GEO, StringLoader.STRING_WHITE_NOBK_GEO, StringLoader.STRING_WHITE_NOBK_GEO}, new int[]{3, 3, 3}, 30, 1));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1500, 6800}, 1000, Shader.Cover_Center_H,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1500, 6800}, 1000, Shader.Cover_Center_H,
                 new boolean[]{true, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.1f, 1.0825f}, new float[]{1.0825f, 1.0f}, new float[]{1.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 1.0f, 1.0f, new int[]{0, 0}, new int[]{7, 2}));
@@ -61,27 +61,27 @@ public class Life extends BasicScript {
                 new float[]{1.0f}, new float[]{1.0f}, new float[]{1.0f}, new float[]{1.0f}, 1.0f, 1.0f,
                 new int[]{StringLoader.STRING_WHITE_NOBK_GEO}, new int[]{3}, 30, 1));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{2500, 4000, 1300}, 2200, Shader.Cover_Half_Right,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{2500, 4000, 1300}, 2200, Shader.Cover_Half_Right,
                 new boolean[]{true, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.0679f, 1.0128f}, new float[]{1.0679f, 1.0128f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 0.5f, 1.0f, new int[]{0, 0, 0}, new int[]{4, 4, 4}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{2500, 4000, 1300}, 2100, Shader.Cover_Half_Left,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{2500, 4000, 1300}, 2100, Shader.Cover_Half_Left,
                 new boolean[]{true, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.0679f, 1.0128f}, new float[]{1.0679f, 1.0128f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 0.5f, 1.0f, new int[]{0, 0, 0}, new int[]{3, 3, 3}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1300, 1100, 1300}, 1100, Shader.Scale_Fade,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1300, 1100, 1300}, 1100, Shader.Scale_Fade,
                 new boolean[]{false, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.0648f, 1.0351f}, new float[]{1.0648f, 1.0351f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 0.5f, 1.0f, new int[]{0, 0, 0}, new int[]{4, 4, 4}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1300, 1100, 1000}, 1400, Shader.Scale_Fade,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1300, 1100, 1000}, 1400, Shader.Scale_Fade,
                 new boolean[]{false, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.0617f, 1.0294f}, new float[]{1.0617f, 1.0294f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 0.5f, 1.0f, new int[]{0, 0, 0}, new int[]{3, 3, 3}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{100, 1300, 1100, 2000}, 0, Shader.Scale_Fade,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{100, 1300, 1100, 2000}, 0, Shader.Scale_Fade,
                 new boolean[]{false, false, false, false}, new int[]{0, 0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.1f, 1.07046f, 1.0454f}, new float[]{1.1f, 1.0704f, 1.0454f, 1.0f}, new float[]{0.0f, 0.0f, 1.0f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f, 0.0f},
                 0.5f, 1.0f, new int[]{0, 0, 0, 0}, new int[]{4, 4, 4, 4}));
@@ -91,28 +91,28 @@ public class Life extends BasicScript {
                 new float[]{0.0f, 1.0f, 1.0f}, new float[]{0.0f, 1.0f, 1.0f}, new float[]{0.0f, 0.0f, 1.0f}, new float[]{0.0f, 1.0f, 0.0f}, 1.0f, 1.0f,
                 new int[]{StringLoader.STRING_WHITE_NOBK, StringLoader.STRING_WHITE_NOBK, StringLoader.STRING_WHITE_NOBK}, new int[]{5, 5, 5}, 180, 0));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1000, 4700}, 1200, Shader.Cover_Half_Left_Q,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1000, 4700}, 1200, Shader.Cover_Half_Left_Q,
                 new boolean[]{true, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.1f, 1.0824f}, new float[]{1.0824f, 1.0f}, new float[]{1.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 1f/3f, 1.0f, new int[]{0, 0}, new int[]{14, 14}));
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1000, 4700}, 1200, Shader.Cover_Half_Left_Q,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1000, 4700}, 1200, Shader.Cover_Half_Left_Q,
                 new boolean[]{true, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.1f, 1.0824f}, new float[]{1.0824f, 1.0f}, new float[]{1.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 1f/3f, 1.0f, new int[]{0, 0}, new int[]{15, 15}));
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1000, 4400}, 2300, Shader.Cover_Half_Left_Q,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1000, 4400}, 2300, Shader.Cover_Half_Left_Q,
                 new boolean[]{true, false}, new int[]{0, 0}, 0, 0,
                 new float[]{1.1f, 1.0824f}, new float[]{1.0824f, 1.0f}, new float[]{1.0f, 1.0f}, new float[]{1.0f, 1.0f},
                 1f/3f, 1.0f, new int[]{0, 0}, new int[]{16, 16}));
 
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1000, 3800, 500}, 1200, Shader.Cover_Half_Left_Q,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1000, 3800, 500}, 1200, Shader.Cover_Half_Left_Q,
                 new boolean[]{true, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.1f, 1.0821f, 1.0089f}, new float[]{1.0821f, 1.0089f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 1f/3f, 1.0f, new int[]{0, 0, 0}, new int[]{8, 8, 8}));
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1000, 2600, 500}, 1200, Shader.Cover_Half_Left_Q,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1000, 2600, 500}, 1200, Shader.Cover_Half_Left_Q,
                 new boolean[]{true, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.0785f, 1.0607f, 1.0089f}, new float[]{1.0607f, 1.0089f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 1f/3f, 1.0f, new int[]{0, 0, 0}, new int[]{9, 9, 9}));
-        mEffects.add(EffectLib.Scale_Fade(processGL, new int[]{1000, 1400, 500}, 2600, Shader.Cover_Half_Left_Q,
+        mEffects.add(EffectLib.Scale_Fade(gldraw, new int[]{1000, 1400, 500}, 2600, Shader.Cover_Half_Left_Q,
                 new boolean[]{true, false, false}, new int[]{0, 0, 0}, 0, 0,
                 new float[]{1.0625f, 1.04464f, 1.0089f}, new float[]{1.04464f, 1.0089f, 1.0f}, new float[]{1.0f, 1.0f, 1.0f}, new float[]{1.0f, 1.0f, 0.0f},
                 1f/3f, 1.0f, new int[]{0, 0, 0}, new int[]{10, 10, 10}));

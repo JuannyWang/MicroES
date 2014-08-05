@@ -12,11 +12,11 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.mask.Mask;
 import com.s890510.microfilm.script.effects.Effect;
 
@@ -64,17 +64,17 @@ public class LineShader extends Shader {
     private float[] mETime = {0.526f, 0.578f, 0.631f, 0.684f, 0.736f, 0.789f, 0.842f, 0.894f, 0.947f, 1f};
     private float[] mStartPos = new float[10];
     private float[] mEndPos = new float[10];
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public LineShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public LineShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
     public void init() {
         float length = 0;
-        ratio = ((float)mProcessGL.ScreenWidth/(float)mProcessGL.ScreenHeight);
+        ratio = ((float)mGLDraw.ScreenWidth/(float)mGLDraw.ScreenHeight);
         mDist = ratio*2;
 
         for(int i=0; i<10; i++) {
@@ -112,8 +112,8 @@ public class LineShader extends Shader {
         boolean mIsTrans = mEffect.getTransition(mElapseTime);
         float progress = mEffect.getProgressByElapse(mElapseTime);
 
-        float[] mLeft = mProcessGL.getLeftFilter();
-        float[] mRight = mProcessGL.getRightFilter();
+        float[] mLeft = mGLDraw.getLeftFilter();
+        float[] mRight = mGLDraw.getRightFilter();
 
         if((!mIsTrans && !mIsInit) || IsGone != mIsGone || mHashCode != mElementInfo.hashCode() ||
                 mIsReverse != IsGone) {
@@ -155,12 +155,12 @@ public class LineShader extends Shader {
             GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
             if(mType == Shader.STRING) {
-            	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
-                GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
+            	mGLDraw.mStringLoader.mStringTextureCoords.position(0);
+                GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringTextureCoords);
                 GLES20.glEnableVertexAttribArray(mTextureHandle);
 
-                mProcessGL.mStringLoader.mStringVertices.position(0);
-                GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringVertices);
+                mGLDraw.mStringLoader.mStringVertices.position(0);
+                GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringVertices);
                 GLES20.glEnableVertexAttribArray(mPositionHandle);
 
                 GLES20.glUniform1f(mIsStringHandle, 1.0f);
@@ -178,10 +178,10 @@ public class LineShader extends Shader {
         }
 
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
-        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
         GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
         GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
-        GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
+        GLES20.glUniform1f(mThemeHandle, mGLDraw.getScriptFilter());
 
         if(mIsTrans && ((mIsGone && progress > 0.05f) || !mIsGone)) {
             progress = progress*10/9.5f;
@@ -248,12 +248,12 @@ public class LineShader extends Shader {
         if(mProgram != 0) {
             GLES20.glDeleteProgram(mProgram);
         }
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("DefaultShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
@@ -288,7 +288,7 @@ public class LineShader extends Shader {
     }
 
     private void CalcVertices() {
-        float mRatio = mProcessGL.ScreenRatio;
+        float mRatio = mGLDraw.ScreenRatio;
         final float[] mTriangleVerticesData = {
             // X, Y, Z, U, V
             -mRatio, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -298,7 +298,7 @@ public class LineShader extends Shader {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);
@@ -306,7 +306,7 @@ public class LineShader extends Shader {
 
     private void CreateBitmap() {
         if(mBitmap == null)
-            mBitmap = Bitmap.createBitmap(mProcessGL.ScreenWidth, mProcessGL.ScreenHeight, Bitmap.Config.ARGB_8888);
+            mBitmap = Bitmap.createBitmap(mGLDraw.ScreenWidth, mGLDraw.ScreenHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvasTemp = new Canvas(mBitmap);
         canvasTemp.drawColor(mColor);

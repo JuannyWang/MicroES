@@ -3,13 +3,41 @@ package com.s890510.microfilm.draw;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.ArrayList;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import com.asus.gallery.micromovie.StringLoader;
+import com.s890510.microfilm.FileInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.script.Script;
+import com.s890510.microfilm.script.Script1;
+
 public class GLDraw {
+	public static final String TAG = "GLDraw";
+
+	public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
+    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
+    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
+    
+    private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
+
+    private MicroFilmActivity mActivity;
+    public int mSpecialHash = 0;
+    public Script mScript;
+    
 	private float[] mProjectionMatrix = new float[16];
 	private float[] mMVPMatrix = new float[16];
+
+	public int ScreenHeight;
+    public int ScreenWidth;
+    public float ScreenScale = 1.0f;
+    public float ScreenRatio;
+    private boolean mIsEncode = false;
+    private boolean mVideoWaitUpdate = false;
+    public StringLoader mStringLoader;
 
     private FloatBuffer mVertices;
     private int mProgram;
@@ -17,6 +45,48 @@ public class GLDraw {
     private int mAlphaHandle;
     private float mAlpha = 1;
     private boolean mAlphaAdd = false;
+
+    public GLDraw(MicroFilmActivity activity, boolean isEncode) {
+    	mActivity = activity;
+    	mScript = new Script1(mActivity, this);
+    	mIsEncode = isEncode;
+	}
+
+    public void setSpecialHash(int hash) {
+        mSpecialHash = hash;
+    }
+
+    public boolean getVideoWait() {
+        return mVideoWaitUpdate;
+    }
+
+    public boolean isEncode(){
+        return mIsEncode;
+    }
+
+    public float[] getLeftFilter() {
+        return mScript.getFilterLeft();
+    }
+
+    public float[] getRightFilter() {
+        return mScript.getFilterRight();
+    }
+
+    public int getScriptFilter() {
+        return mScript.getFilterNumber();
+    }
+
+    public String getFirstLocation() {
+        if(mFileList.get(0).mGeoInfo != null) {
+            if(mFileList.get(0).mGeoInfo.getLocation() != null) {
+                return mFileList.get(0).mGeoInfo.getLocation().get(0);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
 
 	public void prepare() {
 		// Disable depth testing -- we're 2D only.

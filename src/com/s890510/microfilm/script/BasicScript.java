@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 import android.opengl.Matrix;
 
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.MusicManager;
-import com.asus.gallery.micromovie.ProcessGL;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.MusicManager;
+import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.script.effects.Effect;
 
@@ -20,12 +20,12 @@ public class BasicScript extends Script {
     protected int mNoItem = 0;
     protected int mNoCount = 0;
     ArrayList<Effect> mEffects = new ArrayList<Effect>();
-    public MicroMovieActivity mActivity;
-    private ProcessGL mProcessGL;
+    public MicroFilmActivity mActivity;
+    private GLDraw mGLDraw;
 
-    public BasicScript(MicroMovieActivity activity, ProcessGL processGL) {
+    public BasicScript(MicroFilmActivity activity, GLDraw gldraw) {
         mActivity = activity;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
     @Override
@@ -109,7 +109,7 @@ public class BasicScript extends Script {
         for(int i = 0; i < info.size() ; i++) {
             info.get(i).effect = mEffects.get(i % effNum);
             info.get(i).time = mEffects.get(i % effNum).getSleep();
-            info.get(i).timer = new Timer(mEffects.get(i % effNum).getDuration(), mActivity, mProcessGL);
+            info.get(i).timer = new Timer(mEffects.get(i % effNum).getDuration(), mActivity, mGLDraw);
             info.get(i).scaleH = mEffects.get(i % effNum).getTextureHightScaleRatio();
             info.get(i).scaleW = mEffects.get(i % effNum).getTextureWidthScaleRatio();
             if(mEffects.get(i % effNum).getEffectType() == Effect.VIDEO_EFFECT)

@@ -6,6 +6,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Random;
 
+import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.script.Timer;
 import com.s890510.microfilm.script.effects.Effect;
 
@@ -43,8 +44,8 @@ public class ElementInfo {
     public ArrayList<int[]> mFaceRegion;
     public boolean mIsRestore = false;
 
-    public void CalcTriangleVertices(ProcessGL processGL) {
-        float mVisioRatio = (float)processGL.ScreenHeight/processGL.ScreenWidth;
+    public void CalcTriangleVertices(GLDraw mGLDraw) {
+        float mVisioRatio = (float)mGLDraw.ScreenHeight/mGLDraw.ScreenWidth;
         float mBitmapRatio = (float)height/width;
 
         float textW = 1.0f;
@@ -116,7 +117,7 @@ public class ElementInfo {
             }
         }
 
-        x = scaleW * processGL.ScreenRatio;
+        x = scaleW * mGLDraw.ScreenRatio;
         y = scaleH;
 
         float[] mVerticesData = new float[]{
@@ -150,10 +151,10 @@ public class ElementInfo {
             textures[stCount++] = centerX;
             textures[stCount++] = centerY;
 
-            textures[stCount++] = (float)(centerX-(textW/2)/processGL.ScreenRatio*Math.sin(angrad));
+            textures[stCount++] = (float)(centerX-(textW/2)/mGLDraw.ScreenRatio*Math.sin(angrad));
             textures[stCount++] = (float)(centerY+(textH/2)*Math.cos(angrad));
 
-            textures[stCount++] = (float)(centerX-(textW/2)/processGL.ScreenRatio*Math.sin(angradNext));
+            textures[stCount++] = (float)(centerX-(textW/2)/mGLDraw.ScreenRatio*Math.sin(angradNext));
             textures[stCount++] = (float)(centerY+(textH/2)*Math.cos(angradNext));
         }
 
@@ -164,17 +165,17 @@ public class ElementInfo {
             mSTextureCoords.clear();
 
         mVertices = ByteBuffer.allocateDirect(
-                mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+                mVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
 
         mSTextureCoords = ByteBuffer.allocateDirect(
-                mTextCoordsData.length * ProcessGL.FLOAT_SIZE_BYTES)
+                mTextCoordsData.length * GLDraw.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mSTextureCoords.put(mTextCoordsData).position(0);
 
         mCTextureCoords = ByteBuffer.allocateDirect(
-                textures.length * ProcessGL.FLOAT_SIZE_BYTES)
+                textures.length * GLDraw.FLOAT_SIZE_BYTES)
                     .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mCTextureCoords.put(textures).position(0);
     }

@@ -8,10 +8,10 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 
 public class TopBottomBarMask extends Mask {
     private static final String TAG = "TopBottomBarMask";
@@ -25,11 +25,11 @@ public class TopBottomBarMask extends Mask {
     private FloatBuffer mTriangleVertices;
     private float[] mMVPMatrix = new float[16];
     private float[] mModelMatrix = new float[16];
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public TopBottomBarMask(MicroMovieActivity activity, ProcessGL processGL) {
+    public TopBottomBarMask(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -90,12 +90,12 @@ public class TopBottomBarMask extends Mask {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("TopBottomBarMask");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
@@ -109,7 +109,7 @@ public class TopBottomBarMask extends Mask {
     }
 
     public void CalcVertices() {
-        float mRatio = mProcessGL.ScreenRatio;
+        float mRatio = mGLDraw.ScreenRatio;
         float mheight = 0.12f;
         final float[] mTriangleVerticesData = {
                 // X, Y, Z,
@@ -128,7 +128,7 @@ public class TopBottomBarMask extends Mask {
         };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * GLDraw.FLOAT_SIZE_BYTES)
         .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);

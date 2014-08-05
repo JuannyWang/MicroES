@@ -2,30 +2,30 @@ package com.s890510.microfilm.shader;
 
 import java.util.ArrayList;
 
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.draw.GLDraw;
 
 public class MultiShader {
     private static final String TAG = "MultiShader";
-    private MicroMovieActivity mActivity;
+    private MicroFilmActivity mActivity;
     private ArrayList<Integer> mTextureId = new ArrayList<Integer>();
     private ArrayList<ElementInfo> mElementInfo = new ArrayList<ElementInfo>();
 
     private LatticeShader mLatticeShader;
     private FadeShader mFadeShader;
     private ShuttersShader mShuttersShader;
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public MultiShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public MultiShader(MicroFilmActivity activity, GLDraw gldraw) {
         mActivity = activity;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
     public void initMultipleShader() {
-        mLatticeShader = new LatticeShader(mActivity, mProcessGL);
-        mFadeShader = new FadeShader(mActivity, mProcessGL);
-        mShuttersShader = new ShuttersShader(mActivity, mProcessGL);
+        mLatticeShader = new LatticeShader(mActivity, mGLDraw);
+        mFadeShader = new FadeShader(mActivity, mGLDraw);
+        mShuttersShader = new ShuttersShader(mActivity, mGLDraw);
     }
 
     public void SetContainer(int TId, ElementInfo Info) {

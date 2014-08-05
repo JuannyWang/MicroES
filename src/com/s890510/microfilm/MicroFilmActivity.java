@@ -16,33 +16,44 @@
 
 package com.s890510.microfilm;
 
+import java.util.ArrayList;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Choreographer;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
-import com.s890510.microfilm.draw.GLDraw;
-import com.s890510.microfilm.render.RenderHandler;
-import com.s890510.microfilm.render.RenderThread;
 import com.s890510.microfilm.util.ThreadPool;
 
-public class MicroFilmActivity extends Activity implements SurfaceHolder.Callback,
-        Choreographer.FrameCallback {
+public class MicroFilmActivity extends Activity {
     private static final String TAG = "MainActivity";
+    
+    private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
+    private ArrayList<ElementInfo> mFileOrder = null;
+    private Object mAttachView = new Object();
 
-    private RenderThread mRenderThread;
-    private GLDraw mGLDraw;
+    private MicroFilmSurfaceView mMicroView = null;
+    private boolean mIsSaving = false;
+    private boolean isPause = false;
+    private boolean isPlaying = false;
     
     private ProgressDialog mProgressDialog;
+    public LoadTexture mLoadTexture;
+    public MicroFilmOrder mMicroMovieOrder;
+    public long mStartDate = 0;
+    public long mEndDate = 0;
+    public int mItemCount = 0;
+    
+    private int mInitBitmapCount = 0;
+    private int mDoneBitmapCount = 0;
     
     private ThreadPool mLocationThreadPool;
     private ThreadPool mBitmapThreadPool;
+    
+    public int mVisioWidth = 1280;
+    public int mVisioHeight = 720;
     
     interface ISaveCallback{
         void onSaveDone();
@@ -54,12 +65,14 @@ public class MicroFilmActivity extends Activity implements SurfaceHolder.Callbac
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        /*
         SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
         sv.getHolder().addCallback(this);
         sv.getHolder().setFormat(PixelFormat.TRANSPARENT);
-        
-        mGLDraw = new GLDraw();
+        */
+
         mSaveCallback = new SaveCallback();
+        mLoadTexture = new LoadTexture(this);
 
         Log.d(TAG, "onCreate done");
     }
@@ -86,102 +99,50 @@ public class MicroFilmActivity extends Activity implements SurfaceHolder.Callbac
     	return super.onMenuItemSelected(featureId, item);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        // TODO: we might want to stop recording here.  As it is, we continue "recording",
-        //       which is pretty boring since we're not outputting any frames (test this
-        //       by blanking the screen with the power button).
-
-        // If the callback was posted, remove it.  This stops the notifications.  Ideally we
-        // would send a message to the thread letting it know, so when it wakes up it can
-        // reset its notion of when the previous Choreographer event arrived.
-        Log.d(TAG, "onPause unhooking choreographer");
-        Choreographer.getInstance().removeFrameCallback(this);
+    public boolean checkPause() {
+        return isPause;
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
+    public boolean checkPlay() {
+        return isPlaying;
+    }
 
-        // If we already have a Surface, we just need to resume the frame notifications.
-        if (mRenderThread != null) {
-            Log.d(TAG, "onResume re-hooking choreographer");
-            Choreographer.getInstance().postFrameCallback(this);
+    public long getStartDate() {
+        return mStartDate;
+    }
+
+    public long getEndDate() {
+        return mEndDate;
+    }
+
+    public int getItemCount() {
+        return mItemCount;
+    }
+
+    public boolean isSaving(){
+        return mIsSaving;
+    }
+
+    public void DoneLoadBitmap() {
+        mDoneBitmapCount++;
+        synchronized (mAttachView) {
+            if(!mIsSetView) SetupMicroView();
         }
-    }
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceCreated holder=" + holder);
-
-        SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
-        mRenderThread = new RenderThread(sv.getHolder(), MiscUtils.getDisplayRefreshNsec(this), mGLDraw);
-        mRenderThread.setName("GL render");
-        mRenderThread.start();
-        mRenderThread.waitUntilReady();
-
-        RenderHandler rh = mRenderThread.getHandler();
-        if (rh != null) {
-            rh.sendSurfaceCreated();
-        }
-
-        // start the draw events
-        Choreographer.getInstance().postFrameCallback(this);
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-        Log.d(TAG, "surfaceChanged fmt=" + format + " size=" + width + "x" + height +
-                " holder=" + holder);
-        RenderHandler rh = mRenderThread.getHandler();
-        if (rh != null) {
-            rh.sendSurfaceChanged(format, width, height);
-        }
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-        Log.d(TAG, "surfaceDestroyed holder=" + holder);
-
-        // We need to wait for the render thread to shut down before continuing because we
-        // don't want the Surface to disappear out from under it mid-render.  The frame
-        // notifications will have been stopped back in onPause(), but there might have
-        // been one in progress.
-        //
-        // TODO: the RenderThread doesn't currently wait for the encoder / muxer to stop,
-        //       so we can't use this as an indication that the .mp4 file is complete.
-
-        RenderHandler rh = mRenderThread.getHandler();
-        if (rh != null) {
-            rh.sendShutdown();
-            try {
-                mRenderThread.join();
-            } catch (InterruptedException ie) {
-                // not expected
-                throw new RuntimeException("join was interrupted", ie);
+        if(mInitBitmapCount == mDoneBitmapCount) {
+            //Here we need to quickly check again about bitmap
+            for(int i=0; i<mFileList.size(); i++) {
+                if(!mFileList.get(i).mIsInitial || mFileList.get(i).mBitmap == null) {
+                    mFileList.remove(i);
+                    i--;
+                } else {
+                    mFileList.get(i).CountId = i;
+                }
             }
-        }
-        mRenderThread = null;
-
-        // If the callback was posted, remove it.  Without this, we could get one more
-        // call on doFrame().
-        Choreographer.getInstance().removeFrameCallback(this);
-        Log.d(TAG, "surfaceDestroyed complete");
-    }
-
-    /*
-     * Choreographer callback, called near vsync.
-     *
-     * @see android.view.Choreographer.FrameCallback#doFrame(long)
-     */
-    @Override
-    public void doFrame(long frameTimeNanos) {
-        RenderHandler rh = mRenderThread.getHandler();
-        if (rh != null) {
-            Choreographer.getInstance().postFrameCallback(this);
-            rh.sendDoFrame(frameTimeNanos);
+            mMicroView.setFiles(mFileList);
+            mMicroView.InitData();
+            mIsLoadBitmapDone = true;
+            if(mMicroView.mReadyInit)
+                mMicroView.SendMSG(MicroMovieSurfaceView.MSG_STOPPROGRASS);
         }
     }
     

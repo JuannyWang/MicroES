@@ -4,13 +4,13 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
+import com.s890510.microfilm.util.Easing;
 
 public class MirrorShader extends Shader {
     private static final String TAG = "MirrorShader";
@@ -34,11 +34,11 @@ public class MirrorShader extends Shader {
     private int mLeftFilterHandle;
     private int mRightFilterHandle;
     private float[] mMVPMatrix = new float[16];
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public MirrorShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public MirrorShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -52,8 +52,8 @@ public class MirrorShader extends Shader {
         if(mEffect == null) return;
         else mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
-        float[] mLeft = mProcessGL.getLeftFilter();
-        float[] mRight = mProcessGL.getRightFilter();
+        float[] mLeft = mGLDraw.getLeftFilter();
+        float[] mRight = mGLDraw.getRightFilter();
 
         float duration = mEffect.getDuration(mElapseTime);
         float progress = mEffect.getProgressByElapse(mElapseTime);
@@ -75,7 +75,7 @@ public class MirrorShader extends Shader {
         GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mElementInfo.mVertices);
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-        GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
+        GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
         GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
         GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
         GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
@@ -92,7 +92,7 @@ public class MirrorShader extends Shader {
                 GLES20.glUniform1f(mTransHandle, 1.0f);
 
                 GLES20.glUniform1f(mCoverHandle, 3.0f);
-                GLES20.glUniform1f(mSizeHandle, -(Util.easeInOutCubic(elapse, 0, 2, duration*0.6f) - 1));
+                GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, 2, duration*0.6f) - 1));
             } else {
                 GLES20.glUniform1f(mTransHandle, 0.0f);
             }
@@ -131,12 +131,12 @@ public class MirrorShader extends Shader {
             GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mElementInfo.mVertices);
             GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-            GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
+            GLES20.glUniform2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
             GLES20.glUniform1f(mAlphaHandle, mEffect.getAlpha(mElapseTime));
             GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
             GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
             GLES20.glUniform1f(mSizeHandle, 0);
-            GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
+            GLES20.glUniform1f(mThemeHandle, mGLDraw.getScriptFilter());
 
             if(mMirrorType == Shader.MIRROR_VERTICAL) {
                 GLES20.glUniform1f(mDirectHandle, 1.0f);
@@ -148,7 +148,7 @@ public class MirrorShader extends Shader {
                     GLES20.glUniform1f(mTransHandle, 1.0f);
 
                     GLES20.glUniform1f(mCoverHandle, 2.0f);
-                    GLES20.glUniform1f(mSizeHandle, Util.easeInOutCubic(elapse, 0, 2, duration*0.6f) - 1);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, 2, duration*0.6f) - 1);
                 } else {
                     GLES20.glUniform1f(mTransHandle, 0.0f);
                 }
@@ -178,12 +178,12 @@ public class MirrorShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("MirrorShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;

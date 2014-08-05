@@ -4,13 +4,13 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.asus.gallery.R;
-import com.asus.gallery.micromovie.ElementInfo;
-import com.asus.gallery.micromovie.MicroMovieActivity;
-import com.asus.gallery.micromovie.ProcessGL;
-import com.asus.gallery.micromovie.ShaderHelper;
-import com.asus.gallery.micromovie.Util;
+import com.s890510.microfilm.ElementInfo;
+import com.s890510.microfilm.MicroFilmActivity;
+import com.s890510.microfilm.R;
+import com.s890510.microfilm.draw.GLDraw;
+import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
+import com.s890510.microfilm.util.Easing;
 
 public class LatticeShader extends Shader {
     private static final String TAG = "LatticeShader";
@@ -30,11 +30,11 @@ public class LatticeShader extends Shader {
     private int mLeftFilterHandle;
     private int mRightFilterHandle;
     private float[] mMVPMatrix = new float[16];
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public LatticeShader(MicroMovieActivity activity, ProcessGL processGL) {
+    public LatticeShader(MicroFilmActivity activity, GLDraw gldraw) {
         super(activity);
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
         CreateProgram();
     }
 
@@ -48,8 +48,8 @@ public class LatticeShader extends Shader {
         if(mEffect == null) return;
         else mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
-        float[] mLeft = mProcessGL.getLeftFilter();
-        float[] mRight = mProcessGL.getRightFilter();
+        float[] mLeft = mGLDraw.getLeftFilter();
+        float[] mRight = mGLDraw.getRightFilter();
 
         if(mEffect.getMaskType(mElapseTime) != 0 && mType != Shader.LATTICE_BLUE_BAR_GONE_STRING) {
             mType = mEffect.getMaskType(mElapseTime);
@@ -62,12 +62,12 @@ public class LatticeShader extends Shader {
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
         if(mType == Shader.LATTICE_BLUE_BAR_GONE_STRING) {
-        	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
-            GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
+        	mGLDraw.mStringLoader.mStringTextureCoords.position(0);
+            GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringTextureCoords);
             GLES20.glEnableVertexAttribArray(mTextureHandle);
 
-            mProcessGL.mStringLoader.mStringVertices.position(0);
-            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringVertices);
+            mGLDraw.mStringLoader.mStringVertices.position(0);
+            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 0, mGLDraw.mStringLoader.mStringVertices);
             GLES20.glEnableVertexAttribArray(mPositionHandle);
 
             mType = Shader.LATTICE_BLUE_BAR_GONE;
@@ -82,8 +82,8 @@ public class LatticeShader extends Shader {
         }
 
         GLES20.glUniform1f(mSizeHandle, 0);
-        GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
-        GLES20.glVertexAttrib2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
+        GLES20.glUniform1f(mThemeHandle, mGLDraw.getScriptFilter());
+        GLES20.glVertexAttrib2f(mResolutionHandle, mGLDraw.ScreenWidth, mGLDraw.ScreenHeight);
         GLES20.glUniform4f(mLeftFilterHandle, mLeft[0], mLeft[1], mLeft[2], mLeft[3]);
         GLES20.glUniform4f(mRightFilterHandle, mRight[0], mRight[1], mRight[2], mRight[3]);
 
@@ -92,24 +92,24 @@ public class LatticeShader extends Shader {
             float duration = mEffect.getDuration(mElapseTime);
 
             if(mType == Shader.LATTICE_TILTED_RIGHT_R) {
-                GLES20.glUniform1f(mRadiusHandle, (mProcessGL.ScreenWidth+mProcessGL.ScreenHeight)/8);
+                GLES20.glUniform1f(mRadiusHandle, (mGLDraw.ScreenWidth+mGLDraw.ScreenHeight)/8);
                 if(progress < 0.45) {
                     GLES20.glUniform1f(mMotionHandle, 1);
-                    GLES20.glUniform1f(mSizeHandle, Util.easeOutCubic(progress*10/4.5f*duration, 0, 4, duration) - 2.0f);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeOutCubic(progress*10/4.5f*duration, 0, 4, duration) - 2.0f);
                 } else if(progress > 0.55) {
                     GLES20.glUniform1f(mMotionHandle, 2);
-                    GLES20.glUniform1f(mSizeHandle, Util.easeOutCubic((progress-0.55f)*10/4.5f*duration, 0, 4, duration) - 2.0f);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeOutCubic((progress-0.55f)*10/4.5f*duration, 0, 4, duration) - 2.0f);
                 } else {
                     GLES20.glUniform1f(mMotionHandle, 3);
                 }
             } else if(mType == Shader.LATTICE_CROSS_4) {
-                GLES20.glUniform1f(mRadiusHandle, (mProcessGL.ScreenWidth+mProcessGL.ScreenHeight)/4);
+                GLES20.glUniform1f(mRadiusHandle, (mGLDraw.ScreenWidth+mGLDraw.ScreenHeight)/4);
                 GLES20.glUniform1f(mMotionHandle, 4);
-                GLES20.glUniform1f(mSizeHandle, Util.easeOutCubic(progress*duration, 0, 4, duration) - 2.0f);
+                GLES20.glUniform1f(mSizeHandle, Easing.easeOutCubic(progress*duration, 0, 4, duration) - 2.0f);
             } else if(mType == Shader.LATTICE_CROSS_2) {
-                GLES20.glUniform1f(mRadiusHandle, (mProcessGL.ScreenWidth+mProcessGL.ScreenHeight)/2);
+                GLES20.glUniform1f(mRadiusHandle, (mGLDraw.ScreenWidth+mGLDraw.ScreenHeight)/2);
                 GLES20.glUniform1f(mMotionHandle, 5);
-                GLES20.glUniform1f(mSizeHandle,  Util.easeOutCubic(progress*duration, 0, 4, duration) - 2.0f);
+                GLES20.glUniform1f(mSizeHandle,  Easing.easeOutCubic(progress*duration, 0, 4, duration) - 2.0f);
             } else if(mType == Shader.LATTICE_BLUE_BAR) {
                 GLES20.glUniform1f(mMotionHandle, 7);
                 GLES20.glUniform1f(mSizeHandle, progress * 6.0f - 3.0f);
@@ -119,7 +119,7 @@ public class LatticeShader extends Shader {
             } else {
                 GLES20.glUniform1f(mMotionHandle, 6);
                 GLES20.glUniform1f(mSizeHandle, (1-progress) * 2.0f);
-                GLES20.glUniform1f(mRadiusHandle, mProcessGL.ScreenHeight/20);
+                GLES20.glUniform1f(mRadiusHandle, mGLDraw.ScreenHeight/20);
             }
         } else {
             GLES20.glUniform1f(mMotionHandle, 0);
@@ -143,12 +143,12 @@ public class LatticeShader extends Shader {
     }
 
     private void CreateProgram() {
-        final int vertexShaderHandle = ShaderHelper.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
-        final int fragmentShaderHandle = ShaderHelper.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
+        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, VertexShader());
+        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("LatticeShader");
         //Create the new program
-        mProgram = ShaderHelper.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
+        mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
         if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;

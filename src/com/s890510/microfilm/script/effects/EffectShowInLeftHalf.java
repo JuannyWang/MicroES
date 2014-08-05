@@ -2,7 +2,7 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-import com.asus.gallery.micromovie.ProcessGL;
+import com.s890510.microfilm.draw.GLDraw;
 
 public class EffectShowInLeftHalf extends BasicEffect
 {
@@ -16,21 +16,21 @@ public class EffectShowInLeftHalf extends BasicEffect
     private float mStartAlpha = 1.0f;
     private float mEndAlpha = 1.0f;
     private float scale = 1.0f;
-    private ProcessGL mProcessGL;
+    private GLDraw mGLDraw;
 
-    public EffectShowInLeftHalf(ProcessGL processGL) {
+    public EffectShowInLeftHalf(GLDraw gldraw) {
         mDuration = DURATION;
         mSleep = SLEEP;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
-    public EffectShowInLeftHalf(ProcessGL processGL, int duration) {
+    public EffectShowInLeftHalf(GLDraw gldraw, int duration) {
         mDuration = duration;
         mSleep = SLEEP;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
-    public EffectShowInLeftHalf(ProcessGL processGL, int duration, float sScale, float eScale, float sAlpha, float eAlpha) {
+    public EffectShowInLeftHalf(GLDraw gldraw, int duration, float sScale, float eScale, float sAlpha, float eAlpha) {
         mDuration = duration;
         mSleep = SLEEP;
         mStartScale = sScale;
@@ -38,10 +38,10 @@ public class EffectShowInLeftHalf extends BasicEffect
         mStartAlpha = sAlpha;
         mEndAlpha = eAlpha;
         NeedScale = true;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
-    public EffectShowInLeftHalf(ProcessGL processGL, int duration, float sScale, float eScale, float sAlpha, float eAlpha, int mask) {
+    public EffectShowInLeftHalf(GLDraw gldraw, int duration, float sScale, float eScale, float sAlpha, float eAlpha, int mask) {
         mDuration = duration;
         mSleep = SLEEP;
         mStartScale = sScale;
@@ -50,7 +50,7 @@ public class EffectShowInLeftHalf extends BasicEffect
         mEndAlpha = eAlpha;
         NeedScale = true;
         mMask = mask;
-        mProcessGL = processGL;
+        mGLDraw = gldraw;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class EffectShowInLeftHalf extends BasicEffect
             scale = mStartScale + getProgressByElapse(elapse) * (mEndScale - mStartScale);
             Matrix.scaleM(mMVPMatrix, 0, scale, scale, 0);
         }
-        Matrix.translateM(mMVPMatrix, 0, -mProcessGL.ScreenRatio/2, 0, 0);
+        Matrix.translateM(mMVPMatrix, 0, -mGLDraw.ScreenRatio/2, 0, 0);
         return mMVPMatrix;
     }
 

@@ -2,7 +2,7 @@ package com.s890510.microfilm.script;
 
 import java.util.ArrayList;
 
-import com.asus.gallery.micromovie.ElementInfo;
+import com.s890510.microfilm.ElementInfo;
 
 public abstract class Script
 {

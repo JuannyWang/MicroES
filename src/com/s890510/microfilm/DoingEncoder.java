@@ -40,7 +40,7 @@ public class DoingEncoder {
     private GLDraw mGLDraw;
     
     public DoingEncoder() {
-    	mGLDraw = new GLDraw();
+    	//mGLDraw = new GLDraw();
 	}
     
     public void Start(SaveCallback callback) {
