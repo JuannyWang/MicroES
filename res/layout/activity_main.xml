@@ -20,6 +20,7 @@
     android:layout_height="match_parent"
     tools:context=".MicroFilmActivity" >
 
+    <!-- 
     <SurfaceView
         android:id="@+id/fboActivity_surfaceView"
         android:layout_width="wrap_content"
@@ -28,4 +29,10 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
+     -->
+     <Button
+         android:id="@+id/click_button" 
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:text="aaaaaaaa" />         
 </RelativeLayout>

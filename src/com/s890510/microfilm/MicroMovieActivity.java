@@ -774,6 +774,7 @@ public class MicroMovieActivity extends Activity {
                 info.mGeoInfo = new GeoInfo(getApplicationContext(), this, new double[]{mLatitude[i], mLongitude[i]});
                 info.mGeoInfo.LoadAddress();
             }
+            /*
             if(mTypeFiles.get(i) == MediaObject.MEDIA_TYPE_IMAGE) {
                 info.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
                 info.TextureId = BitmapCounter;
@@ -792,6 +793,7 @@ public class MicroMovieActivity extends Activity {
                 mFileList.add(info);
                 mVideoList.add(i);
             }
+            */
         }
 
         //make the bitmap number to 10 (only if we have video)

@@ -12,7 +12,6 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Surface;
 
-import com.s890510.microfilm.MicroFilmActivity.SaveCallback;
 import com.s890510.microfilm.draw.GLDraw;
 import com.s890510.microfilm.gles.EglCore;
 import com.s890510.microfilm.gles.WindowSurface;
@@ -43,9 +42,9 @@ public class DoingEncoder {
     	//mGLDraw = new GLDraw();
 	}
     
-    public void Start(SaveCallback callback) {
+    public void Start(/*SaveCallback callback*/) {
     	create(new File(Environment.getExternalStorageDirectory().toString(), "test.mp4"));
-    	callback.onSaveDone();
+    	//callback.onSaveDone();
 	}
 
     public void create(File outputFile) {

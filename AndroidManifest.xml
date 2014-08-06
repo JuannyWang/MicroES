@@ -26,6 +26,9 @@
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" /> 
+    
 
     <uses-feature android:glEsVersion="0x00020000" android:required="true" />
 
@@ -45,6 +48,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        
+        <activity android:name="com.s890510.microfilm.MicroMovieActivity"
+            android:screenOrientation="sensorLandscape"
+            android:configChanges="keyboardHidden|orientation|screenSize" />
     </application>
 
 </manifest>

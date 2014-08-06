@@ -61,11 +61,13 @@ public class MicroFilmSurfaceView extends Activity implements SurfaceHolder.Call
     public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated holder=" + holder);
 
+        /*
         SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
         mRenderThread = new RenderThread(sv.getHolder(), MiscUtils.getDisplayRefreshNsec(this), mGLDraw);
         mRenderThread.setName("GL render");
         mRenderThread.start();
         mRenderThread.waitUntilReady();
+        */
 
         RenderHandler rh = mRenderThread.getHandler();
         if (rh != null) {
