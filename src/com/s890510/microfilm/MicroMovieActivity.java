@@ -546,7 +546,7 @@ public class MicroMovieActivity extends Activity {
         mSaveProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mSaveProgressDialog.setMax(mEncodeAndMuxTest.TOTAL_FRAMES + 100);
         mSaveProgressDialog.setProgressNumberFormat(null);
-        //mSaveProgressDialog.setProgressPercentFormat(null);
+        mSaveProgressDialog.setProgressPercentFormat(null);
         mSaveProgressDialog.setCanceledOnTouchOutside(false);
         mSaveProgressDialog.setOnKeyListener(new OnKeyListener(){
             @Override
@@ -774,8 +774,8 @@ public class MicroMovieActivity extends Activity {
                 info.mGeoInfo = new GeoInfo(getApplicationContext(), this, new double[]{mLatitude[i], mLongitude[i]});
                 info.mGeoInfo.LoadAddress();
             }
-            /*
-            if(mTypeFiles.get(i) == MediaObject.MEDIA_TYPE_IMAGE) {
+
+            if(mTypeFiles.get(i) == MediaInfo.MEDIA_TYPE_IMAGE) {
                 info.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
                 info.TextureId = BitmapCounter;
                 info.CountId = i;
@@ -785,7 +785,7 @@ public class MicroMovieActivity extends Activity {
                 mInitBitmapCount++;
                 BitmapCounter++;
                 mFileList.add(info);
-            } else if(mTypeFiles.get(i) == MediaObject.MEDIA_TYPE_VIDEO) {
+            } else if(mTypeFiles.get(i) == MediaInfo.MEDIA_TYPE_VIDEO) {
                 info.Type = MicroMovieSurfaceView.INFO_TYPE_VIDEO;
                 info.TextureId = VideoCounter;
 
@@ -793,7 +793,6 @@ public class MicroMovieActivity extends Activity {
                 mFileList.add(info);
                 mVideoList.add(i);
             }
-            */
         }
 
         //make the bitmap number to 10 (only if we have video)
@@ -853,7 +852,6 @@ public class MicroMovieActivity extends Activity {
             mAuto.setMediaSet(mMediaSet);
             mAuto.execute(0);
         } else {
-        */
             mFiles = mIntent.getStringArrayListExtra("File_Path");
             mVirtualPath = mIntent.getStringArrayListExtra("Virtual_Path");
             mTypeFiles = mIntent.getIntegerArrayListExtra("File_Type");
@@ -864,7 +862,35 @@ public class MicroMovieActivity extends Activity {
             mLongitude = mIntent.getDoubleArrayExtra("Geo_long");
 
             runData();
-        //}
+        }
+        */
+        
+        MediaPool mPool = (MediaPool)getApplicationContext();
+        ArrayList<MediaInfo> mInfo = mPool.getMediaInfo();
+        for(int i=0; i<mInfo.size(); i++) Log.e(TAG, "mInfo:" + mInfo.get(i).getPath());
+        
+        mFiles = new ArrayList<String>();
+        mVirtualPath = new ArrayList<String>();
+        mTypeFiles = new ArrayList<Integer>();
+        mRotateInfo= new ArrayList<Integer>();
+        
+        long[] mDate = new long[mInfo.size()];
+        mLatitude = new double[mInfo.size()];
+        mLongitude = new double[mInfo.size()];
+        for(int i=0; i<mInfo.size(); i++) {
+        	MediaInfo info = mInfo.get(i); 
+        	mFiles.add(info.getPath());
+        	mVirtualPath.add(info.getUri().getPath());
+        	mTypeFiles.add(info.getType());
+        	mRotateInfo.add(info.getRotate());
+        	mDate[i] = info.getDate();
+        	mLatitude[i] = 99999;
+        	mLongitude[i] = 99999;
+        }
+        
+        mDateInfo = mDate;
+
+        runData();
 
         mItemCount = mIntent.getIntExtra("Item_Count", 0);
     }
