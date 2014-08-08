@@ -97,6 +97,20 @@ public class MediaInfo {
 		return mRotate;
 	}
 	
+	public double getLatitude() {
+		if(mHaveLatLong)
+			return mLatLong[0];
+		else
+			return 99999;
+	}
+	
+	public double getLongitude() {
+		if(mHaveLatLong)
+			return mLatLong[1];
+		else
+			return 99999;
+	}
+	
 	private String getMimeType(Uri uri) {
         Cursor cursor = mActivity.getApplicationContext().getContentResolver().query(uri,
         		new String[] { MediaStore.MediaColumns.MIME_TYPE }, null, null, null);

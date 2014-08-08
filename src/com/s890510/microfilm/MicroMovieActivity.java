@@ -52,7 +52,9 @@ public class MicroMovieActivity extends Activity {
     private ArrayList<String> mVirtualPath;
     private ArrayList<Integer> mTypeFiles;
     private ArrayList<Integer> mRotateInfo;
-    private long[] mDateInfo;
+    private ArrayList<Long> mDateInfo;
+    private ArrayList<Double> mLatitude;
+    private ArrayList<Double> mLongitude;
     private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
     private ArrayList<ElementInfo> mFileOrder = null;
     private ProgressDialog mProgressDialog;
@@ -60,7 +62,7 @@ public class MicroMovieActivity extends Activity {
     private String Owner_Name;
     private UpdateListener mUpdateListener = new UpdateListener();
     private boolean mWindowhasFocus = false;
-    private double[] mLatitude, mLongitude;
+    //private double[] mLatitude, mLongitude;
     private boolean mIsAuto = false;
 
     private MicroMovieSurfaceView mMicroView = null;
@@ -761,7 +763,7 @@ public class MicroMovieActivity extends Activity {
             info.Path = mFiles.get(i);
             info.PathString = mVirtualPath.get(i);
             info.CountId = i;
-            info.mDate = mDateInfo[i];
+            info.mDate = mDateInfo.get(i);
 
             if(mStartDate == 0 || info.mDate < mStartDate) {
                 mStartDate = info.mDate;
@@ -770,8 +772,8 @@ public class MicroMovieActivity extends Activity {
                 mEndDate = info.mDate;
             }
 
-            if(mLatitude[i] != 99999 && mLongitude[i] != 99999) {
-                info.mGeoInfo = new GeoInfo(getApplicationContext(), this, new double[]{mLatitude[i], mLongitude[i]});
+            if(mLatitude.get(i) != 99999 && mLongitude.get(i) != 99999) {
+                info.mGeoInfo = new GeoInfo(getApplicationContext(), this, new double[]{mLatitude.get(i), mLongitude.get(i)});
                 info.mGeoInfo.LoadAddress();
             }
 
@@ -839,60 +841,20 @@ public class MicroMovieActivity extends Activity {
     }
 
     private void initData() {
-        Intent mIntent;
-        mIntent = this.getIntent();
-        mIsAuto = mIntent.getBooleanExtra("IsAuto", false);
-        /*
-        if(mIsAuto) {
-            String mPath = mIntent.getStringExtra("Media_Path");
-            Path mMediaSetPath = Path.fromString(mPath);
-            MediaSet mMediaSet = mEphotoApp.getDataManager().getMediaSet(mMediaSetPath);
-
-            AutolaunchMicroMovie mAuto = new AutolaunchMicroMovie();
-            mAuto.setMediaSet(mMediaSet);
-            mAuto.execute(0);
-        } else {
-            mFiles = mIntent.getStringArrayListExtra("File_Path");
-            mVirtualPath = mIntent.getStringArrayListExtra("Virtual_Path");
-            mTypeFiles = mIntent.getIntegerArrayListExtra("File_Type");
-            mRotateInfo = mIntent.getIntegerArrayListExtra("Rotate_Info");
-            mDateInfo = mIntent.getLongArrayExtra("Date_Info");
-
-            mLatitude = mIntent.getDoubleArrayExtra("Geo_lat");
-            mLongitude = mIntent.getDoubleArrayExtra("Geo_long");
-
-            runData();
-        }
-        */
-        
         MediaPool mPool = (MediaPool)getApplicationContext();
-        ArrayList<MediaInfo> mInfo = mPool.getMediaInfo();
-        for(int i=0; i<mInfo.size(); i++) Log.e(TAG, "mInfo:" + mInfo.get(i).getPath());
         
-        mFiles = new ArrayList<String>();
-        mVirtualPath = new ArrayList<String>();
-        mTypeFiles = new ArrayList<Integer>();
-        mRotateInfo= new ArrayList<Integer>();
-        
-        long[] mDate = new long[mInfo.size()];
-        mLatitude = new double[mInfo.size()];
-        mLongitude = new double[mInfo.size()];
-        for(int i=0; i<mInfo.size(); i++) {
-        	MediaInfo info = mInfo.get(i); 
-        	mFiles.add(info.getPath());
-        	mVirtualPath.add(info.getUri().getPath());
-        	mTypeFiles.add(info.getType());
-        	mRotateInfo.add(info.getRotate());
-        	mDate[i] = info.getDate();
-        	mLatitude[i] = 99999;
-        	mLongitude[i] = 99999;
-        }
-        
-        mDateInfo = mDate;
+        mFiles = mPool.getPath();
+        mVirtualPath = mPool.getUriPath();
+        mTypeFiles = mPool.getType();
+        mRotateInfo= mPool.getRotate();
+        mDateInfo = mPool.getDate();
+        mLatitude = mPool.getLatitude();
+        mLongitude = mPool.getLongitude();
 
         runData();
 
-        mItemCount = mIntent.getIntExtra("Item_Count", 0);
+        mItemCount = mPool.getCount();
+        Log.e(TAG, "mItemCount:" + mItemCount);
     }
 
     /*
