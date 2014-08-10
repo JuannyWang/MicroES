@@ -8,11 +8,18 @@ import java.util.TimeZone;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.ExifInterface;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images.Thumbnails;
+import android.util.Log;
 
 public class MediaInfo {
+	private final String TAG = "MediaInfo";
+
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	public static final int MEDIA_TYPE_VIDEO = 2;
 	public static final int MEDIA_TYPE_UNKNOW = 3;
@@ -26,6 +33,7 @@ public class MediaInfo {
 	private float[] mLatLong = new float[2];
 	private boolean mHaveLatLong = false;
 	private boolean mIsUTC = false;
+	private Bitmap mThumbNail;
 	
 	public MediaInfo(Activity activity) {
 		mActivity = activity;
@@ -66,7 +74,9 @@ public class MediaInfo {
             
 		} catch (IOException e) {
 			e.printStackTrace();
-		}   		
+		}
+		
+		getThumbNail(uri);
 	}
 	
 	public boolean IsUTC() {
@@ -111,6 +121,28 @@ public class MediaInfo {
 			return 99999;
 	}
 	
+	public Bitmap getThumbNail() {
+		return mThumbNail;
+	}
+
+	private void getThumbNail(Uri uri) {
+		BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inDither = false;
+	    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+		Cursor cursor = mActivity.getApplicationContext().getContentResolver().query(uri,
+        		new String[] { MediaStore.Images.Thumbnails._ID }, null, null, null);
+
+        if (cursor != null && cursor.moveToNext()) {
+            String id = cursor.getString(0);
+            mThumbNail = MediaStore.Images.Thumbnails.getThumbnail(mActivity.getContentResolver(), Long.parseLong(id), Thumbnails.MINI_KIND, options);
+        }
+
+        int minedge = Math.min(mThumbNail.getWidth(), mThumbNail.getHeight());
+
+		mThumbNail = ThumbnailUtils.extractThumbnail(mThumbNail, minedge, minedge);
+	}
+
 	private String getMimeType(Uri uri) {
         Cursor cursor = mActivity.getApplicationContext().getContentResolver().query(uri,
         		new String[] { MediaStore.MediaColumns.MIME_TYPE }, null, null, null);

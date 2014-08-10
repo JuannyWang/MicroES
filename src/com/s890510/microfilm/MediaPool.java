@@ -2,6 +2,8 @@ package com.s890510.microfilm;
 
 import java.util.ArrayList;
 
+import com.s890510.microfilm.util.ThreadPool;
+
 import android.app.Application;
 import android.content.ClipData.Item;
 import android.database.Cursor;
@@ -9,6 +11,7 @@ import android.provider.MediaStore;
 
 public class MediaPool extends Application {
 	private static final String TAG = "MediaPool";
+	private ThreadPool mLocationThreadPool, mBitmapThreadPool;
 	private ArrayList<MediaInfo> mMediaInfo = new ArrayList<MediaInfo>();
 
 	private ArrayList<String> mPath = new ArrayList<String>();
@@ -84,4 +87,18 @@ public class MediaPool extends Application {
 	public ArrayList<Double> getLongitude() {
 		return mLongitude;
 	}
+	
+	public synchronized ThreadPool getLocationThreadPool() {
+        if (mLocationThreadPool == null) {
+            mLocationThreadPool = new ThreadPool(1, 1, "Event-Location-pool");
+        }
+        return mLocationThreadPool;
+    }
+
+    public synchronized ThreadPool getBitmapThreadPool() {
+        if (mBitmapThreadPool == null) {
+            mBitmapThreadPool = new ThreadPool(4, 8, "Event-Bitmap-pool");
+        }
+        return mBitmapThreadPool;
+    }
 }

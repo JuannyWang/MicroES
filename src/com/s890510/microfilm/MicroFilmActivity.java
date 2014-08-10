@@ -1,6 +1,7 @@
 package com.s890510.microfilm;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.ClipData;
@@ -10,18 +11,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.GridView;
 
 public class MicroFilmActivity extends Activity {
     private static final String TAG = "MainActivity";
 
     private static final int SELECT_PHOTO = 100;
     private ArrayList<MediaInfo> mMediaInfo = new ArrayList<MediaInfo>();
+    private ArrayList<Map<String, Object>> mItems = new ArrayList<Map<String,Object>>();
+    private GridView mGridView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         /*
         SurfaceView sv = (SurfaceView) findViewById(R.id.fboActivity_surfaceView);
@@ -31,7 +36,31 @@ public class MicroFilmActivity extends Activity {
 
         //mSaveCallback = new SaveCallback();
         
-        Button btn = (Button) findViewById(R.id.click_buttonAAA);
+        if(getIntent().getBooleanExtra("ToEdit", false)) {
+        	PhotoEdit();
+        } else {
+        	PhotoSelect();
+        }
+        
+        Log.d(TAG, "onCreate done");
+    }
+
+    private void PhotoEdit() {
+    	setContentView(R.layout.asus_micromovie_edit);
+
+    	MicroFilmAdapter mAdapter = new MicroFilmAdapter(getApplicationContext());
+    	mGridView = (GridView)findViewById(R.id.asus_micromovie_editshow);
+    	mGridView.setNumColumns(4);
+    	mGridView.setAdapter(mAdapter);
+    }
+    
+    private void PhotoSelect() {
+    	setContentView(R.layout.activity_main);
+    	
+    	mGridView = (GridView)findViewById(R.id.asus_micromovie_startshow);
+    	mGridView.setNumColumns(4);
+    	
+    	Button btn = (Button) findViewById(R.id.click_buttonA);
         btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -43,17 +72,23 @@ public class MicroFilmActivity extends Activity {
 			}
 		});
         
-        Button btn1 = (Button) findViewById(R.id.click_buttonBBB);
+        Button btn1 = (Button) findViewById(R.id.click_buttonB);
         btn1.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent();
 		        intent.setClass(getApplicationContext(), MicroMovieActivity.class);
-		        startActivity(intent);		        
+		        startActivity(intent);
+		        finish();
 			}
 		});
-
-        Log.d(TAG, "onCreate done");
+    }
+    
+    private void setImage(Uri uri) {
+    	Log.e(TAG, "Uri:" + uri);
+    	MediaInfo mInfo = new MediaInfo(this);
+		mInfo.setup(uri);
+		mMediaInfo.add(mInfo);
     }
     
     @Override
@@ -63,30 +98,22 @@ public class MicroFilmActivity extends Activity {
         switch(requestCode) { 
 	        case SELECT_PHOTO:
 	            if(resultCode == RESULT_OK){
-	            	Uri selectedImage = imageReturnedIntent.getData();
-	                if(selectedImage == null) {
-	                	ClipData pickedImage = imageReturnedIntent.getClipData();
-		            	Log.e(TAG, "pickedImage:" + pickedImage.getItemCount());
+	            	mMediaInfo = ((MediaPool)getApplicationContext()).getMediaInfo();
+
+	            	Uri SingleImage = imageReturnedIntent.getData();
+	                if(SingleImage == null) {
+	                	ClipData MultiImage = imageReturnedIntent.getClipData();
+	                	for(int i=0; i<MultiImage.getItemCount(); i++) {
+	                		setImage(MultiImage.getItemAt(i).getUri());	                		
+	                	}
 	                } else {
-	                	Log.e(TAG, "AAAAAAAAAAAAAA");
+	                	setImage(imageReturnedIntent.getData());
 	                }
 	                
-	                
-	            	//ClipData pickedImage = imageReturnedIntent.getClipData();
-	            	//Log.e(TAG, "pickedImage:" + pickedImage.getItemCount());
-	            	/*
-	                Uri selectedImage = imageReturnedIntent.getData();
-	                MediaInfo mInfo = new MediaInfo(this);
-	                
-	                mInfo.setup(selectedImage);
-	                mMediaInfo.add(mInfo);
-	                MediaPool mPool = (MediaPool)getApplicationContext();
-	                mPool.setMediaInfo(mMediaInfo);
-	                */
+	                ((MediaPool)getApplicationContext()).setMediaInfo(mMediaInfo);
+	                MicroFilmAdapter mAdapter = new MicroFilmAdapter(getApplicationContext());
+	                mGridView.setAdapter(mAdapter);
 	            }
         }
-        
-        for(int i=0; i<mMediaInfo.size(); i++)
-        	Log.e(TAG, "i:" + i + ", Path:" + mMediaInfo.get(i).getPath());
     }
 }

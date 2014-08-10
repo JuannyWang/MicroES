@@ -74,6 +74,7 @@ public class MicroMovieActivity extends Activity {
 
     private MenuItem mSaveMovie;
     private MenuItem mRefreshMovie;
+    private MenuItem mMovieEdit;
     private ImageButton mControlButtom;
     private boolean isPlaying = false;
     private boolean setLayoutListener = false;
@@ -108,8 +109,8 @@ public class MicroMovieActivity extends Activity {
     public LoadTexture mLoadTexture;
     public MicroMovieOrder mMicroMovieOrder;
 
-    public int mVisioWidth = 1280;
-    public int mVisioHeight = 720;
+    public static final int mVisioWidth = 1280;
+    public static final int mVisioHeight = 720;
 
     interface ISaveCallback{
         void onSaveDone(String saveUri, int frameTime);
@@ -415,6 +416,7 @@ public class MicroMovieActivity extends Activity {
         inflater.inflate(R.menu.asus_micromovie_menu, menu);
         mSaveMovie = (MenuItem) menu.findItem(R.id.MicroMovie_save_button);
         mRefreshMovie = (MenuItem) menu.findItem(R.id.MicroMovie_refresh_button);
+        mMovieEdit = (MenuItem) menu.findItem(R.id.MicroMovie_album_button);
 
         if(mScript == null){
             mSaveMovie.setEnabled(false);
@@ -446,6 +448,12 @@ public class MicroMovieActivity extends Activity {
             case R.id.MicroMovie_refresh_button:
                 setMovieOrder(true);
                 DoPlay();
+                return true;
+            case R.id.MicroMovie_album_button:
+            	Intent intent = new Intent();
+		        intent.setClass(getApplicationContext(), MicroFilmActivity.class);
+		        intent.putExtra("ToEdit", true);
+		        startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

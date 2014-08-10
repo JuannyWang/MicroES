@@ -18,6 +18,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".MicroFilmActivity" >
 
     <!-- 
@@ -30,14 +31,26 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true" />
      -->
-     <Button
-         android:id="@+id/click_buttonAAA" 
+     <LinearLayout 
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
-         android:text="aaaaaaaa" />
-     <Button
-         android:id="@+id/click_buttonBBB" 
-         android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-         android:text="bbbbbbbb" />   
+         android:orientation="horizontal">
+	     <Button
+	         android:id="@+id/click_buttonA" 
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:text="Select Photo" />
+	     <Button
+	         android:id="@+id/click_buttonB" 
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:text="Start MicroFilm" /> 
+     </LinearLayout>
+     <GridView
+        android:id="@+id/asus_micromovie_startshow"  
+        android:layout_width="match_parent" 
+        android:layout_height="match_parent" 
+        android:numColumns="auto_fit"
+     	android:gravity="center"
+     	android:stretchMode="columnWidth" />
 </LinearLayout>
