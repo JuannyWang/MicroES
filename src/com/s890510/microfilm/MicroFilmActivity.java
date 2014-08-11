@@ -8,6 +8,7 @@ import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -20,6 +21,7 @@ public class MicroFilmActivity extends Activity {
 
     private static final int SELECT_PHOTO = 100;
     private ArrayList<MediaInfo> mMediaInfo = new ArrayList<MediaInfo>();
+    private ArrayList<String> mUriPath = new ArrayList<String>();
     private ArrayList<Map<String, Object>> mItems = new ArrayList<Map<String,Object>>();
     private GridView mGridView;
 
@@ -79,16 +81,18 @@ public class MicroFilmActivity extends Activity {
 				Intent intent = new Intent();
 		        intent.setClass(getApplicationContext(), MicroMovieActivity.class);
 		        startActivity(intent);
-		        finish();
 			}
 		});
     }
     
     private void setImage(Uri uri) {
+    	//To get true uri path
     	Log.e(TAG, "Uri:" + uri);
+    	if(mUriPath.contains(uri.getPath())) return;
     	MediaInfo mInfo = new MediaInfo(this);
 		mInfo.setup(uri);
 		mMediaInfo.add(mInfo);
+		mUriPath.add(uri.getPath());
     }
     
     @Override
@@ -99,6 +103,7 @@ public class MicroFilmActivity extends Activity {
 	        case SELECT_PHOTO:
 	            if(resultCode == RESULT_OK){
 	            	mMediaInfo = ((MediaPool)getApplicationContext()).getMediaInfo();
+	            	mUriPath = ((MediaPool)getApplicationContext()).getUriPath();
 
 	            	Uri SingleImage = imageReturnedIntent.getData();
 	                if(SingleImage == null) {
