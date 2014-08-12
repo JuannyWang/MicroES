@@ -22,13 +22,13 @@ public class LoadTexture {
         height = mActivity.mVisioHeight;
     }
 
-    public boolean loadTexture(final Context context, final FileInfo Info, final boolean IsFake, int duration) {
-        if(!Info.Path.isEmpty()) {
+    public boolean loadTexture(final Context context, final MediaInfo Info, final boolean IsFake, int duration) {
+        if(!Info.getPath().isEmpty()) {
 
             Bitmap bitmap = null;
 
             MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-            mediaMetadataRetriever.setDataSource(Info.Path);
+            mediaMetadataRetriever.setDataSource(Info.getPath());
             Log.e(TAG, "INFO_TYPE_VITMAP Duration:" + duration);
             bitmap = mediaMetadataRetriever.getFrameAtTime(duration*1000); //unit in microsecond
 
@@ -39,7 +39,7 @@ public class LoadTexture {
                     bitmap = BitmapScale(bitmap, width, height);
 
                 Log.e(TAG, "loadTexture, width:" + bitmap.getWidth() + ", height:" + bitmap.getHeight());
-                Info.mBitmap = bitmap;
+                Info.setImage(bitmap);
                 return true;
             }
             else {

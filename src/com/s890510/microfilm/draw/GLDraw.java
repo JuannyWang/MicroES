@@ -3,12 +3,10 @@ package com.s890510.microfilm.draw;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
-import java.util.ArrayList;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.s890510.microfilm.FileInfo;
 import com.s890510.microfilm.MicroFilmActivity;
 import com.s890510.microfilm.script.Script;
 
@@ -19,8 +17,6 @@ public class GLDraw {
     private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
     private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
     private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
-    
-    private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
 
     private MicroFilmActivity mActivity;
     public int mSpecialHash = 0;
@@ -71,18 +67,6 @@ public class GLDraw {
 
     public int getScriptFilter() {
         return mScript.getFilterNumber();
-    }
-
-    public String getFirstLocation() {
-        if(mFileList.get(0).mGeoInfo != null) {
-            if(mFileList.get(0).mGeoInfo.getLocation() != null) {
-                return mFileList.get(0).mGeoInfo.getLocation().get(0);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
     }
 
 	public void prepare() {

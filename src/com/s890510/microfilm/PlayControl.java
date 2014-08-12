@@ -150,13 +150,13 @@ public class PlayControl {
                             playIndex++;
 
                             //Need to find sometime to rewrite...
-                            if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+                            if(eInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                                 mSurfaceView.changeBitmap(eInfo, true);
                                 if(misVideo) {
                                     mSurfaceView.stopMediaPlayer();
                                     misVideo = false;
                                 }
-                            } else if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
+                            } else if(eInfo.Type == MediaInfo.MEDIA_TYPE_VIDEO) {
                                 if(mSleep > 0) {
                                     Log.e(TAG, "We need to seek the video!");
                                     int time = eInfo.time - mSleep;

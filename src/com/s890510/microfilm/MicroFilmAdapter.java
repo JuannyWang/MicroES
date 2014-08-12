@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.provider.MediaStore.Images.Thumbnails;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,8 +21,13 @@ public class MicroFilmAdapter extends BaseAdapter {
 	}
 
 	@Override
+	public void notifyDataSetChanged() {
+		super.notifyDataSetChanged();
+		mMediaInfo = ((MediaPool)mContext).getMediaInfo();
+	}
+
+	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
 		return mMediaInfo.size();
 	}
 
@@ -52,8 +56,8 @@ public class MicroFilmAdapter extends BaseAdapter {
         mImageView = (ImageView) mView.findViewById(R.id.micromovie_item);
         
         DisplayMetrics metrics = mContext.getResources().getDisplayMetrics();
-        int edge = metrics.widthPixels / 4;
-        
+        int edge = metrics.widthPixels / 5;
+
         mImageView.setImageBitmap(Bitmap.createScaledBitmap(mMediaInfo.get(position).getThumbNail(), edge, edge, false));
         
         return mView;

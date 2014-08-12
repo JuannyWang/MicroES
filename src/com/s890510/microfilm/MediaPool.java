@@ -23,6 +23,7 @@ public class MediaPool extends Application {
     private ArrayList<Double> mLongitude = new ArrayList<Double>();
     
     private int ItemCount = 0;
+    public int InfoCounter = 0;
 	
 	public ArrayList<MediaInfo> getMediaInfo() {
 		return mMediaInfo;
@@ -44,11 +45,23 @@ public class MediaPool extends Application {
 		}
 	}
 	
+	public void addInfo(MediaInfo info) {
+		mMediaInfo.add(info);
+		
+		mPath.add(info.getPath());
+		mUriPath.add(info.getUri().getPath());
+		mType.add(info.getType());
+		mRotate.add(info.getRotate());
+		mDate.add(info.getDate());
+		mLatitude.add(info.getLatitude());
+		mLongitude.add(info.getLongitude());
+	}
+	
 	public void setCount(int count) {
 		ItemCount = count;
 	}
 	
-	public int getCount() {
+	public int getImageCount() {
 		if(ItemCount == 0) {
 			Cursor cursor = getApplicationContext().getContentResolver().query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
 	        		new String[] { MediaStore.Images.Media._ID }, null, null, null);
@@ -58,6 +71,10 @@ public class MediaPool extends Application {
 	        }
 		}
 	    return ItemCount;
+	}
+	
+	public int getCount() {
+		return mMediaInfo.size();
 	}
 	
 	public ArrayList<String> getPath() {

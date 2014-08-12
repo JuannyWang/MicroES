@@ -48,14 +48,7 @@ public class MicroMovieActivity extends Activity {
 
     private final String TAG = "MicroMovieActivity";
     private final int MIN_STORAGE_NEED = 200 * 1024 *1024; // 200 MB
-    private ArrayList<String> mFiles;
-    private ArrayList<String> mVirtualPath;
-    private ArrayList<Integer> mTypeFiles;
-    private ArrayList<Integer> mRotateInfo;
-    private ArrayList<Long> mDateInfo;
-    private ArrayList<Double> mLatitude;
-    private ArrayList<Double> mLongitude;
-    private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
+    private ArrayList<MediaInfo> mFileList = new ArrayList<MediaInfo>();
     private ArrayList<ElementInfo> mFileOrder = null;
     private ProgressDialog mProgressDialog;
     private boolean isPause = false;
@@ -146,14 +139,14 @@ public class MicroMovieActivity extends Activity {
         if(mInitBitmapCount == mDoneBitmapCount) {
             //Here we need to quickly check again about bitmap
             for(int i=0; i<mFileList.size(); i++) {
-                if(!mFileList.get(i).mIsInitial || mFileList.get(i).mBitmap == null) {
+                if(!mFileList.get(i).mIsInitial || mFileList.get(i).getImage() == null) {
                     mFileList.remove(i);
                     i--;
                 } else {
                     mFileList.get(i).CountId = i;
                 }
             }
-            mMicroView.setFiles(mFileList);
+            mMicroView.setMedia(mFileList);
             mMicroView.InitData();
             mIsLoadBitmapDone = true;
             if(mMicroView.mReadyInit)
@@ -309,7 +302,6 @@ public class MicroMovieActivity extends Activity {
                 mIsDDS = true;
             }
             mIsThisActivitySaving = savedInstanceState.getBoolean("IsSaving");
-            mVirtualPath = savedInstanceState.getStringArrayList("AutoPath");
 
             for(int i=0; i<ThemeAdapter.TYPE_Count; i++) {
                 mMicroMovieOrder.setOrderList(i,
@@ -321,10 +313,14 @@ public class MicroMovieActivity extends Activity {
             mMicroMovieOrder.Reset();
         }
 
-        initData();
-
         mSaveCallback = new SaveCallback();
         mLoadTexture = new LoadTexture(this);
+        
+        //temp
+        mFileList = ((MediaPool)getApplicationContext()).getMediaInfo();
+        mMicroView.setMedia(mFileList);
+        mMicroView.InitData();
+        mIsLoadBitmapDone = true;
     }
 
     private void checkSaveWhenLaunch(){
@@ -492,7 +488,6 @@ public class MicroMovieActivity extends Activity {
         }
 
         outState.putBoolean("IsSaving", mIsThisActivitySaving);
-        outState.putStringArrayList("AutoPath", mVirtualPath);
 
         for(int i=0; i<ThemeAdapter.TYPE_Count; i++) {
             outState.putIntArray("OrderList_" + i, mMicroMovieOrder.getOrderList(i));
@@ -521,6 +516,7 @@ public class MicroMovieActivity extends Activity {
             }
         }
 
+        /*
         for(int i=0; i<mFileList.size(); i++) {
             mFileList.get(i).onDestory();
             if(mFileList.get(i).mBitmap != null) {
@@ -531,6 +527,7 @@ public class MicroMovieActivity extends Activity {
                 mFileList.get(i).mGeoInfo.cancel();
             }
         }
+        */
 
         if(mProgressDialog != null)
             mProgressDialog.dismiss();
@@ -681,13 +678,13 @@ public class MicroMovieActivity extends Activity {
             ArrayList<Integer> eBitmap = new ArrayList<Integer>();
             ArrayList<Integer> eChange = new ArrayList<Integer>();
             for(int i=0; i<mFileOrder.size(); i++) {
-                if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+                if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                     mFileOrder.get(i).CalcTriangleVertices(processGL);
                 }
 
-                if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
+                if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
                     eVideo.add(i);
-                } else if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP && mFileOrder.get(i).isVideo) {
+                } else if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE && mFileOrder.get(i).isVideo) {
                     eBitmap.add(i);
                 }
             }
@@ -718,12 +715,12 @@ public class MicroMovieActivity extends Activity {
                 } else {
                     //So sad...the pos can't put video
                     ElementInfo etemp = mFileOrder.get(eVideo.get(i));
-                    FileInfo itemp = mFileList.get(etemp.InfoId);
+                    MediaInfo itemp = mFileList.get(etemp.InfoId);
 
-                    etemp.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
+                    etemp.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                     etemp.TextureId = itemp.VId.get(itemp.Count)[0];
 
-                    FileInfo tmp = mFileList.get(itemp.VId.get(itemp.Count)[1]);
+                    MediaInfo tmp = mFileList.get(itemp.VId.get(itemp.Count)[1]);
                     etemp.x = tmp.x;
                     etemp.y = tmp.y;
                     etemp.mFaceCount = tmp.mFaceCount;
@@ -761,13 +758,14 @@ public class MicroMovieActivity extends Activity {
         }
         //--------------------------------------------*/
     }
-
+    
+    /*
     private void runData() {
         int BitmapCounter = 0;
         int VideoCounter = 0;
         ArrayList<Integer> mVideoList = new ArrayList<Integer>();
         for(int i=0; i<mFiles.size(); i++) {
-            FileInfo info = new FileInfo(this);
+        	MediaInfo info = new MediaInfo(this);
             info.Path = mFiles.get(i);
             info.PathString = mVirtualPath.get(i);
             info.CountId = i;
@@ -831,7 +829,7 @@ public class MicroMovieActivity extends Activity {
             }
         }
 
-        /*/--------------------------------------------
+        //--------------------------------------------
         int bitmapCount = 0;
         int videoCount = 0;
         for(int i=0; i<mFileList.size(); i++) {
@@ -845,25 +843,9 @@ public class MicroMovieActivity extends Activity {
             if(info.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO && !info.IsFake) videoCount++;
         }
         Log.e(TAG, "bitmapCount:" + bitmapCount + ", videoCount:" + videoCount);
-        //--------------------------------------------*/
+        //--------------------------------------------/
     }
-
-    private void initData() {
-        MediaPool mPool = (MediaPool)getApplicationContext();
-        
-        mFiles = mPool.getPath();
-        mVirtualPath = mPool.getUriPath();
-        mTypeFiles = mPool.getType();
-        mRotateInfo= mPool.getRotate();
-        mDateInfo = mPool.getDate();
-        mLatitude = mPool.getLatitude();
-        mLongitude = mPool.getLongitude();
-
-        runData();
-
-        mItemCount = mPool.getCount();
-        Log.e(TAG, "mItemCount:" + mItemCount);
-    }
+    */
 
     /*
     private class AutolaunchMicroMovie extends AsyncTask<Integer, Integer, ArrayList<MediaItem>> {

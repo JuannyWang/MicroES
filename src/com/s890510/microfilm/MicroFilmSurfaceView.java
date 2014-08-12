@@ -21,9 +21,6 @@ public class MicroFilmSurfaceView extends Activity implements SurfaceHolder.Call
     public static final int MSG_FINCHANGESURFACE = 3;
     public static final int MSG_PLAYFIN = 4;
 
-    public static final int INFO_TYPE_BITMAP = 0;
-    public static final int INFO_TYPE_VIDEO = 1;
-
 	public MicroFilmSurfaceView() {
 		
 	}

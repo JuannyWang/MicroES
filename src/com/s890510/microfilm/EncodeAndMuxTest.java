@@ -114,8 +114,8 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     private String mOutputPath;
     private String mVideoPath;
     private MediaFormat mVideoFormat;
-    private ArrayList<FileInfo> mFilesList;
-    private ArrayList<FileInfo> mFileInfo = new ArrayList<FileInfo>();
+    private ArrayList<MediaInfo> mFilesList;
+    private ArrayList<MediaInfo> mMediaInfo = new ArrayList<MediaInfo>();
     private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
     private Script mScript;
     private int mScriptSelect;
@@ -149,7 +149,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     
 
 
-    public EncodeAndMuxTest(MicroMovieActivity activity, ArrayList<FileInfo> fileList,
+    public EncodeAndMuxTest(MicroMovieActivity activity, ArrayList<MediaInfo> fileList,
             ArrayList<ElementInfo> fileOrder, Script script, int scriptSelect) {
         mContext = activity.getApplicationContext();
         mActivity = activity;
@@ -159,7 +159,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         mProcessGL = new ProcessGL(mContext, mActivity, true);
         
         mFilesList = fileList;
-        mProcessGL.setFileInfo(fileList);
+        mProcessGL.setMediaInfo(fileList);
         mFileOrder = fileOrder;
         mScript = script;
         mScriptSelect = scriptSelect;
@@ -169,11 +169,11 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     // It is the same with MicroMovieSurfaceView
     private void InitData() {
         for(int i=0; i<mFilesList.size(); i++) {
-            FileInfo info = mFilesList.get(i);
+        	MediaInfo info = mFilesList.get(i);
 
-            if(info.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+            if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
                 mProcessGL.setBitmap(info);
-            } else if(info.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
+            } else if(info.getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
                 mProcessGL.setMediaPlayer(info);
             }
         }
@@ -235,13 +235,13 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 
             	eInfo = mFileOrder.get(i);
                 
-                if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+                if(eInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                 	mProcessGL.changeBitmap(eInfo, true);
                     if(misVideo) {
                     	mProcessGL.stopMediaPlayer();
                         misVideo = false;
                     }
-                } else if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
+                } else if(eInfo.Type == MediaInfo.MEDIA_TYPE_VIDEO) {
                     misVideo = true;
                     //mSurfaceView.changeVideo(info[1], info[2]);
                     mProcessGL.changeVideo(eInfo.TextureId);
@@ -481,13 +481,13 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         ArrayList<Integer> eBitmap = new ArrayList<Integer>();
         ArrayList<Integer> eChange = new ArrayList<Integer>();
         for(int i=0; i<mFileOrder.size(); i++) {
-            if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+            if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                 mFileOrder.get(i).CalcTriangleVertices(mProcessGL);
             }
 
-            if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
+            if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
                 eVideo.add(i);
-            } else if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP && mFileOrder.get(i).isVideo) {
+            } else if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE && mFileOrder.get(i).isVideo) {
                 eBitmap.add(i);
             }
         }      
@@ -518,12 +518,12 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
             } else {
                 //So sad...the pos can't put video
                 ElementInfo etemp = mFileOrder.get(eVideo.get(i));
-                FileInfo itemp = mFilesList.get(etemp.InfoId);
+                MediaInfo itemp = mFilesList.get(etemp.InfoId);
 
-                etemp.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
+                etemp.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                 etemp.TextureId = itemp.VId.get(itemp.Count)[0];
 
-                FileInfo tmp = mFilesList.get(itemp.VId.get(itemp.Count)[1]);
+                MediaInfo tmp = mFilesList.get(itemp.VId.get(itemp.Count)[1]);
                 etemp.x = tmp.x;
                 etemp.y = tmp.y;
                 etemp.mFaceCount = tmp.mFaceCount;

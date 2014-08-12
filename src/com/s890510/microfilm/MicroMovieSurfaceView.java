@@ -26,7 +26,7 @@ class MicroMovieSurfaceView extends GLSurfaceView
     private ProcessGL mProcessGL;
     private boolean updateSurface = false;
     private PlayBackMusic mPlayBackMusic = null;
-    private ArrayList<FileInfo> mFilesList;
+    private ArrayList<MediaInfo> mMediaInfo;
     private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
 
     private MicroMovieActivity mActivity;
@@ -44,9 +44,6 @@ class MicroMovieSurfaceView extends GLSurfaceView
     public static final int MSG_STOPPROGRASS = 2;
     public static final int MSG_FINCHANGESURFACE = 3;
     public static final int MSG_PLAYFIN = 4;
-
-    public static final int INFO_TYPE_BITMAP = 0;
-    public static final int INFO_TYPE_VIDEO = 1;
 
     public MicroMovieSurfaceView(MicroMovieActivity activity) {
         this(activity, null);
@@ -252,27 +249,27 @@ class MicroMovieSurfaceView extends GLSurfaceView
 
     public void InitData() {
         //The same means all files are in init.
-        if(mActivity.getInitBitmapCount() == mFilesList.size()) {
+        if(mActivity.getInitBitmapCount() == mMediaInfo.size()) {
             mActivity.setInitial(true);
             return;
         }
 
-        for(int i=0; i<mFilesList.size(); i++) {
-            if(!mFilesList.get(i).IsFake) continue;
+        for(int i=0; i<mMediaInfo.size(); i++) {
+            if(!mMediaInfo.get(i).IsFake) continue;
 
-            if(mFilesList.get(i).Type == INFO_TYPE_BITMAP) {
-                mFilesList.get(i).mIsInitial = mProcessGL.setBitmap(mFilesList.get(i));
-            } else if(mFilesList.get(i).Type == INFO_TYPE_VIDEO) {
-                mFilesList.get(i).mIsInitial = mProcessGL.setMediaPlayer(mFilesList.get(i));
+            if(mMediaInfo.get(i).getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
+                mMediaInfo.get(i).mIsInitial = mProcessGL.setBitmap(mMediaInfo.get(i));
+            } else if(mMediaInfo.get(i).getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
+                mMediaInfo.get(i).mIsInitial = mProcessGL.setMediaPlayer(mMediaInfo.get(i));
             }
         }
 
         mActivity.setInitial(true);
     }
 
-    public void setFiles(ArrayList<FileInfo> FList) {
-        mFilesList = FList;
-        mProcessGL.setFileInfo(FList);
+    public void setMedia(ArrayList<MediaInfo> FList) {
+        mMediaInfo = FList;
+        mProcessGL.setMediaInfo(FList);
     }
 
     public void setUpdateLintener(MicroMovieListener updateListener) {
@@ -289,7 +286,7 @@ class MicroMovieSurfaceView extends GLSurfaceView
 
     private void ClearOrderTexture() {
         for(int i=0; i<mFileOrder.size(); i++) {
-            if(mFileOrder.get(i).Type == INFO_TYPE_BITMAP)
+            if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE)
                 mFileOrder.get(i).TextureId = -1;
         }
     }

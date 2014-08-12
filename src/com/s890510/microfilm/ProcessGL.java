@@ -51,7 +51,7 @@ public class ProcessGL {
     private float[] mViewMatrix = new float[16];
     private float[] mProjectionMatrix = new float[16];
 
-    private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
+    private ArrayList<MediaInfo> mMediaList = new ArrayList<MediaInfo>();
     private ArrayList<Integer> BitmapTexture = new ArrayList<Integer>();
     private ArrayList<int[]> BitmapTextureConvert = new ArrayList<int[]>();
     private ArrayList<int[]> WaitBitmapTexture = new ArrayList<int[]>();
@@ -122,14 +122,14 @@ public class ProcessGL {
         mIsEncode = isEncode;
     }
 
-    public void setFileInfo(ArrayList<FileInfo> FList) {
-        mFileList = FList;
+    public void setMediaInfo(ArrayList<MediaInfo> MList) {
+        mMediaList = MList;
     }
 
     public String getFirstLocation() {
-        if(mFileList.get(0).mGeoInfo != null) {
-            if(mFileList.get(0).mGeoInfo.getLocation() != null) {
-                return mFileList.get(0).mGeoInfo.getLocation().get(0);
+        if(mMediaList.get(0).mGeoInfo != null) {
+            if(mMediaList.get(0).mGeoInfo.getLocation() != null) {
+                return mMediaList.get(0).mGeoInfo.getLocation().get(0);
             } else {
                 return null;
             }
@@ -224,7 +224,7 @@ public class ProcessGL {
         }).start();
     }
 
-    public boolean setMediaPlayer(FileInfo info){
+    public boolean setMediaPlayer(MediaInfo info){
         int VideoDuration, duration, seekTime;
 
         MediaStatus status = new MediaStatus();
@@ -232,8 +232,8 @@ public class ProcessGL {
         if(status.player == null)
             status.player = new MediaPlayer();
         try {
-            status.Path = info.Path;
-            status.player.setDataSource(info.Path);
+            status.Path = info.getPath();
+            status.player.setDataSource(info.getPath());
             status.player.prepare();
 
             VideoDuration = status.player.getDuration();
@@ -261,7 +261,7 @@ public class ProcessGL {
         return true;
     }
 
-    public boolean setBitmap(FileInfo info) {
+    public boolean setBitmap(MediaInfo info) {
         boolean check = false;
 
         if(!info.IsFake)
@@ -271,7 +271,7 @@ public class ProcessGL {
                     (int)Math.floor(Math.random()*mVideoInfo.get(info.VOId).TotalDuration));
 
         if(check) {
-            Log.e(TAG, "bwidth:" + info.mBitmap.getWidth() + ", bheight:" + info.mBitmap.getHeight());
+            Log.e(TAG, "bwidth:" + info.getImage().getWidth() + ", bheight:" + info.getImage().getHeight());
 
             return true;
         }
@@ -282,8 +282,8 @@ public class ProcessGL {
         //we need to find which Texture is not in use
         for(int i=0; i<WaitBitmapTexture.size(); i++) {
             int[] Id = WaitBitmapTexture.get(i);
-            if(mFileList.get(Id[1]).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
-                Log.e(TAG, "[0]:" + Id[0] + ", [1]:" + Id[1] + ", type:" + mFileList.get(Id[1]).Type);
+            if(mMediaList.get(Id[1]).getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
+                Log.e(TAG, "[0]:" + Id[0] + ", [1]:" + Id[1] + ", type:" + mMediaList.get(Id[1]).getType());
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mBitmapTextureID[Id[0]]);
                 mActivity.mLoadTexture.BindTexture(GLES20.GL_TEXTURE_2D, mBitmapTextureID[Id[0]]);
 
@@ -292,14 +292,14 @@ public class ProcessGL {
                     try {
                         Paint mPaint = new Paint();
                         ColorMatrix cMatrix = new ColorMatrix();
-                        bmp = Bitmap.createBitmap(mFileList.get(Id[1]).mBitmap.getWidth(), mFileList.get(Id[1]).mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+                        bmp = Bitmap.createBitmap(mMediaList.get(Id[1]).getImage().getWidth(), mMediaList.get(Id[1]).getImage().getHeight(), Bitmap.Config.ARGB_8888);
                         Canvas mCanvas = new Canvas(bmp);
 
                         if(Id[2] == 1) {//Saturation
                             cMatrix.setSaturation((float) (Id[3]/100.0));
                         }
                         mPaint.setColorFilter(new ColorMatrixColorFilter(cMatrix));
-                        mCanvas.drawBitmap(mFileList.get(Id[1]).mBitmap, 0, 0, mPaint);
+                        mCanvas.drawBitmap(mMediaList.get(Id[1]).getImage(), 0, 0, mPaint);
                         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
                         bmp.recycle();
@@ -311,10 +311,10 @@ public class ProcessGL {
                             bmp = null;
                         }
 
-                        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mFileList.get(Id[1]).mBitmap, 0);
+                        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mMediaList.get(Id[1]).getImage(), 0);
                     }
                 } else {
-                    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mFileList.get(Id[1]).mBitmap, 0);
+                    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mMediaList.get(Id[1]).getImage(), 0);
                 }
             }
         }
@@ -612,7 +612,7 @@ public class ProcessGL {
     }
 
     private void updateTexture(int type) {
-        if(type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+        if(type == MediaInfo.MEDIA_TYPE_IMAGE) {
             mBitmapinit = true;
             mBitmapUpdate = false;
             mSloganinit = false;
@@ -654,7 +654,7 @@ public class ProcessGL {
         }
 
         if(mBitmapUpdate) {
-            updateTexture(MicroMovieSurfaceView.INFO_TYPE_BITMAP);
+            updateTexture(MediaInfo.MEDIA_TYPE_IMAGE);
         }
 
         synchronized(mProcessData) {
