@@ -48,7 +48,7 @@ public class GeoInfo {
     
     public void LoadAddress() {
         if(!isCNSku() && !isCTA()) {
-	        mAddressLookupJob = mActivity.getLocationThreadPool().submit(
+	        mAddressLookupJob = ((MediaPool)mActivity.getApplicationContext()).getLocationThreadPool().submit(
 	            new AddressLookupJob(mlatlng),
 	            new FutureListener<Address>() {
 	                @Override

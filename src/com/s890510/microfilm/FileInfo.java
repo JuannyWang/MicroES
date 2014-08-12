@@ -64,7 +64,7 @@ public class FileInfo {
     }
 
     public void LoadBitmap() {
-        mBitmapLookupJob = mActivity.getBitmapThreadPool().submit(
+        mBitmapLookupJob = ((MediaPool)mActivity.getApplicationContext()).getBitmapThreadPool().submit(
             new LoadBitmapJob(),
             new FutureListener<Bitmap>() {
                 @Override

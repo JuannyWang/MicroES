@@ -1261,18 +1261,4 @@ public class MicroMovieActivity extends Activity {
     public int getDuration() {
         return mMicroView.getDuration();
     }
-
-    public synchronized ThreadPool getLocationThreadPool() {
-        if (mLocationThreadPool == null) {
-            mLocationThreadPool = new ThreadPool(1, 1, "Event-Location-pool");
-        }
-        return mLocationThreadPool;
-    }
-
-    public synchronized ThreadPool getBitmapThreadPool() {
-        if (mBitmapThreadPool == null) {
-            mBitmapThreadPool = new ThreadPool(4, 8, "Event-Bitmap-pool");
-        }
-        return mBitmapThreadPool;
-    }
 }

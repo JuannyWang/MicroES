@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Intent;
 import android.net.Uri;
@@ -24,6 +25,10 @@ public class MicroFilmActivity extends Activity {
     private ArrayList<String> mUriPath = new ArrayList<String>();
     private ArrayList<Map<String, Object>> mItems = new ArrayList<Map<String,Object>>();
     private GridView mGridView;
+    private LoadStatus mLoadStatus;
+    private int mInitBitmapCount = 0;
+    private int mDoneBitmapCount = 0;
+    private ProgressDialog mProgressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,8 @@ public class MicroFilmActivity extends Activity {
         } else {
         	PhotoSelect();
         }
+        
+        mLoadStatus = new LoadStatus();
         
         Log.d(TAG, "onCreate done");
     }
@@ -86,13 +93,15 @@ public class MicroFilmActivity extends Activity {
     }
     
     private void setImage(Uri uri) {
-    	//To get true uri path
     	Log.e(TAG, "Uri:" + uri);
     	if(mUriPath.contains(uri.getPath())) return;
+
     	MediaInfo mInfo = new MediaInfo(this);
-		mInfo.setup(uri);
+		mInfo.setup(uri, mLoadStatus);
 		mMediaInfo.add(mInfo);
 		mUriPath.add(uri.getPath());
+
+		mInitBitmapCount++;
     }
     
     @Override
@@ -102,6 +111,10 @@ public class MicroFilmActivity extends Activity {
         switch(requestCode) { 
 	        case SELECT_PHOTO:
 	            if(resultCode == RESULT_OK){
+	            	mProgressDialog = ProgressDialog.show(this, null, getResources().getString(R.string.loading));
+
+	            	mInitBitmapCount = 0;
+	            	mDoneBitmapCount = 0;
 	            	mMediaInfo = ((MediaPool)getApplicationContext()).getMediaInfo();
 	            	mUriPath = ((MediaPool)getApplicationContext()).getUriPath();
 
@@ -115,10 +128,35 @@ public class MicroFilmActivity extends Activity {
 	                	setImage(imageReturnedIntent.getData());
 	                }
 	                
-	                ((MediaPool)getApplicationContext()).setMediaInfo(mMediaInfo);
-	                MicroFilmAdapter mAdapter = new MicroFilmAdapter(getApplicationContext());
-	                mGridView.setAdapter(mAdapter);
+	                if(mInitBitmapCount == 0) mProgressDialog.dismiss();
 	            }
         }
+    }
+    
+    public void updateAdapter() {
+        MicroFilmAdapter mAdapter = new MicroFilmAdapter(getApplicationContext());
+        mGridView.setAdapter(mAdapter);
+    }
+    
+    private class LoadStatus implements LoadControl {
+	    public void DoneLoadBitmap() {
+	        mDoneBitmapCount++;
+
+	        if(mInitBitmapCount == mDoneBitmapCount) {
+	            //Here we need to quickly check again about bitmap
+	            for(int i=0; i<mMediaInfo.size(); i++) {
+	                if(!mMediaInfo.get(i).mIsInitial || mMediaInfo.get(i).getImage() == null) {
+	                	mMediaInfo.remove(i);
+	                    i--;
+	                } else {
+	                	mMediaInfo.get(i).CountId = i;
+	                }
+	            }
+	            
+	            ((MediaPool)getApplicationContext()).setMediaInfo(mMediaInfo);
+	            updateAdapter();
+	            mProgressDialog.dismiss();
+	        }
+	    }
     }
 }
