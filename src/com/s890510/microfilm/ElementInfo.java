@@ -11,7 +11,7 @@ import com.s890510.microfilm.script.effects.Effect;
 
 public class ElementInfo {
     private static final String TAG = "ElementInfo";
-    public int Type;
+    public int Type = -1;
     public int TextureId;
     public int time;
 

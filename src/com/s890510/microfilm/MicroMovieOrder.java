@@ -344,7 +344,7 @@ public class MicroMovieOrder {
                         eInfo.mDate = tmp.getDate();
                         eInfo.mFaceRect = tmp.mFaceRect;
 
-                    }else if(tmp.getType() == MediaInfo.MEDIA_TYPE_VIDEO){
+                    } else if(tmp.getType() == MediaInfo.MEDIA_TYPE_VIDEO){
                         eInfo.Type = MediaInfo.MEDIA_TYPE_VIDEO;
                         eInfo.TextureId = tmp.TextureId;
                         eInfo.Videopart = oldEInfo.Videopart;
@@ -355,6 +355,9 @@ public class MicroMovieOrder {
                     break;
                 }
             }
+            
+            if(eInfo.Type == -1) 
+            	eInfo.Type = oldEInfo.Type;
 
             mFileOrder.add(eInfo);
         }

@@ -552,7 +552,7 @@ public class MicroMovieActivity extends Activity {
         mSaveProgressDialog.setMessage(getResources().getString(R.string.transcoding));
         mSaveProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mSaveProgressDialog.setMax(mEncodeAndMuxTest.TOTAL_FRAMES + 100);
-        mSaveProgressDialog.setProgressNumberFormat(null);
+        //mSaveProgressDialog.setProgressNumberFormat(null);
         mSaveProgressDialog.setProgressPercentFormat(null);
         mSaveProgressDialog.setCanceledOnTouchOutside(false);
         mSaveProgressDialog.setOnKeyListener(new OnKeyListener(){
@@ -1004,7 +1004,6 @@ public class MicroMovieActivity extends Activity {
                     mLongitude[i] = 99999;
                 }
             }
-
             runData();
         }
     }
