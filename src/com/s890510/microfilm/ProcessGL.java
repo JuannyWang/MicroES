@@ -36,6 +36,7 @@ import com.s890510.microfilm.shader.Shader;
 import com.s890510.microfilm.shader.SingleShader;
 
 public class ProcessGL {
+<<<<<<< HEAD
     private static final String  TAG                                 = "ProcessGL";
 
     // Video Encoder
@@ -95,6 +96,81 @@ public class ProcessGL {
 
     private boolean              mIsEncode                           = false;
     private int[]                mRemainTime                         = { 0, 0, 0, 0, 0 };
+=======
+    private static final String TAG = "ProcessGL";
+
+    //Video Encoder
+    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
+    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
+    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
+
+    private FloatBuffer mVideoTriangleVertices = null;
+
+    private float[] mMVPMatrix = new float[16]; //the texture
+    private float[] mModelMatrix = new float[16];
+    private float[] mViewMatrix = new float[16];
+    private float[] mProjectionMatrix = new float[16];
+
+    private ArrayList<FileInfo> mFileList = new ArrayList<FileInfo>();
+    private ArrayList<Integer> BitmapTexture = new ArrayList<Integer>();
+    private ArrayList<int[]> BitmapTextureConvert = new ArrayList<int[]>();
+    private ArrayList<int[]> WaitBitmapTexture = new ArrayList<int[]>();
+
+    //Video Program
+    private int mVProgram;
+    private int mVMVPMatrixHandle;
+    private int mVPositionHandle;
+    private int mVTextureHandle;
+    private int mVSamplerHandle;
+    private int mVResolution;
+
+    private BackgroundShader mBackground;
+    private SingleShader mSingleShader;
+    private ShowMask mShowMask;
+
+    private int mVideoTextureID;
+    private int[] mBitmapTextureID = new int[5];
+    private int[] mBitmapTextureCount = new int[5];
+    private int VideoShowCounter = -1;
+    private int mSpecialTextureID;
+    public int mSpecialHash = 0;
+
+    private OnFrameAvailableListener mlistener;
+
+    private ArrayList<MediaStatus> mVideoInfo = new ArrayList<MediaStatus>();
+    private SurfaceTexture mSurfaceTexture = null;
+    private int mTextureUpdateCount = 0;
+    private Context mContext;
+    public StringLoader mStringLoader;
+
+    public int ScreenHeight;
+    public int ScreenWidth;
+    public float ScreenScale = 1.0f;
+    public float ScreenRatio;
+    private boolean mVideoinit = false;
+    private boolean mVideoWaitUpdate = false;
+    private boolean mBitmapinit = false;
+    private boolean mBitmapUpdate = false;
+    private boolean mSloganinit = false;
+
+    public Script mScript;
+    private MicroMovieActivity mActivity;
+    private Timer mTimer;
+    private ElementInfo[] mProcessData = new ElementInfo[5];
+    private Filter mFilter;
+
+    private boolean mShouldResetOpenGL = false;
+    private int mTextureNum = 1;
+    private int[] mStartTime = {0, 0, 0, 0, 0};
+    private boolean mNeedAgain = false;
+    private int mPreSleep = 0;
+
+    private Slogan mSlogan;
+
+    private boolean mIsEncode = false;
+    private int[] mRemainTime = {0, 0, 0, 0, 0};
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
 
     public ProcessGL(Context context, MicroMovieActivity activity, boolean isEncode) {
         mContext = context;
@@ -108,14 +184,14 @@ public class ProcessGL {
         mIsEncode = isEncode;
     }
 
-    public void setMediaInfo(ArrayList<MediaInfo> MList) {
-        mMediaList = MList;
+    public void setFileInfo(ArrayList<FileInfo> FList) {
+        mFileList = FList;
     }
 
     public String getFirstLocation() {
-        if(mMediaList.get(0).mGeoInfo != null) {
-            if(mMediaList.get(0).mGeoInfo.getLocation() != null) {
-                return mMediaList.get(0).mGeoInfo.getLocation().get(0);
+        if(mFileList.get(0).mGeoInfo != null) {
+            if(mFileList.get(0).mGeoInfo.getLocation() != null) {
+                return mFileList.get(0).mGeoInfo.getLocation().get(0);
             } else {
                 return null;
             }
@@ -173,13 +249,109 @@ public class ProcessGL {
         Log.e(TAG, "ScreenScale:" + ScreenScale + ", ScreenHeight:" + ScreenHeight + ", ScreenWidth:" + ScreenWidth);
     }
 
+<<<<<<< HEAD
+=======
+    public void stopMediaPlayer() {
+        final int VideoCounter = VideoShowCounter;
+        mVideoinit = false;
+        final MediaStatus Status = mVideoInfo.get(VideoCounter);
+        if(Status.player != null) {
+            if(Status.player.isPlaying())
+                Status.player.stop();
+            Status.player.release();
+            Status.player = null;
+        }
+
+        if(mSurfaceTexture != null) {
+            mSurfaceTexture.release();
+            mSurfaceTexture = null;
+        }
+
+        new Thread(new Runnable() {
+            public void run() {
+                if(Status.player == null)
+                    Status.player = new MediaPlayer();
+                try {
+                    Status.player.setDataSource(Status.Path);
+                    Status.player.prepare();
+
+                    Status.player.seekTo(Status.Duration.get(Status.DurationCount++));
+                    Status.player.setVolume(0, 0);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    public boolean setMediaPlayer(FileInfo info){
+        int VideoDuration, duration, seekTime;
+
+        MediaStatus status = new MediaStatus();
+
+        if(status.player == null)
+            status.player = new MediaPlayer();
+        try {
+            status.Path = info.Path;
+            status.player.setDataSource(info.Path);
+            status.player.prepare();
+
+            VideoDuration = status.player.getDuration();
+            status.TotalDuration = VideoDuration;
+
+            if(VideoDuration < 3500) duration = 0;
+            else duration = VideoDuration - 3500;
+
+            //now we make 10 different seek time
+            for(int i=0; i<10; i++) {
+                seekTime = (int)Math.floor(Math.random()*duration);
+                status.Duration.add(seekTime);
+            }
+
+            status.player.seekTo(status.Duration.get(status.DurationCount++));
+            status.player.setVolume(0, 0);
+
+            status.CalcTriangleVertices(TVD(status.player.getVideoWidth(), status.player.getVideoHeight()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        mVideoInfo.add(status);
+        Log.e(TAG, "mVideoInfo size:" + mVideoInfo.size());
+        return true;
+    }
+
+    public boolean setBitmap(FileInfo info) {
+        boolean check = false;
+
+        if(!info.IsFake)
+            check = mActivity.mLoadTexture.loadTexture(mContext, info, info.IsFake, 0);
+        else
+            check = mActivity.mLoadTexture.loadTexture(mContext, info, info.IsFake,
+                    (int)Math.floor(Math.random()*mVideoInfo.get(info.VOId).TotalDuration));
+
+        if(check) {
+            Log.e(TAG, "bwidth:" + info.mBitmap.getWidth() + ", bheight:" + info.mBitmap.getHeight());
+
+            return true;
+        }
+        return false;
+    }
+
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
     public void playprepare() {
         // we need to find which Texture is not in use
         for(int i = 0; i < WaitBitmapTexture.size(); i++) {
             int[] Id = WaitBitmapTexture.get(i);
+<<<<<<< HEAD
             if(mMediaList.get(Id[1]).getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
                 Log.e(TAG, "[0]:" + Id[0] + ", [1]:" + Id[1] + ", type:" + mMediaList.get(Id[1]).getType());
                 GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mBitmapTextureID[Id[0]]);
+=======
+            if(mFileList.get(Id[1]).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
+                Log.e(TAG, "[0]:" + Id[0] + ", [1]:" + Id[1] + ", type:" + mFileList.get(Id[1]).Type);
+                GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mBitmapTextureID[Id[0]]);
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                 mActivity.mLoadTexture.BindTexture(GLES20.GL_TEXTURE_2D, mBitmapTextureID[Id[0]]);
 
                 if(Id[2] != 0) {
@@ -187,15 +359,19 @@ public class ProcessGL {
                     try {
                         Paint mPaint = new Paint();
                         ColorMatrix cMatrix = new ColorMatrix();
+<<<<<<< HEAD
                         bmp = Bitmap.createBitmap(mMediaList.get(Id[1]).getImage().getWidth(), mMediaList.get(Id[1]).getImage().getHeight(),
                                 Bitmap.Config.ARGB_8888);
+=======
+                        bmp = Bitmap.createBitmap(mFileList.get(Id[1]).mBitmap.getWidth(), mFileList.get(Id[1]).mBitmap.getHeight(), Bitmap.Config.ARGB_8888);
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                         Canvas mCanvas = new Canvas(bmp);
 
                         if(Id[2] == 1) {// Saturation
                             cMatrix.setSaturation((float) (Id[3] / 100.0));
                         }
                         mPaint.setColorFilter(new ColorMatrixColorFilter(cMatrix));
-                        mCanvas.drawBitmap(mMediaList.get(Id[1]).getImage(), 0, 0, mPaint);
+                        mCanvas.drawBitmap(mFileList.get(Id[1]).mBitmap, 0, 0, mPaint);
                         GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0);
 
                         bmp.recycle();
@@ -207,10 +383,10 @@ public class ProcessGL {
                             bmp = null;
                         }
 
-                        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mMediaList.get(Id[1]).getImage(), 0);
+                        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mFileList.get(Id[1]).mBitmap, 0);
                     }
                 } else {
-                    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mMediaList.get(Id[1]).getImage(), 0);
+                    GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mFileList.get(Id[1]).mBitmap, 0);
                 }
             }
         }
@@ -387,7 +563,7 @@ public class ProcessGL {
     }
 
     private void updateTexture(int type) {
-        if(type == MediaInfo.MEDIA_TYPE_IMAGE) {
+        if(type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
             mBitmapinit = true;
             mBitmapUpdate = false;
             mSloganinit = false;
@@ -422,7 +598,7 @@ public class ProcessGL {
         }
 
         if(mBitmapUpdate) {
-            updateTexture(MediaInfo.MEDIA_TYPE_IMAGE);
+            updateTexture(MicroMovieSurfaceView.INFO_TYPE_BITMAP);
         }
 
         synchronized(mProcessData) {

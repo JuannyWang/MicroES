@@ -51,7 +51,7 @@ public class MediaInfo {
 	private boolean mIsUTC = false;
 	private Bitmap mThumbNail;
 	private Bitmap mBitmap;
-	private int mThimbNailEdge = 240;
+	private int mThimbNailEdge = 360;
 	
 	private Future<Bitmap> mBitmapLookupJob;
 	private final Handler mHandler;
@@ -59,10 +59,14 @@ public class MediaInfo {
 	
 	public boolean mIsInitial = false;
 	public GeoInfo mGeoInfo = null;
+<<<<<<< HEAD
 	public int TextureId;
     public int CountId;
 	public float x;
     public float y;
+=======
+	public int CountId;
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
 	
 	public int mFaceCount = 0;
     public float[] mFBorder = {-1, -1, -1, -1}; //0->left, 1->right, 2->top, 3->bottom
@@ -163,10 +167,6 @@ public class MediaInfo {
 	public Bitmap getImage() {
 		return mBitmap;
 	}
-	
-	public void setImage(Bitmap bitmap) {
-		mBitmap = bitmap;
-	}
 
 	private String getMimeType(Uri uri) {
         Cursor cursor = mActivity.getApplicationContext().getContentResolver().query(uri,
@@ -223,7 +223,6 @@ public class MediaInfo {
     }
     
     public void LoadBitmap() {
-    	final MediaInfo mInfo = this;
         mBitmapLookupJob = ((MediaPool)mActivity.getApplicationContext()).getBitmapThreadPool().submit(
             new LoadBitmapJob(),
             new FutureListener<Bitmap>() {
@@ -236,12 +235,11 @@ public class MediaInfo {
                             public void run() {
                                 mBitmap = future.get();
                                 if(mBitmap != null) {
-                                	Log.e(TAG, "Bitmap is not null");
                                     mIsInitial = true;
                                     mThumbNail = ThumbnailUtils.extractThumbnail(mBitmap, mThimbNailEdge, mThimbNailEdge);
-                                    Log.e(TAG, "loadTexture, width:" + mBitmap.getWidth() + ", height:" + mBitmap.getHeight());
+                                    Log.e("FileInfo", "loadTexture, width:" + mBitmap.getWidth() + ", height:" + mBitmap.getHeight());
                                 }
-                                mLoadControl.DoneLoadBitmap(mInfo);
+                                mLoadControl.DoneLoadBitmap();
                             }
                         });
                     }

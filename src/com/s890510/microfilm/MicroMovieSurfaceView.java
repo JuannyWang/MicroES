@@ -18,6 +18,7 @@ import android.util.Log;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Timer;
 
+<<<<<<< HEAD
 class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     private static String          TAG                  = "MicroMovieSurfaceView";
@@ -42,6 +43,36 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
     public static final int        MSG_STOPPROGRASS     = 2;
     public static final int        MSG_FINCHANGESURFACE = 3;
     public static final int        MSG_PLAYFIN          = 4;
+=======
+class MicroMovieSurfaceView extends GLSurfaceView
+    implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
+
+    private static String TAG = "MicroMovieSurfaceView";
+    private ProcessGL mProcessGL;
+    private boolean updateSurface = false;
+    private PlayBackMusic mPlayBackMusic = null;
+    private ArrayList<FileInfo> mFilesList;
+    private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
+
+    private MicroMovieActivity mActivity;
+    private MicroMovieListener mUpdatelistener;
+    private final Handler mHandler;
+    private PlayControl mPlayControl = null;
+    private int mWidth = 0, mHeight = 0;
+    private boolean mIsDone = false;
+    private Timer mTimer;
+    private Script mScript;
+    public boolean mReadyInit = false;
+    public boolean mIsPlayFin = false;
+
+    public static final int MSG_STARTPROGRASS = 1;
+    public static final int MSG_STOPPROGRASS = 2;
+    public static final int MSG_FINCHANGESURFACE = 3;
+    public static final int MSG_PLAYFIN = 4;
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
+
+    public static final int INFO_TYPE_BITMAP = 0;
+    public static final int INFO_TYPE_VIDEO = 1;
 
     public MicroMovieSurfaceView(MicroMovieActivity activity) {
         this(activity, null);
@@ -226,18 +257,36 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     public void InitData() {
+<<<<<<< HEAD
         // The same means all files are in init.
         if(mActivity.getInitBitmapCount() == mMediaInfo.size()) {
+=======
+        //The same means all files are in init.
+        if(mActivity.getInitBitmapCount() == mFilesList.size()) {
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
             mActivity.setInitial(true);
             return;
         }
 
+<<<<<<< HEAD
+=======
+        for(int i=0; i<mFilesList.size(); i++) {
+            if(!mFilesList.get(i).IsFake) continue;
+
+            if(mFilesList.get(i).Type == INFO_TYPE_BITMAP) {
+                mFilesList.get(i).mIsInitial = mProcessGL.setBitmap(mFilesList.get(i));
+            } else if(mFilesList.get(i).Type == INFO_TYPE_VIDEO) {
+                mFilesList.get(i).mIsInitial = mProcessGL.setMediaPlayer(mFilesList.get(i));
+            }
+        }
+
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
         mActivity.setInitial(true);
     }
 
-    public void setMedia(ArrayList<MediaInfo> FList) {
-        mMediaInfo = FList;
-        mProcessGL.setMediaInfo(FList);
+    public void setFiles(ArrayList<FileInfo> FList) {
+        mFilesList = FList;
+        mProcessGL.setFileInfo(FList);
     }
 
     public void setUpdateLintener(MicroMovieListener updateListener) {
@@ -253,8 +302,13 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     private void ClearOrderTexture() {
+<<<<<<< HEAD
         for(int i = 0; i < mFileOrder.size(); i++) {
             if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE)
+=======
+        for(int i=0; i<mFileOrder.size(); i++) {
+            if(mFileOrder.get(i).Type == INFO_TYPE_BITMAP)
+>>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                 mFileOrder.get(i).TextureId = -1;
         }
     }

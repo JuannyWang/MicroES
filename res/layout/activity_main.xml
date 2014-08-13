@@ -40,6 +40,11 @@
 	         android:layout_width="wrap_content"
 	         android:layout_height="wrap_content"
 	         android:text="Select Photo" />
+	     <Button
+	         android:id="@+id/click_buttonB" 
+	         android:layout_width="wrap_content"
+	         android:layout_height="wrap_content"
+	         android:text="Start MicroFilm" /> 
      </LinearLayout>
      <GridView
         android:id="@+id/asus_micromovie_startshow"  
