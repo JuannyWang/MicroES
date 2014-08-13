@@ -68,17 +68,13 @@ public class MicroMovieOrder {
         mCenterY[i] = y;
     }
 
-    public ArrayList<ElementInfo> gettimeandorder(ProcessGL processGL, ArrayList<FileInfo> FileInfo, Script mScript, boolean IsShuffle) {
+    public ArrayList<ElementInfo> gettimeandorder(ProcessGL processGL, ArrayList<MediaInfo> mMediaInfo, Script mScript, boolean IsShuffle) {
         ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
         ArrayList<Integer> mFileBucket = new ArrayList<Integer>();
         ArrayList<Integer> mRandomBucket = new ArrayList<Integer>();
         ArrayList<Integer> mSpaceBucket = new ArrayList<Integer>();
         Random mRandom = new Random(System.currentTimeMillis());
-<<<<<<< HEAD
         int mFileTotalCount = mMediaInfo.size(); // means remove fake file size
-=======
-        int mFileTotalCount = FileInfo.size(); //means remove fake file size
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
         int mEffectCount = mScript.geteffectsize();
         int mNoItemCount = mScript.getNoItemSize();
         int mNoCountSize = mScript.getNoCountSize();
@@ -98,7 +94,6 @@ public class MicroMovieOrder {
          * another video 2.First one not video
          */
 
-<<<<<<< HEAD
         // remove the fake info
         Log.e(TAG, "mMediaInfo.size():" + mMediaInfo.size());
         for(int i = 0; i < mMediaInfo.size(); i++) {
@@ -108,20 +103,6 @@ public class MicroMovieOrder {
         int[] ElementCount = new int[mMediaInfo.size()];
         for(int i = 0; i < ElementCount.length; i++)
             ElementCount[i] = 0;
-=======
-        //remove the fake info
-        for(int i=0; i<FileInfo.size(); i++) {
-            if(FileInfo.get(i).IsFake) {
-                mFileTotalCount--;
-            } else {
-                mFileBucket.add(i);
-            }
-            mRandomBucket.add(i);
-        }
-
-        int[] ElementCount = new int[FileInfo.size()];
-        for (int i=0; i<ElementCount.length; i++) ElementCount[i] = 0;
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
 
         mRunCount = mEffectCount - mNoItemCount - mNoCountSize;
 
@@ -157,31 +138,23 @@ public class MicroMovieOrder {
         // Default order is sort by date
         for(int i = 0; i < mEffectCount; i++) {
             ElementInfo eInfo = new ElementInfo();
-            FileInfo info = null;
+            MediaInfo info = null;
 
             if(mScript.CheckNoItem(i)) {
-                eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
+                eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                 eInfo.height = processGL.ScreenHeight;
                 eInfo.width = processGL.ScreenWidth;
                 mOrder[i] = -1;
             } else if(!mScript.CheckInCount(i)) {
-<<<<<<< HEAD
                 // Random and push in...
                 info = mMediaInfo.get(mRandom.nextInt(mMediaInfo.size()));
                 eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                 eInfo.height = info.getImage().getHeight();
                 eInfo.width = info.getImage().getWidth();
-=======
-                //Random and push in...
-                info = FileInfo.get(mRandom.nextInt(FileInfo.size()));
-                eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
-                eInfo.height = info.mBHeight;
-                eInfo.width = info.mBWidth;
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                 eInfo.mFaceCount = info.mFaceCount;
                 eInfo.mFBorder = info.mFBorder;
                 eInfo.InfoId = info.CountId;
-                eInfo.mDate = info.mDate;
+                eInfo.mDate = info.getDate();
                 eInfo.mFaceRect = info.mFaceRect;
 
                 mOrder[i] = info.CountId;
@@ -189,17 +162,11 @@ public class MicroMovieOrder {
                 if(!IsShuffle) {
                     if(mOrderList[mScriptId] == null) {
                         if(mFileTotalCount >= mEffectCount) {
-                            info = FileInfo.get(i);
+                            info = mMediaInfo.get(i);
                         } else {
-<<<<<<< HEAD
                             if(mFileBucket.size() > 0
                                     && (mStartCount > 0 || (mFHalfCount == 0 && mCenterCount > 0) || (mLHalfCount == 0 && mEndCount > 0))) {
                                 info = mMediaInfo.get(mFileBucket.get(0));
-=======
-                            if(mFileBucket.size() > 0 &&
-                                    (mStartCount > 0 || (mFHalfCount == 0 && mCenterCount > 0) || (mLHalfCount == 0 && mEndCount > 0))) {
-                                info = FileInfo.get(mFileBucket.get(0));
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                                 mFileBucket.remove(0);
 
                                 if(mStartCount > 0)
@@ -239,19 +206,14 @@ public class MicroMovieOrder {
                                     }
                                 }
 
-<<<<<<< HEAD
                                 for(int j = 0; j < mPos; j++) {
                                     mSpaceBucket.add(mMediaInfo.get(mFileBucket.get(j)).CountId);
-=======
-                                for(int j=0; j<mPos; j++) {
-                                    mSpaceBucket.add(FileInfo.get(mFileBucket.get(j)).CountId);
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                                 }
 
                                 int tmp;
                                 do {
                                     tmp = mRandom.nextInt(mRandomBucket.size());
-                                    info = FileInfo.get(mRandomBucket.get(tmp));
+                                    info = mMediaInfo.get(mRandomBucket.get(tmp));
                                 } while(mSpaceBucket.contains(info.CountId) && mFileTotalCount > mSpacing);
 
                                 if(ElementCount[info.CountId] >= mAvgCount) {
@@ -264,7 +226,7 @@ public class MicroMovieOrder {
                             }
                         }
                     } else {
-                        info = FileInfo.get(mOrderList[mScriptId][i]);
+                        info = mMediaInfo.get(mOrderList[mScriptId][i]);
                         eInfo.centerX = mCenterX[mScriptId][i];
                         eInfo.centerY = mCenterY[mScriptId][i];
                         eInfo.mIsRestore = true;
@@ -277,7 +239,7 @@ public class MicroMovieOrder {
                     int tmp;
                     do {
                         tmp = mRandom.nextInt(mRandomBucket.size());
-                        info = FileInfo.get(mRandomBucket.get(tmp));
+                        info = mMediaInfo.get(mRandomBucket.get(tmp));
                     } while(mSpaceBucket.contains(info.CountId) && mFileTotalCount > mSpacing);
 
                     if(ElementCount[info.CountId] >= mAvgCount) {
@@ -286,49 +248,14 @@ public class MicroMovieOrder {
                     mSpaceBucket.add(info.CountId);
                 }
 
-<<<<<<< HEAD
                 if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
                     eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                     eInfo.height = info.getImage().getHeight();
                     eInfo.width = info.getImage().getWidth();
-=======
-                if(info.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
-                    //First, Continuous, Last can't be Video
-                    if((i == 0 || mPastVideo || mEffectCount == i+1)) {
-                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
-
-                        //Get the fake fileinfo
-                        FileInfo Finfo = FileInfo.get(info.VId.get(info.Count)[1]);
-                        eInfo.height = Finfo.mBHeight;
-                        eInfo.width = Finfo.mBWidth;
-                        eInfo.mFaceCount = Finfo.mFaceCount;
-                        eInfo.mFBorder = Finfo.mFBorder;
-                        eInfo.InfoId = Finfo.CountId;
-                        eInfo.mDate = Finfo.mDate;
-                        if(info.Count + 1 <= info.VId.size() - 1) {
-                            info.Count++;
-                        } else {
-                            info.Count = 0;
-                        }
-
-                        mPastVideo = false;
-                    } else {
-                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_VIDEO;
-                        eInfo.TextureId = info.TextureId;
-                        eInfo.Videopart = ElementCount[info.CountId];
-                        eInfo.InfoId = info.CountId;
-                        eInfo.mDate = info.mDate;
-                        mPastVideo = true;
-                    }
-                } else if(info.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
-                    eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
-                    eInfo.height = info.mBHeight;
-                    eInfo.width = info.mBWidth;
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                     eInfo.mFaceCount = info.mFaceCount;
                     eInfo.mFBorder = info.mFBorder;
                     eInfo.InfoId = info.CountId;
-                    eInfo.mDate = info.mDate;
+                    eInfo.mDate = info.getDate();
                     eInfo.mFaceRect = info.mFaceRect;
 
                     if(info.mGeoInfo != null)
@@ -353,7 +280,7 @@ public class MicroMovieOrder {
         return mFileOrder;
     }
 
-    public ArrayList<ElementInfo> gettimeandorderForEncode(ArrayList<ElementInfo> elementInfo, ArrayList<FileInfo> FileInfo, Script mScript) {
+    public ArrayList<ElementInfo> gettimeandorderForEncode(ArrayList<ElementInfo> elementInfo, ArrayList<MediaInfo> mMediaInfo, Script mScript) {
         ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
         int ElementCount = elementInfo.size();
 
@@ -365,43 +292,26 @@ public class MicroMovieOrder {
 
             int infoId = elementInfo.get(i).InfoId;
 
-<<<<<<< HEAD
             for(int j = 0; j < mMediaInfo.size(); j++) {
                 if(mMediaInfo.get(j).CountId == infoId) {
                     MediaInfo tmp = mMediaInfo.get(j);
                     if(tmp.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
                         if(oldEInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
-=======
-            for(int j=0; j < FileInfo.size();j++){
-                if(FileInfo.get(j).CountId == infoId){
-                    FileInfo tmp = FileInfo.get(j);
-                    if(tmp.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP){
-                        if(oldEInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP){
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
 
-                            eInfo.height = tmp.mBHeight;
-                            eInfo.width = tmp.mBWidth;
+                            eInfo.height = tmp.getImage().getHeight();
+                            eInfo.width = tmp.getImage().getWidth();
 
                             if(tmp.mGeoInfo != null)
                                 eInfo.mLocation = tmp.mGeoInfo.getLocation();
                         }
 
-                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
+                        eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                         eInfo.mFaceCount = tmp.mFaceCount;
                         eInfo.mFBorder = tmp.mFBorder;
                         eInfo.InfoId = tmp.CountId;
-                        eInfo.mDate = tmp.mDate;
+                        eInfo.mDate = tmp.getDate();
                         eInfo.mFaceRect = tmp.mFaceRect;
 
-<<<<<<< HEAD
-=======
-                    }else if(tmp.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO){
-                        eInfo.Type = MicroMovieSurfaceView.INFO_TYPE_VIDEO;
-                        eInfo.TextureId = tmp.TextureId;
-                        eInfo.Videopart = oldEInfo.Videopart;
-                        eInfo.InfoId = tmp.CountId;
-                        eInfo.mDate = tmp.mDate;
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                     }
 
                     break;

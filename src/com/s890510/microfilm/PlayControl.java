@@ -148,28 +148,9 @@ public class PlayControl {
                             eInfo = mFileOrder.get(playIndex % mFileOrder.size());
                             playIndex++;
 
-<<<<<<< HEAD
                             // Need to find sometime to rewrite...
                             if(eInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                                 mSurfaceView.changeBitmap(eInfo, true);
-=======
-                            //Need to find sometime to rewrite...
-                            if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
-                                mSurfaceView.changeBitmap(eInfo, true);
-                                if(misVideo) {
-                                    mSurfaceView.stopMediaPlayer();
-                                    misVideo = false;
-                                }
-                            } else if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
-                                if(mSleep > 0) {
-                                    Log.e(TAG, "We need to seek the video!");
-                                    int time = eInfo.time - mSleep;
-                                    mSurfaceView.SeekVideo(eInfo.TextureId, eInfo.Videopart, time);
-                                }
-                                misVideo = true;
-                                //mSurfaceView.changeVideo(info[1], info[2]);
-                                mSurfaceView.changeVideo(eInfo.TextureId);
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                             }
 
                             // here we need to check again for mSetProgress

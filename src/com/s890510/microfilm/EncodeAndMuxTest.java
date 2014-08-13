@@ -115,7 +115,6 @@ public class EncodeAndMuxTest {
     private boolean                     mMuxerStarted;
 
     // allocate one of these up front so we don't need to do it every time
-<<<<<<< HEAD
     private MediaCodec.BufferInfo       mBufferInfo;
 
     private ProcessGL                   mProcessGL;
@@ -159,54 +158,6 @@ public class EncodeAndMuxTest {
 
     public EncodeAndMuxTest(MicroMovieActivity activity, ArrayList<MediaInfo> fileList, ArrayList<ElementInfo> fileOrder, Script script,
             int scriptSelect) {
-=======
-    private MediaCodec.BufferInfo mBufferInfo;
-
-    private ProcessGL mProcessGL;
-    private boolean updateSurface = false;
-    private Context mContext;
-    private MicroMovieActivity mActivity;
-    private String mOutputPath;
-    private String mVideoPath;
-    private MediaFormat mVideoFormat;
-    private ArrayList<FileInfo> mFilesList;
-    private ArrayList<FileInfo> mFileInfo = new ArrayList<FileInfo>();
-    private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
-    private Script mScript;
-    private int mScriptSelect;
-    
-    private boolean mPause = false;
-    private Object mLock = new Object();
-    private boolean mIsCancel = false;
-    
-    private IEPhotoMusicProviderService mService = null;  
-
-    
-    
-    
-    private ServiceConnection mConn = new ServiceConnection() {  
-    	  
-        @Override  
-        public void onServiceConnected(ComponentName name, IBinder service) {  
-            // TODO Auto-generated method stub  
-            mService = IEPhotoMusicProviderService.Stub.asInterface(service);  
-            Log.d(TAG, TAG + " Service Connected."); 
-        }  
-  
-        @Override  
-        public void onServiceDisconnected(ComponentName name) {  
-            // TODO Auto-generated method stub  
-            mService = null;  
-            Log.d(TAG, TAG + " Service Disconnected.");  
-        }  
-          
-    }; 
-    
-
-
-    public EncodeAndMuxTest(MicroMovieActivity activity, ArrayList<FileInfo> fileList,
-            ArrayList<ElementInfo> fileOrder, Script script, int scriptSelect) {
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
         mContext = activity.getApplicationContext();
         mActivity = activity;
 
@@ -215,29 +166,11 @@ public class EncodeAndMuxTest {
         mProcessGL = new ProcessGL(mContext, mActivity, true);
 
         mFilesList = fileList;
-        mProcessGL.setFileInfo(fileList);
+        mProcessGL.setMediaInfo(fileList);
         mFileOrder = fileOrder;
         mScript = script;
         mScriptSelect = scriptSelect;
     }
-<<<<<<< HEAD
-=======
-    
-    
-    // It is the same with MicroMovieSurfaceView
-    private void InitData() {
-        for(int i=0; i<mFilesList.size(); i++) {
-            FileInfo info = mFilesList.get(i);
-
-            if(info.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
-                mProcessGL.setBitmap(info);
-            } else if(info.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
-                mProcessGL.setMediaPlayer(info);
-            }
-        }
-    }   
-    
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
 
     /**
      * Tests encoding of AVC video from a Surface. The output is saved as an MP4
@@ -281,7 +214,6 @@ public class EncodeAndMuxTest {
             int totalFrame = 0;
 
             int processNum = mScript.geteffectsize();
-<<<<<<< HEAD
 
             for(int i = 0; i < processNum && totalFrame < TOTAL_FRAMES && !Thread.currentThread().isInterrupted(); i++) {
                 int numFrame;
@@ -303,31 +235,6 @@ public class EncodeAndMuxTest {
                     if(totalFrame + numFrame > TOTAL_FRAMES) {
                         numFrame = TOTAL_FRAMES - totalFrame;
                     }
-=======
-            
-
-            for(int i=0; i< processNum && totalFrame < TOTAL_FRAMES && !Thread.currentThread().isInterrupted(); i++) {  
-            	int preVideoPosition = 0;
-            	int preElipseTime = 0;
-            	boolean firstProcessVideo = true;
-            	boolean dropFirstVideo = true;
-            	int numFrame;
-            	long interval;
-               
-
-            	eInfo = mFileOrder.get(i);
-                
-                if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
-                	mProcessGL.changeBitmap(eInfo, true);
-                    if(misVideo) {
-                    	mProcessGL.stopMediaPlayer();
-                        misVideo = false;
-                    }
-                } else if(eInfo.Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO) {
-                    misVideo = true;
-                    //mSurfaceView.changeVideo(info[1], info[2]);
-                    mProcessGL.changeVideo(eInfo.TextureId);
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
                 }
 
                 totalFrame += numFrame;
@@ -523,74 +430,10 @@ public class EncodeAndMuxTest {
         mFileOrder = mActivity.mMicroMovieOrder.gettimeandorderForEncode(mFileOrder, mFilesList, mScript);
         mFileOrder = mScript.setElementInfoTime(mFileOrder);
 
-<<<<<<< HEAD
         for(int i = 0; i < mFileOrder.size(); i++) {
             if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                 mFileOrder.get(i).CalcTriangleVertices(mProcessGL);
             }
-=======
-
-        //Calc. Bitmap TriangleVertices and check video position
-        ArrayList<Integer> eVideo = new ArrayList<Integer>();
-        ArrayList<Integer> eBitmap = new ArrayList<Integer>();
-        ArrayList<Integer> eChange = new ArrayList<Integer>();
-        for(int i=0; i<mFileOrder.size(); i++) {
-            if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP) {
-                mFileOrder.get(i).CalcTriangleVertices(mProcessGL);
-            }
-
-            if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
-                eVideo.add(i);
-            } else if(mFileOrder.get(i).Type == MicroMovieSurfaceView.INFO_TYPE_BITMAP && mFileOrder.get(i).isVideo) {
-                eBitmap.add(i);
-            }
-        }      
-
-        for(int i=0, j=0; i<eVideo.size(); i++) {
-            if(eBitmap.size() > j) {
-                //Do swap
-                ElementInfo temp = mFileOrder.get(eBitmap.get(j));
-                Effect effect = temp.effect;
-                Timer timer = temp.timer;
-                boolean isVideo = temp.isVideo;
-
-                temp.effect = mFileOrder.get(eVideo.get(i)).effect;
-                temp.timer = mFileOrder.get(eVideo.get(i)).timer;
-                temp.isVideo = mFileOrder.get(eVideo.get(i)).isVideo;
-
-                mFileOrder.get(eVideo.get(i)).effect = effect;
-                mFileOrder.get(eVideo.get(i)).timer = timer;
-                mFileOrder.get(eVideo.get(i)).isVideo = isVideo;
-
-                mFileOrder.set(eBitmap.get(j), mFileOrder.get(eVideo.get(i)));
-                mFileOrder.set(eVideo.get(i), temp);
-
-                eChange.add(eBitmap.get(j));
-                eChange.add(eVideo.get(i));
-
-                j++;
-            } else {
-                //So sad...the pos can't put video
-                ElementInfo etemp = mFileOrder.get(eVideo.get(i));
-                FileInfo itemp = mFilesList.get(etemp.InfoId);
-
-                etemp.Type = MicroMovieSurfaceView.INFO_TYPE_BITMAP;
-                etemp.TextureId = itemp.VId.get(itemp.Count)[0];
-
-                FileInfo tmp = mFilesList.get(itemp.VId.get(itemp.Count)[1]);
-                etemp.x = tmp.x;
-                etemp.y = tmp.y;
-                etemp.mFaceCount = tmp.mFaceCount;
-                etemp.mFBorder = tmp.mFBorder;
-                etemp.InfoId = tmp.CountId;
-                if(itemp.Count + 1 <= itemp.VId.size() - 1) itemp.Count++;
-                else itemp.Count = 0;
-
-                mFileOrder.set(eVideo.get(i), etemp);
-
-                eChange.add(eVideo.get(i));
-            }
->>>>>>> parent of 5342a45... Remove Fileinfo and adjust several thing
         }
     }
 
