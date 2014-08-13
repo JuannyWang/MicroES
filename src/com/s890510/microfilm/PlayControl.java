@@ -80,7 +80,6 @@ public class PlayControl {
         private long mTime = 0;
         private long mElapseTime = 0;
         private int mLossTime = 0;
-        private boolean misVideo = false;
 
         public ThemeControl(ArrayList<ElementInfo> FileOrder, MicroMovieSurfaceView surfaceview) {
             mPauseLock = new Object();
@@ -152,19 +151,6 @@ public class PlayControl {
                             //Need to find sometime to rewrite...
                             if(eInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                                 mSurfaceView.changeBitmap(eInfo, true);
-                                if(misVideo) {
-                                    mSurfaceView.stopMediaPlayer();
-                                    misVideo = false;
-                                }
-                            } else if(eInfo.Type == MediaInfo.MEDIA_TYPE_VIDEO) {
-                                if(mSleep > 0) {
-                                    Log.e(TAG, "We need to seek the video!");
-                                    int time = eInfo.time - mSleep;
-                                    mSurfaceView.SeekVideo(eInfo.TextureId, eInfo.Videopart, time);
-                                }
-                                misVideo = true;
-                                //mSurfaceView.changeVideo(info[1], info[2]);
-                                mSurfaceView.changeVideo(eInfo.TextureId);
                             }
 
                             //here we need to check again for mSetProgress
@@ -188,10 +174,6 @@ public class PlayControl {
                 }
 
                 if(mSurfaceView.checkPause()) {
-                    if(misVideo) {
-                        mSurfaceView.pauseMediaPlayer();
-                    }
-
                     synchronized (mPauseLock) {
                         try {
                             mPauseLock.wait();
@@ -202,18 +184,12 @@ public class PlayControl {
 
                     //If mLossTime > 0 it's means actually sleep times != need sleep times
                     if(mLossTime > 0 && !mSetProgress && !mIsDone) {
-                        if(misVideo) {
-                            mSurfaceView.resumeMediaPlayer();
-                        }
                         doSleep(mLossTime);
                         mElapseTime = System.currentTimeMillis();
                     }
                 }
 
             } while(playIndex < effectsize && !mIsDone);
-
-            if(misVideo)
-                mSurfaceView.stopMediaPlayer();
 
             if(!mIsDone) {
                 mSurfaceView.IsPlayFin(true);

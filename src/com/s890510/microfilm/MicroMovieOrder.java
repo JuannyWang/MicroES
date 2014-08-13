@@ -97,11 +97,7 @@ public class MicroMovieOrder {
         //remove the fake info
         Log.e(TAG, "mMediaInfo.size():" + mMediaInfo.size());
         for(int i=0; i<mMediaInfo.size(); i++) {
-            if(mMediaInfo.get(i).IsFake) {
-                mFileTotalCount--;
-            } else {
-                mFileBucket.add(i);
-            }
+            mFileBucket.add(i);
             mRandomBucket.add(i);
         }
 
@@ -251,35 +247,7 @@ public class MicroMovieOrder {
                     mSpaceBucket.add(info.CountId);
                 }
 
-                if(info.getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
-                    //First, Continuous, Last can't be Video
-                    if((i == 0 || mPastVideo || mEffectCount == i+1)) {
-                        eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
-
-                        //Get the fake fileinfo
-                        MediaInfo Finfo = mMediaInfo.get(info.VId.get(info.Count)[1]);
-                        eInfo.height = Finfo.getImage().getHeight();
-                        eInfo.width = Finfo.getImage().getWidth();
-                        eInfo.mFaceCount = Finfo.mFaceCount;
-                        eInfo.mFBorder = Finfo.mFBorder;
-                        eInfo.InfoId = Finfo.CountId;
-                        eInfo.mDate = Finfo.getDate();
-                        if(info.Count + 1 <= info.VId.size() - 1) {
-                            info.Count++;
-                        } else {
-                            info.Count = 0;
-                        }
-
-                        mPastVideo = false;
-                    } else {
-                        eInfo.Type = MediaInfo.MEDIA_TYPE_VIDEO;
-                        eInfo.TextureId = info.TextureId;
-                        eInfo.Videopart = ElementCount[info.CountId];
-                        eInfo.InfoId = info.CountId;
-                        eInfo.mDate = info.getDate();
-                        mPastVideo = true;
-                    }
-                } else if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
+                if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
                     eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                     eInfo.height = info.getImage().getHeight();
                     eInfo.width = info.getImage().getWidth();
@@ -294,8 +262,7 @@ public class MicroMovieOrder {
                     mPastVideo = false;
                 }
 
-                if(!info.IsFake)
-                    ElementCount[info.CountId]++;
+                ElementCount[info.CountId]++;
 
                 mOrder[i] = info.CountId;
 

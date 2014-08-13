@@ -108,14 +108,12 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     private MediaCodec.BufferInfo mBufferInfo;
 
     private ProcessGL mProcessGL;
-    private boolean updateSurface = false;
     private Context mContext;
     private MicroMovieActivity mActivity;
     private String mOutputPath;
     private String mVideoPath;
     private MediaFormat mVideoFormat;
     private ArrayList<MediaInfo> mFilesList;
-    private ArrayList<MediaInfo> mMediaInfo = new ArrayList<MediaInfo>();
     private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
     private Script mScript;
     private int mScriptSelect;
@@ -156,29 +154,14 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         
         TOTAL_FRAMES = mActivity.getDuration() * FRAME_RATE / 1000;
         
-        mProcessGL = new ProcessGL(mContext, mActivity, true);
+        mProcessGL = new ProcessGL(mActivity, true);
         
         mFilesList = fileList;
         mProcessGL.setMediaInfo(fileList);
         mFileOrder = fileOrder;
         mScript = script;
         mScriptSelect = scriptSelect;
-    }
-    
-    
-    // It is the same with MicroMovieSurfaceView
-    private void InitData() {
-        for(int i=0; i<mFilesList.size(); i++) {
-        	MediaInfo info = mFilesList.get(i);
-
-            if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
-                mProcessGL.setBitmap(info);
-            } else if(info.getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
-                mProcessGL.setMediaPlayer(info);
-            }
-        }
-    }   
-    
+    } 
 
     /**
      * Tests encoding of AVC video from a Surface.  The output is saved as an MP4 file.
@@ -214,7 +197,6 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
             OpenglPrepare();
             Log.e(TAG, "OpenglPrepare");
             
-            boolean misVideo = false;
             long timer = 0;
             //long interval = (NUM_FRAMES/FRAME_RATE)*1000;
             
@@ -237,14 +219,6 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
                 
                 if(eInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                 	mProcessGL.changeBitmap(eInfo, true);
-                    if(misVideo) {
-                    	mProcessGL.stopMediaPlayer();
-                        misVideo = false;
-                    }
-                } else if(eInfo.Type == MediaInfo.MEDIA_TYPE_VIDEO) {
-                    misVideo = true;
-                    //mSurfaceView.changeVideo(info[1], info[2]);
-                    mProcessGL.changeVideo(eInfo.TextureId);
                 }
 
          		if(eInfo.time == 0) // special case: sleep time = 0
@@ -283,41 +257,12 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
                 	}
 
                     // Generate a new frame of input.
-                    generateSurfaceFrame(j, misVideo);
+                    generateSurfaceFrame(j);
 
                     // Feed any pending encoder output into the muxer.
                     if(j + 1 < numFrame) drainEncoder(false);
-
-                	if(misVideo){
-                		if(firstProcessVideo){
-                			preVideoPosition = mProcessGL.getVideoPosition();
-                			firstProcessVideo = false;
-                			continue;
-                		}else{
-                			if(mProcessGL.getVideoPosition() == preVideoPosition)
-                				continue;
-                		}
-                	}
                 	
-                    long elapseTime;
-                    if(misVideo){
-                    	int newElipseTime = mProcessGL.getVideoPosition() - preVideoPosition;
-                    	if(preElipseTime < newElipseTime){
-                    		preElipseTime = newElipseTime;
-                    		elapseTime = newElipseTime;
-                    	}else{
-                    		continue;
-                    	}
-
-						// drop first video frame because sometimes it is from previous video
-						if(dropFirstVideo){
-							dropFirstVideo = false;
-							continue;
-						}
-                    }else{
-                    	//elapseTime = mProcessGL.getElapseTime();
-                    	elapseTime = computePresentationTimeMsec(j);                 	
-                    }
+                    long elapseTime = computePresentationTimeMsec(j);                 	
                     
                     if(elapseTime <= interval){
                     	long presentationTime = timer + elapseTime*1000000;
@@ -342,11 +287,6 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
                 
                 //timer = computePresentationTimeNsec(frameNum);
                 timer = timer + (interval*1000000);              
-            }
-            
-            if(misVideo) {
-            	mProcessGL.stopMediaPlayer();
-                misVideo = false;
             }
             
             // send end-of-stream to encoder, and drain remaining output
@@ -470,81 +410,16 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     
     // porting from MicroMovieActivity
     private void setMovieOrder() {
-
     	//mFileOrder = MicroMovieOrder.gettimeandorder(mEphotoApp, mFilesList, mScript); // do not change order again
         mFileOrder = mActivity.mMicroMovieOrder.gettimeandorderForEncode(mFileOrder, mFilesList, mScript);
         mFileOrder = mScript.setElementInfoTime(mFileOrder);
-
-
-        //Calc. Bitmap TriangleVertices and check video position
-        ArrayList<Integer> eVideo = new ArrayList<Integer>();
-        ArrayList<Integer> eBitmap = new ArrayList<Integer>();
-        ArrayList<Integer> eChange = new ArrayList<Integer>();
+        
+        //Calc. Bitmap TriangleVertices
         for(int i=0; i<mFileOrder.size(); i++) {
             if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                 mFileOrder.get(i).CalcTriangleVertices(mProcessGL);
             }
-
-            if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
-                eVideo.add(i);
-            } else if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE && mFileOrder.get(i).isVideo) {
-                eBitmap.add(i);
-            }
-        }      
-
-        for(int i=0, j=0; i<eVideo.size(); i++) {
-            if(eBitmap.size() > j) {
-                //Do swap
-                ElementInfo temp = mFileOrder.get(eBitmap.get(j));
-                Effect effect = temp.effect;
-                Timer timer = temp.timer;
-                boolean isVideo = temp.isVideo;
-
-                temp.effect = mFileOrder.get(eVideo.get(i)).effect;
-                temp.timer = mFileOrder.get(eVideo.get(i)).timer;
-                temp.isVideo = mFileOrder.get(eVideo.get(i)).isVideo;
-
-                mFileOrder.get(eVideo.get(i)).effect = effect;
-                mFileOrder.get(eVideo.get(i)).timer = timer;
-                mFileOrder.get(eVideo.get(i)).isVideo = isVideo;
-
-                mFileOrder.set(eBitmap.get(j), mFileOrder.get(eVideo.get(i)));
-                mFileOrder.set(eVideo.get(i), temp);
-
-                eChange.add(eBitmap.get(j));
-                eChange.add(eVideo.get(i));
-
-                j++;
-            } else {
-                //So sad...the pos can't put video
-                ElementInfo etemp = mFileOrder.get(eVideo.get(i));
-                MediaInfo itemp = mFilesList.get(etemp.InfoId);
-
-                etemp.Type = MediaInfo.MEDIA_TYPE_IMAGE;
-                etemp.TextureId = itemp.VId.get(itemp.Count)[0];
-
-                MediaInfo tmp = mFilesList.get(itemp.VId.get(itemp.Count)[1]);
-                etemp.x = tmp.x;
-                etemp.y = tmp.y;
-                etemp.mFaceCount = tmp.mFaceCount;
-                etemp.mFBorder = tmp.mFBorder;
-                etemp.InfoId = tmp.CountId;
-                if(itemp.Count + 1 <= itemp.VId.size() - 1) itemp.Count++;
-                else itemp.Count = 0;
-
-                mFileOrder.set(eVideo.get(i), etemp);
-
-                eChange.add(eVideo.get(i));
-            }
         }
-
-        if(eChange.size() > 0) {
-            mFileOrder = mScript.setElementInfoTime(mFileOrder);
-            for(int i=0; i<eChange.size(); i++) {
-                mScript.updateTextureScaleRatio(mFileOrder.get(eChange.get(i)), eChange.get(i));
-                mFileOrder.get(eChange.get(i)).CalcTriangleVertices(mProcessGL);
-            }
-        }		
     }
     
     
@@ -780,10 +655,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     }
 
     public void OpenglPrepare() {
-        mProcessGL.prepareOpenGL(this);
-        synchronized(this) {
-            updateSurface = false;
-        }
+        mProcessGL.prepareOpenGL();
 
         mProcessGL.setView(mWidth, mHeight);
         mProcessGL.setEye();
@@ -839,13 +711,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 
 
 
-    private void generateSurfaceFrame(int frameNumber, boolean isVideo) {
-        synchronized(this) {
-            if (isVideo) { // only video should update surface texture
-                mProcessGL.updateSurfaceTexture();
-            }
-        }
-
+    private void generateSurfaceFrame(int frameNumber) {
         mProcessGL.doDraw(computePresentationTimeMsec(frameNumber));
     }
 

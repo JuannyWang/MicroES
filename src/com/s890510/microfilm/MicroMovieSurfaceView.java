@@ -19,12 +19,10 @@ import android.util.Log;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Timer;
 
-class MicroMovieSurfaceView extends GLSurfaceView
-    implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
+class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Renderer {
 
     private static String TAG = "MicroMovieSurfaceView";
     private ProcessGL mProcessGL;
-    private boolean updateSurface = false;
     private PlayBackMusic mPlayBackMusic = null;
     private ArrayList<MediaInfo> mMediaInfo;
     private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
@@ -91,7 +89,7 @@ class MicroMovieSurfaceView extends GLSurfaceView
             }
         };
 
-        mProcessGL = new ProcessGL(mContext, mActivity, false);
+        mProcessGL = new ProcessGL(mActivity, false);
         setRenderer(this);
         setRenderMode(GLSurfaceView.RENDERMODE_WHEN_DIRTY);
 
@@ -199,20 +197,12 @@ class MicroMovieSurfaceView extends GLSurfaceView
         return mProcessGL.getScript();
     }
 
-    public void changeVideo(int VideoId) {
-        mProcessGL.changeVideo(VideoId);
-    }
-
     public void changeSlogan() {
         mProcessGL.changeSlogan();
     }
 
     public void changeBitmap(ElementInfo eInfo, boolean resetTimer) {
         mProcessGL.changeBitmap(eInfo, resetTimer);
-    }
-
-    public void SeekVideo(int textureId, int videopart, int time) {
-        mProcessGL.SeekVideo(textureId, videopart, time);
     }
 
     public void onDestroy() {
@@ -225,20 +215,7 @@ class MicroMovieSurfaceView extends GLSurfaceView
         mPlayBackMusic.destroy();
 
         mIsDone = true;
-        mProcessGL.onDestroy();
         GLES20.glFinish();
-    }
-
-    public void resumeMediaPlayer() {
-        mProcessGL.resumeMediaPlayer();
-    }
-
-    public void pauseMediaPlayer() {
-        mProcessGL.pauseMediaPlayer();
-    }
-
-    public void stopMediaPlayer() {
-        mProcessGL.stopMediaPlayer();
     }
 
     public void SendMSG(int msg) {
@@ -253,17 +230,7 @@ class MicroMovieSurfaceView extends GLSurfaceView
             mActivity.setInitial(true);
             return;
         }
-
-        for(int i=0; i<mMediaInfo.size(); i++) {
-            if(!mMediaInfo.get(i).IsFake) continue;
-
-            if(mMediaInfo.get(i).getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
-                mMediaInfo.get(i).mIsInitial = mProcessGL.setBitmap(mMediaInfo.get(i));
-            } else if(mMediaInfo.get(i).getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
-                mMediaInfo.get(i).mIsInitial = mProcessGL.setMediaPlayer(mMediaInfo.get(i));
-            }
-        }
-
+        
         mActivity.setInitial(true);
     }
 
@@ -302,10 +269,6 @@ class MicroMovieSurfaceView extends GLSurfaceView
         mProcessGL.clearProcessData();
         ClearOrderTexture();
 
-        if(mProcessGL.getVideoStatus()) {
-            mProcessGL.stopMediaPlayer();
-        }
-
         synchronized (mPlayControl) {
             mPlayControl.setElapse(progress);
             mPlayControl.setSleep((int)mProcessGL.getScript().getSleepByElapse(progress));
@@ -334,12 +297,6 @@ class MicroMovieSurfaceView extends GLSurfaceView
         if(mActivity.isSaving()){
             mProcessGL.doDrawNothing();
         }else{
-            synchronized(this) {
-                if (updateSurface) {
-                    mProcessGL.updateSurfaceTexture();
-                    updateSurface = false;
-                }
-            }
             mProcessGL.doDraw(-1);
         }
 
@@ -367,20 +324,12 @@ class MicroMovieSurfaceView extends GLSurfaceView
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         SendMSG(MSG_STARTPROGRASS);
-        mProcessGL.prepareOpenGL(this);
-        synchronized(this) {
-            updateSurface = false;
-        }
+        mProcessGL.prepareOpenGL();
 
         mWidth = 0;
         mHeight = 0;
 
         GLES20.glDepthMask(false);
-    }
-
-    @Override
-    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
-        updateSurface = true;
     }
 
     public void setTimerElapse(long l, ArrayList<ElementInfo> FOrder){

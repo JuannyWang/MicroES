@@ -42,8 +42,6 @@ public class Timer {
         } else if(mActivity.checkPause()) {
             mSystemTime = System.currentTimeMillis();
             return mSystemTime - mStartTime + mElpaseOffset;
-        } else if(mProcessGL.getVideoWait()) {      	
-            return mTotal;
         } else {
             mSystemTime = System.currentTimeMillis();
             return mSystemTime - mStartTime + mElpaseOffset;

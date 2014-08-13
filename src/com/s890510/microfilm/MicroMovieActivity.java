@@ -92,8 +92,6 @@ public class MicroMovieActivity extends Activity {
     private int mViewHeight;
 
     private static Thread mSaveThread;
-    private ThreadPool mLocationThreadPool;
-    private ThreadPool mBitmapThreadPool;
 
     private int mInitBitmapCount = 0;
     private int mDoneBitmapCount = 0;
@@ -314,7 +312,7 @@ public class MicroMovieActivity extends Activity {
         }
 
         mSaveCallback = new SaveCallback();
-        mLoadTexture = new LoadTexture(this);
+        mLoadTexture = new LoadTexture();
         
         //temp
         mFileList = ((MediaPool)getApplicationContext()).getMediaInfo();
@@ -552,8 +550,8 @@ public class MicroMovieActivity extends Activity {
         mSaveProgressDialog.setMessage(getResources().getString(R.string.transcoding));
         mSaveProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
         mSaveProgressDialog.setMax(mEncodeAndMuxTest.TOTAL_FRAMES + 100);
-        //mSaveProgressDialog.setProgressNumberFormat(null);
-        mSaveProgressDialog.setProgressPercentFormat(null);
+        mSaveProgressDialog.setProgressNumberFormat(null);
+        //mSaveProgressDialog.setProgressPercentFormat(null);
         mSaveProgressDialog.setCanceledOnTouchOutside(false);
         mSaveProgressDialog.setOnKeyListener(new OnKeyListener(){
             @Override
@@ -673,73 +671,10 @@ public class MicroMovieActivity extends Activity {
             }
             //--------------------------------------------*/
 
-            //Calc. Bitmap TriangleVertices and check video position
-            ArrayList<Integer> eVideo = new ArrayList<Integer>();
-            ArrayList<Integer> eBitmap = new ArrayList<Integer>();
-            ArrayList<Integer> eChange = new ArrayList<Integer>();
+            //Calc. Bitmap TriangleVertices
             for(int i=0; i<mFileOrder.size(); i++) {
                 if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                     mFileOrder.get(i).CalcTriangleVertices(processGL);
-                }
-
-                if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_VIDEO && !mFileOrder.get(i).isVideo) {
-                    eVideo.add(i);
-                } else if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE && mFileOrder.get(i).isVideo) {
-                    eBitmap.add(i);
-                }
-            }
-
-            for(int i=0, j=0; i<eVideo.size(); i++) {
-                if(eBitmap.size() > j) {
-                    //Do swap
-                    ElementInfo temp = mFileOrder.get(eBitmap.get(j));
-                    Effect effect = temp.effect;
-                    Timer timer = temp.timer;
-                    boolean isVideo = temp.isVideo;
-
-                    temp.effect = mFileOrder.get(eVideo.get(i)).effect;
-                    temp.timer = mFileOrder.get(eVideo.get(i)).timer;
-                    temp.isVideo = mFileOrder.get(eVideo.get(i)).isVideo;
-
-                    mFileOrder.get(eVideo.get(i)).effect = effect;
-                    mFileOrder.get(eVideo.get(i)).timer = timer;
-                    mFileOrder.get(eVideo.get(i)).isVideo = isVideo;
-
-                    mFileOrder.set(eBitmap.get(j), mFileOrder.get(eVideo.get(i)));
-                    mFileOrder.set(eVideo.get(i), temp);
-
-                    eChange.add(eBitmap.get(j));
-                    eChange.add(eVideo.get(i));
-
-                    j++;
-                } else {
-                    //So sad...the pos can't put video
-                    ElementInfo etemp = mFileOrder.get(eVideo.get(i));
-                    MediaInfo itemp = mFileList.get(etemp.InfoId);
-
-                    etemp.Type = MediaInfo.MEDIA_TYPE_IMAGE;
-                    etemp.TextureId = itemp.VId.get(itemp.Count)[0];
-
-                    MediaInfo tmp = mFileList.get(itemp.VId.get(itemp.Count)[1]);
-                    etemp.x = tmp.x;
-                    etemp.y = tmp.y;
-                    etemp.mFaceCount = tmp.mFaceCount;
-                    etemp.mFBorder = tmp.mFBorder;
-                    etemp.InfoId = tmp.CountId;
-                    if(itemp.Count + 1 <= itemp.VId.size() - 1) itemp.Count++;
-                    else itemp.Count = 0;
-
-                    mFileOrder.set(eVideo.get(i), etemp);
-
-                    eChange.add(eVideo.get(i));
-                }
-            }
-
-            if(eChange.size() > 0) {
-                mFileOrder = mScript.setElementInfoTime(mFileOrder);
-                for(int i=0; i<eChange.size(); i++) {
-                    mScript.updateTextureScaleRatio(mFileOrder.get(eChange.get(i)), eChange.get(i));
-                    mFileOrder.get(eChange.get(i)).CalcTriangleVertices(processGL);
                 }
             }
 
@@ -844,168 +779,6 @@ public class MicroMovieActivity extends Activity {
         }
         Log.e(TAG, "bitmapCount:" + bitmapCount + ", videoCount:" + videoCount);
         //--------------------------------------------/
-    }
-    */
-
-    /*
-    private class AutolaunchMicroMovie extends AsyncTask<Integer, Integer, ArrayList<MediaItem>> {
-        public boolean mRunMicroMovie = false;
-        private ArrayList<MediaItem> mMediaItem;
-        private MediaSet mMediaSet;
-        private int mMicromovieLimit = 20;
-
-        public void setMediaSet(MediaSet mSet) {
-            mMediaSet = mSet;
-            Log.e(TAG, "mMediaSet.getTotalMediaItemCount():" + mMediaSet.getTotalMediaItemCount());
-        }
-
-        private boolean MicroMovieCheck(MediaItem mItem) {
-            final BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inJustDecodeBounds = true;
-
-            if(mItem == null) {
-                return false;
-            }
-
-            try {
-                if(mItem.getMediaType() == MediaObject.MEDIA_TYPE_VIDEO || mItem.getMimeType().contentEquals("image/vnd.wap.wbmp") ||
-                        mItem.getMimeType().contentEquals("image/gif") || mItem.getMediaType() == MediaObject.MEDIA_TYPE_UNKNOWN ||
-                        mItem.getSize() == 0 || mItem.getDetails() == null || mItem.getPath() == null || mItem.getFilePath() == null) {
-                    return false;
-                }
-            } catch(Exception e) {
-                e.printStackTrace();
-                return false;
-            }
-
-            if(LocalImage.class.isInstance(mItem)) {
-                LocalImage image = (LocalImage)mItem;
-                if(image.isInBurstFolder() != -1 || image.isInTimeMachineFolder() != -1) {
-                    return false;
-                }
-            }
-
-            //Here we quick check again!
-            BitmapFactory.decodeFile(mItem.getFilePath(), options);
-            if(options.outHeight < 0 || options.outWidth < 0) {
-                return false;
-            } else {
-                return true;
-            }
-        }
-
-        @Override
-        protected ArrayList<MediaItem> doInBackground(Integer... params) {
-            ArrayList<MediaItem> mItem = new ArrayList<MediaItem>();
-
-            if(!mIsDDS) {
-                mMediaItem = mMediaSet.getMediaItem(0, mMediaSet.getTotalMediaItemCount());
-
-                Random mRandom = new Random(System.currentTimeMillis());
-
-                if(mMediaItem.size() > mMicromovieLimit) {
-                    for(int i=0; i<mMicromovieLimit; i++) {
-                        int rnd = mRandom.nextInt(mMediaItem.size());
-                        MediaItem item = mMediaItem.get(rnd);
-                        if(!MicroMovieCheck(item)) {
-                            continue;
-                        } else {
-                            mItem.add(item);
-                        }
-                        mMediaItem.remove(rnd);
-                    }
-                } else {
-                    for(int i=0; i<mMediaItem.size(); i++) {
-                        MediaItem item = mMediaItem.get(i);
-                        if(!MicroMovieCheck(item)) {
-                            continue;
-                        } else {
-                            mItem.add(item);
-                        }
-                    }
-                }
-            } else {
-                for(int i=0; i<mVirtualPath.size(); i++) {
-                    MediaItem item = (MediaItem) mEphotoApp.getDataManager().getMediaObject(Path.fromString(mVirtualPath.get(i)));
-                    if(item == null) {
-                        mVirtualPath.remove(i);
-                        i--;
-                        continue;
-                    }
-                    if(!MicroMovieCheck(item)) {
-                        mVirtualPath.remove(i);
-                        i--;
-                        continue;
-                    } else {
-                        mItem.add(item);
-                    }
-                }
-            }
-
-            return mItem;
-        }
-
-        @Override
-        protected void onPostExecute(ArrayList<MediaItem> mMediaItem) {
-            ArrayList<MediaItem> mItem = new ArrayList<MediaItem>();
-            ArrayList<long[]> mId = new ArrayList<long[]>();
-            ArrayList<long[]> mSort = new ArrayList<long[]>();
-
-            for(int i=0; i<mMediaItem.size(); i++) {
-                MediaDateTime mdt = (MediaDateTime) mMediaItem.get(i).getDetails().getDetail(MediaDetails.INDEX_DATETIME);
-                long[] tmp = {mItem.size(), mdt.getDateInSec()};
-                mId.add(tmp);
-                mItem.add(mMediaItem.get(i));
-            }
-
-            mSort = mId;
-
-            Collections.sort(mSort, new Comparator<long[]>(){
-                @Override
-                public int compare(long[] lhs, long[] rhs) {
-                    if(lhs[1] > rhs[1]) {
-                        return 1;
-                    } else if(lhs[1] == rhs[1]) {
-                       return 0;
-                   }
-
-                   return -1;
-               }
-            });
-
-            ArrayList<MediaItem> temp = new ArrayList<MediaItem>();
-            for(int i=0; i<mSort.size(); i++) {
-                temp.add(mItem.get((int) mSort.get(i)[0]));
-            }
-
-            mItem.clear();
-            mItem = temp;
-
-            mDateInfo = new long[mItem.size()];
-            mLongitude = new double[mItem.size()];
-            mLatitude = new double[mItem.size()];
-            mFiles = new ArrayList<String>();
-            mVirtualPath = new ArrayList<String>();
-            mTypeFiles = new ArrayList<Integer>();
-            mRotateInfo = new ArrayList<Integer>();
-            for(int i=0; i<mItem.size(); i++) {
-                mFiles.add(mItem.get(i).getFilePath());
-                mVirtualPath.add(mItem.get(i).getPath().toString());
-                mTypeFiles.add(mItem.get(i).getMediaType());
-                mRotateInfo.add(mItem.get(i).getRotation());
-                MediaDateTime mdt = (MediaDateTime) mItem.get(i).getDetails().getDetail(MediaDetails.INDEX_DATETIME);
-                mDateInfo[i] = mdt.getDateInSec();
-                double[] latlng = (double[]) mItem.get(i).getDetails().getDetail(MediaDetails.INDEX_LOCATION);
-                if(latlng != null) {
-                    mLatitude[i] = latlng[0];
-                    mLongitude[i] = latlng[1];
-                } else {
-                    mLatitude[i] = 99999;
-                    mLongitude[i] = 99999;
-                }
-            }
-            runData();
-        }
     }
     */
 

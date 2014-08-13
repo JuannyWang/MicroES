@@ -44,8 +44,6 @@ public class ProcessGL {
     private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
     private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
 
-    private FloatBuffer mVideoTriangleVertices = null;
-
     private float[] mMVPMatrix = new float[16]; //the texture
     private float[] mModelMatrix = new float[16];
     private float[] mViewMatrix = new float[16];
@@ -56,14 +54,6 @@ public class ProcessGL {
     private ArrayList<int[]> BitmapTextureConvert = new ArrayList<int[]>();
     private ArrayList<int[]> WaitBitmapTexture = new ArrayList<int[]>();
 
-    //Video Program
-    private int mVProgram;
-    private int mVMVPMatrixHandle;
-    private int mVPositionHandle;
-    private int mVTextureHandle;
-    private int mVSamplerHandle;
-    private int mVResolution;
-
     private BackgroundShader mBackground;
     private SingleShader mSingleShader;
     private ShowMask mShowMask;
@@ -71,24 +61,15 @@ public class ProcessGL {
     private int mVideoTextureID;
     private int[] mBitmapTextureID = new int[5];
     private int[] mBitmapTextureCount = new int[5];
-    private int VideoShowCounter = -1;
     private int mSpecialTextureID;
     public int mSpecialHash = 0;
 
-    private OnFrameAvailableListener mlistener;
-
-    private ArrayList<MediaStatus> mVideoInfo = new ArrayList<MediaStatus>();
-    private SurfaceTexture mSurfaceTexture = null;
-    private int mTextureUpdateCount = 0;
-    private Context mContext;
     public StringLoader mStringLoader;
 
     public int ScreenHeight;
     public int ScreenWidth;
     public float ScreenScale = 1.0f;
     public float ScreenRatio;
-    private boolean mVideoinit = false;
-    private boolean mVideoWaitUpdate = false;
     private boolean mBitmapinit = false;
     private boolean mBitmapUpdate = false;
     private boolean mSloganinit = false;
@@ -110,8 +91,7 @@ public class ProcessGL {
     private boolean mIsEncode = false;
     private int[] mRemainTime = {0, 0, 0, 0, 0};
 
-    public ProcessGL(Context context, MicroMovieActivity activity, boolean isEncode) {
-        mContext = context;
+    public ProcessGL(MicroMovieActivity activity, boolean isEncode) {
         mActivity = activity;
         mScript = new Script1(mActivity, this);
         mTimer = new Timer(mScript.getTotalDuration(), mActivity, this);
@@ -171,10 +151,6 @@ public class ProcessGL {
         }
     }
 
-    public boolean getVideoStatus() {
-        return mVideoinit;
-    }
-
     public Script getScript(){
         return mScript;
     }
@@ -189,93 +165,6 @@ public class ProcessGL {
         mStringLoader.StringVertex();
         mBackground.CalcVertices();
         Log.e(TAG, "ScreenScale:" + ScreenScale + ", ScreenHeight:" + ScreenHeight + ", ScreenWidth:" + ScreenWidth);
-    }
-
-    public void stopMediaPlayer() {
-        final int VideoCounter = VideoShowCounter;
-        mVideoinit = false;
-        final MediaStatus Status = mVideoInfo.get(VideoCounter);
-        if(Status.player != null) {
-            if(Status.player.isPlaying())
-                Status.player.stop();
-            Status.player.release();
-            Status.player = null;
-        }
-
-        if(mSurfaceTexture != null) {
-            mSurfaceTexture.release();
-            mSurfaceTexture = null;
-        }
-
-        new Thread(new Runnable() {
-            public void run() {
-                if(Status.player == null)
-                    Status.player = new MediaPlayer();
-                try {
-                    Status.player.setDataSource(Status.Path);
-                    Status.player.prepare();
-
-                    Status.player.seekTo(Status.Duration.get(Status.DurationCount++));
-                    Status.player.setVolume(0, 0);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    public boolean setMediaPlayer(MediaInfo info){
-        int VideoDuration, duration, seekTime;
-
-        MediaStatus status = new MediaStatus();
-
-        if(status.player == null)
-            status.player = new MediaPlayer();
-        try {
-            status.Path = info.getPath();
-            status.player.setDataSource(info.getPath());
-            status.player.prepare();
-
-            VideoDuration = status.player.getDuration();
-            status.TotalDuration = VideoDuration;
-
-            if(VideoDuration < 3500) duration = 0;
-            else duration = VideoDuration - 3500;
-
-            //now we make 10 different seek time
-            for(int i=0; i<10; i++) {
-                seekTime = (int)Math.floor(Math.random()*duration);
-                status.Duration.add(seekTime);
-            }
-
-            status.player.seekTo(status.Duration.get(status.DurationCount++));
-            status.player.setVolume(0, 0);
-
-            status.CalcTriangleVertices(TVD(status.player.getVideoWidth(), status.player.getVideoHeight()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        mVideoInfo.add(status);
-        Log.e(TAG, "mVideoInfo size:" + mVideoInfo.size());
-        return true;
-    }
-
-    public boolean setBitmap(MediaInfo info) {
-        boolean check = false;
-
-        if(!info.IsFake)
-            check = mActivity.mLoadTexture.loadTexture(mContext, info, info.IsFake, 0);
-        else
-            check = mActivity.mLoadTexture.loadTexture(mContext, info, info.IsFake,
-                    (int)Math.floor(Math.random()*mVideoInfo.get(info.VOId).TotalDuration));
-
-        if(check) {
-            Log.e(TAG, "bwidth:" + info.getImage().getWidth() + ", bheight:" + info.getImage().getHeight());
-
-            return true;
-        }
-        return false;
     }
 
     public void playprepare() {
@@ -391,61 +280,6 @@ public class ProcessGL {
         }
     }
 
-    public void changeVideo(int VideoId) {
-        mVideoWaitUpdate = true;
-        VideoShowCounter = VideoId;
-        Log.e(TAG, "size:" + mVideoInfo.size());
-        MediaStatus Status = mVideoInfo.get(VideoId);
-        mVideoTriangleVertices = Status.mTriangleVertices;
-
-        if(mSurfaceTexture == null) {
-            mSurfaceTexture = new SurfaceTexture(mVideoTextureID);
-            mSurfaceTexture.setOnFrameAvailableListener(mlistener);
-        }
-
-        Surface surface = new Surface(mSurfaceTexture);
-        Status.player.setSurface(surface);
-        surface.release();
-        surface = null;
-
-        if(!Status.player.isPlaying())
-            Status.player.start();
-    }
-
-    public void SeekVideo(int textureId, int videopart, int time) {
-        MediaStatus Status = mVideoInfo.get(textureId);
-        Status.player.seekTo(Status.Duration.get(videopart) + time);
-        Status.DurationCount = videopart++;
-    }
-
-    public void resumeMediaPlayer() {
-        final int VideoCounter = VideoShowCounter;
-        final MediaStatus Status = mVideoInfo.get(VideoCounter);
-        Status.player.start();
-    }
-
-    public void pauseMediaPlayer() {
-        final int VideoCounter = VideoShowCounter;
-        final MediaStatus Status = mVideoInfo.get(VideoCounter);
-        Status.player.pause();
-    }
-
-    public void releasePlayer() {
-        for(int i=0; i<mVideoInfo.size(); i++) {
-            MediaStatus Status = mVideoInfo.get(i);
-            if(Status.player != null) {
-                if(Status.player.isPlaying())
-                    Status.player.stop();
-                Status.player.release();
-                Status.player = null;
-            }
-        }
-        if(mSurfaceTexture != null) {
-            mSurfaceTexture.release();
-            mSurfaceTexture = null;
-        }
-    }
-
     private float[] CalcXY(int width, int height) {
         float[] XY = new float[2]; //0 => x, 1 => y
 
@@ -507,45 +341,15 @@ public class ProcessGL {
         }
     }
 
-    private String getShaderRaw(final int ResourcesId) {
-        return GLUtil.readTextFileFromRawResource(mContext, ResourcesId);
-    }
-
-    private void VideoProgram() {
-        final int vertexShaderHandle = GLUtil.compileShader(GLES20.GL_VERTEX_SHADER, getShaderRaw(R.raw.video_vertex_shader));
-        final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, mFilter.getVideoFragment());
-
-        checkGlError("CVideoShader");
-        //Create the new program
-        mVProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mVProgram == 0) {
-            Log.e(TAG, "mVProgram is 0");
-            return;
-        }
-
-        // Set program handles. These will later be used to pass in values to the program.
-        mVPositionHandle = GLES20.glGetAttribLocation(mVProgram, "aPosition");
-        mVTextureHandle = GLES20.glGetAttribLocation(mVProgram, "aTextureCoord");
-        mVMVPMatrixHandle = GLES20.glGetUniformLocation(mVProgram, "uMVPMatrix");
-        mFilter.setVideoParams(mVProgram);
-        mVSamplerHandle = GLES20.glGetUniformLocation(mVProgram, "exTexture");
-        mVResolution = GLES20.glGetUniformLocation(mVProgram, "resolution");
-
-        checkGlError("CVideoProgram");
-    }
-
     private void BitmapProgram() {
         mSingleShader.initSingleShader();
         mShowMask.initMask();
     }
 
-    public void prepareOpenGL(SurfaceTexture.OnFrameAvailableListener listener){
-        mlistener = listener;
-
+    public void prepareOpenGL(){
         mBackground = new BackgroundShader(mActivity, this);
         mSlogan = new Slogan(mActivity, this);
 
-        VideoProgram();
         BitmapProgram();
 
         checkGlError("glProgram");
@@ -553,27 +357,17 @@ public class ProcessGL {
         SetTextureID();
     }
 
-    private void resetOpenGLAfterFilterChange(){
-        VideoProgram();
-    }
-
     public void SetTextureID() {
-        //For Video
-        mVideoTextureID = mActivity.mLoadTexture.GenTexture("Video", 1);
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mVideoTextureID);
-        mActivity.mLoadTexture.BindTexture(GLES11Ext.GL_TEXTURE_EXTERNAL_OES, mVideoTextureID);
-        mSurfaceTexture = new SurfaceTexture(mVideoTextureID);
-        mSurfaceTexture.setOnFrameAvailableListener(mlistener);
 
         //For Bitmap
         for(int i=0; i<mBitmapTextureID.length; i++)
-            mBitmapTextureID[i] = mActivity.mLoadTexture.GenTexture("Bitmap", i+2);
+            mBitmapTextureID[i] = mActivity.mLoadTexture.GenTexture("Bitmap", i+1);
 
         for(int i=0; i<mBitmapTextureCount.length; i++)
             mBitmapTextureCount[i] = 0;
 
         //For SpecialTexture
-        mSpecialTextureID = mActivity.mLoadTexture.GenTexture("Special", 7);
+        mSpecialTextureID = mActivity.mLoadTexture.GenTexture("Special", 6);
 
         //print texture id info
         Log.e(TAG, "mSpecialTextureID:" + mSpecialTextureID + ", mVideoTextureID:" + mVideoTextureID);
@@ -582,33 +376,10 @@ public class ProcessGL {
             Log.e(TAG, "mBitmapTextureID[" + i + "]:" + mBitmapTextureID[i]);
     }
 
-    public void updateSurfaceTexture() {
-        mSurfaceTexture.updateTexImage();
-        if(mVideoWaitUpdate && mTextureUpdateCount < 1) {
-            mTextureUpdateCount++;
-            return;
-        }
-        if(mVideoWaitUpdate) {
-            mVideoWaitUpdate = false;
-            mVideoinit = true;
-            mBitmapinit = false;
-            mSloganinit = false;
-            mTextureUpdateCount = 0;
-
-            // reset timer for video
-            //mTimer.resetTimer();
-        }
-    }
-
     public void changeSlogan() {
-        mVideoinit = false;
         mBitmapinit = false;
         mBitmapUpdate = false;
         mSloganinit = true;
-    }
-
-    public boolean getVideoWait() {
-        return mVideoWaitUpdate;
     }
 
     private void updateTexture(int type) {
@@ -638,7 +409,7 @@ public class ProcessGL {
 
         synchronized(mProcessData) {
             try {
-                if((mBitmapinit || mVideoinit) && mProcessData[mProcessData.length-1].effect.showBackground()) {
+                if((mBitmapinit) && mProcessData[mProcessData.length-1].effect.showBackground()) {
                     mBackground.DrawRandar(mProcessData[mProcessData.length-1], mViewMatrix, mProjectionMatrix);
                 }
             } catch (Exception e) {
@@ -646,19 +417,12 @@ public class ProcessGL {
             }
         }
 
-        if(!mBitmapinit && mVideoinit && !mSloganinit) {
-        	if(mModelMatrix != null){
-        		Matrix.setIdentityM(mModelMatrix, 0);
-        		drawVideo();
-        	}
-        }
-
         if(mBitmapUpdate) {
             updateTexture(MediaInfo.MEDIA_TYPE_IMAGE);
         }
 
         synchronized(mProcessData) {
-            if(mBitmapinit && !mVideoinit && !mSloganinit) {
+            if(mBitmapinit && !mSloganinit) {
             	if(mModelMatrix != null){
 	                Matrix.setIdentityM(mModelMatrix, 0);
 	                drawSingleBitmap(elapseTime, false);
@@ -669,7 +433,6 @@ public class ProcessGL {
         if(mShouldResetOpenGL){
             mShouldResetOpenGL = false;
             mFilter = FilterChooser.getFilter(mActivity, mScript.getFilterId());
-            resetOpenGLAfterFilterChange();
         }
 
         GLES20.glFinish();
@@ -704,7 +467,7 @@ public class ProcessGL {
                 }
             } else { // for preview
                 if(mProcessData[i] == null) continue;
-                if(!mProcessData[i].timer.isAlive() && !mVideoWaitUpdate) continue;
+                if(!mProcessData[i].timer.isAlive()) continue;
                 mInfo = mProcessData[i];
             }
 
@@ -981,47 +744,8 @@ public class ProcessGL {
         return mIsEncode;
     }
 
-    public void drawVideo() {
-        GLES20.glUseProgram(mVProgram);
-
-        GLES20.glUniform1i(mVSamplerHandle, mVideoTextureID);
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mVideoTextureID);
-
-        mVideoTriangleVertices.position(TRIANGLE_VERTICES_DATA_POS_OFFSET);
-        GLES20.glVertexAttribPointer(mVPositionHandle, 3, GLES20.GL_FLOAT, false,
-            TRIANGLE_VERTICES_DATA_STRIDE_BYTES, mVideoTriangleVertices);
-        GLES20.glEnableVertexAttribArray(mVPositionHandle);
-        checkGlError("glVertexAttribPointer maPosition");
-
-        mVideoTriangleVertices.position(TRIANGLE_VERTICES_DATA_UV_OFFSET);
-        GLES20.glVertexAttribPointer(mVTextureHandle, 3, GLES20.GL_FLOAT, false,
-            TRIANGLE_VERTICES_DATA_STRIDE_BYTES, mVideoTriangleVertices);
-        GLES20.glEnableVertexAttribArray(mVTextureHandle);
-        checkGlError("glEnableVertexAttribArray maTextureHandle");
-
-        Matrix.rotateM(mModelMatrix, 0, 180, 1.0f, 0.0f, 0.0f);
-        Matrix.multiplyMM(mMVPMatrix, 0, mProjectionMatrix, 0, mMVPMatrix, 0);
-        GLES20.glUniformMatrix4fv(mVMVPMatrixHandle, 1, false, mModelMatrix, 0);
-        mFilter.drawVideo();
-
-        GLES20.glUniform2f(mVResolution, ScreenWidth, ScreenHeight);
-
-        GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, 4);
-
-        checkGlError("drawVideo");
-    }
-
-    public void onDestroy() {
-        releasePlayer();
-    }
-
     public long getElapseTime(){
         return mTimer.getElapse();
-    }
-
-
-    public int getVideoPosition(){
-        return mVideoInfo.get(VideoShowCounter).player.getCurrentPosition();
     }
 
     public void setTimerElapse(long elpase){
@@ -1039,48 +763,9 @@ public class ProcessGL {
     }
 
     public void reset() {
-        MediaStatus Status;
-        for(int i=0; i<mVideoInfo.size(); i++) {
-            Status = mVideoInfo.get(i);
-            Status.DurationCount = 0;
-            if(Status.player == null) {
-                try {
-                    Status.player.setDataSource(Status.Path);
-                    Status.player.prepare();
-
-                    Status.player.seekTo(Status.Duration.get(Status.DurationCount++));
-                    Status.player.setVolume(0, 0);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            } else {
-                Status.player.seekTo(Status.Duration.get(Status.DurationCount++));
-            }
-        }
-
-        mVideoinit = false;
-        mVideoWaitUpdate = false;
         mBitmapinit = false;
         mBitmapUpdate = false;
         mSloganinit = false;
-    }
-
-    private class MediaStatus {
-        public String Path;
-        public MediaPlayer player;
-        public int TotalDuration = 0;
-        public int DurationCount = 0;
-        public ArrayList<Integer> Duration = new ArrayList<Integer>();
-        public FloatBuffer mTriangleVertices = null;
-
-        public void CalcTriangleVertices(float[] mTriangleVerticesData) {
-            if(mTriangleVertices != null)
-                mTriangleVertices.clear();
-            mTriangleVertices = ByteBuffer.allocateDirect(
-                    mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
-                        .order(ByteOrder.nativeOrder()).asFloatBuffer();
-            mTriangleVertices.put(mTriangleVerticesData).position(0);
-        }
     }
 
     public void setTimerForFilter(long timer){

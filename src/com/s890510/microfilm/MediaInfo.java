@@ -60,18 +60,12 @@ public class MediaInfo {
 	public GeoInfo mGeoInfo = null;
 	public int TextureId;
     public int CountId;
-	public boolean IsFake = false;
 	public float x;
     public float y;
 	
 	public int mFaceCount = 0;
     public float[] mFBorder = {-1, -1, -1, -1}; //0->left, 1->right, 2->top, 3->bottom
     public ArrayList<long[]> mFaceRect = new ArrayList<long[]>();
-    
-    //Use for movie
-    public int Count = 0;
-    public ArrayList<int[]> VId = new ArrayList<int[]>();
-    public int VOId = 0;    //Video original Id
 	
 	public MediaInfo(Activity activity) {
 		mActivity = activity;

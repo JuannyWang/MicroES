@@ -2,52 +2,13 @@ package com.s890510.microfilm;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
-import android.media.MediaMetadataRetriever;
 import android.opengl.GLES20;
-import android.util.Log;
 
 public class LoadTexture {
     private String TAG = "LoadTexture";
-    private MicroMovieActivity mActivity;
     private int[] textureHandle = null;
-    private int width;
-    private int height;
-
-    public LoadTexture(MicroMovieActivity activity) {
-        mActivity = activity;
-        width = mActivity.mVisioWidth;
-        height = mActivity.mVisioHeight;
-    }
-
-    public boolean loadTexture(final Context context, final MediaInfo Info, final boolean IsFake, int duration) {
-        if(!Info.getPath().isEmpty()) {
-
-            Bitmap bitmap = null;
-
-            MediaMetadataRetriever mediaMetadataRetriever = new MediaMetadataRetriever();
-            mediaMetadataRetriever.setDataSource(Info.getPath());
-            Log.e(TAG, "INFO_TYPE_VITMAP Duration:" + duration);
-            bitmap = mediaMetadataRetriever.getFrameAtTime(duration*1000); //unit in microsecond
-
-            mediaMetadataRetriever.release();
-
-            if(bitmap != null) {
-                if(bitmap.getWidth() > width || bitmap.getHeight() > height)
-                    bitmap = BitmapScale(bitmap, width, height);
-
-                Log.e(TAG, "loadTexture, width:" + bitmap.getWidth() + ", height:" + bitmap.getHeight());
-                Info.setImage(bitmap);
-                return true;
-            }
-            else {
-                Log.e(TAG, "bitmap is null");
-            }
-        }
-        return false;
-    }
 
     public void BindTexture(int target, int texture) {
         // Bind to the texture in OpenGL
@@ -63,7 +24,7 @@ public class LoadTexture {
 
     public int GenTexture(String Method, int Id) {
         if(textureHandle == null) {
-            textureHandle = new int[8]; //0: unuse, 1:movie, 2-6:bitmap, 7:slogan
+            textureHandle = new int[8]; //0: unuse, 1-5:bitmap, 6:slogan
             for(int i=0; i<textureHandle.length; i++)
                 textureHandle[i] = i;
         }
