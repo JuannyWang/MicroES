@@ -21,50 +21,52 @@ import com.s890510.microfilm.mask.Mask;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class LineShader extends Shader {
-    private static final String TAG = "LineShader";
-    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
-    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
-    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final String TAG                               = "LineShader";
+    private static final int    TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
+    private static final int    TRIANGLE_VERTICES_DATA_UV_OFFSET  = 3;
+    public static final int     FLOAT_SIZE_BYTES                  = 4;                                                                               // float
+                                                                                                                                                      // =
+                                                                                                                                                      // 4bytes
 
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureHandle;
-    private int mSamplerHandle;
-    private int mAlphaHandle;
-    private int mMVPMatrixHandle;
-    private int mResolutionHandle;
-    private int mThemeHandle;
-    private int mXPosHandle;
-    private int mAreaHandle;
-    private int mTransHandle;
-    private int mNPosHandle;
-    private int mStartHandle;
-    private int mEndHandle;
-    private int mReverseHandle;
-    private int mIsStringHandle;
-    private int mLeftFilterHandle;
-    private int mRightFilterHandle;
-    private FloatBuffer mTriangleVertices;
-    private float[] mMVPMatrix = new float[16];
+    private int                 mProgram;
+    private int                 mPositionHandle;
+    private int                 mTextureHandle;
+    private int                 mSamplerHandle;
+    private int                 mAlphaHandle;
+    private int                 mMVPMatrixHandle;
+    private int                 mResolutionHandle;
+    private int                 mThemeHandle;
+    private int                 mXPosHandle;
+    private int                 mAreaHandle;
+    private int                 mTransHandle;
+    private int                 mNPosHandle;
+    private int                 mStartHandle;
+    private int                 mEndHandle;
+    private int                 mReverseHandle;
+    private int                 mIsStringHandle;
+    private int                 mLeftFilterHandle;
+    private int                 mRightFilterHandle;
+    private FloatBuffer         mTriangleVertices;
+    private float[]             mMVPMatrix                        = new float[16];
 
-    private Bitmap mBitmap = null;
-    private int mColor = Color.WHITE;
-    private int mHashCode = 0;
-    private boolean mIsReverse = false;
+    private Bitmap              mBitmap                           = null;
+    private int                 mColor                            = Color.WHITE;
+    private int                 mHashCode                         = 0;
+    private boolean             mIsReverse                        = false;
 
-    private boolean mIsGone = false;
-    private boolean mIsInit = false;
-    private float ratio;
-    private float mAlpha = 1.0f;
-    private float mDist;
-    private float[] mXPos = new float[10];
-    private float[] mArea = new float[10];
-    private float[] mWidth = {0.41f, 0.217f, 0.142f, 0.081f, 0.048f, 0.031f, 0.023f, 0.02f, 0.017f, 0.009f};
-    private float[] mSTime = {0f, 0.052f, 0.105f, 0.157f, 0.210f, 0.263f, 0.315f, 0.368f, 0.421f, 0.473f};
-    private float[] mETime = {0.526f, 0.578f, 0.631f, 0.684f, 0.736f, 0.789f, 0.842f, 0.894f, 0.947f, 1f};
-    private float[] mStartPos = new float[10];
-    private float[] mEndPos = new float[10];
-    private ProcessGL mProcessGL;
+    private boolean             mIsGone                           = false;
+    private boolean             mIsInit                           = false;
+    private float               ratio;
+    private float               mAlpha                            = 1.0f;
+    private float               mDist;
+    private float[]             mXPos                             = new float[10];
+    private float[]             mArea                             = new float[10];
+    private float[]             mWidth                            = { 0.41f, 0.217f, 0.142f, 0.081f, 0.048f, 0.031f, 0.023f, 0.02f, 0.017f, 0.009f };
+    private float[]             mSTime                            = { 0f, 0.052f, 0.105f, 0.157f, 0.210f, 0.263f, 0.315f, 0.368f, 0.421f, 0.473f };
+    private float[]             mETime                            = { 0.526f, 0.578f, 0.631f, 0.684f, 0.736f, 0.789f, 0.842f, 0.894f, 0.947f, 1f };
+    private float[]             mStartPos                         = new float[10];
+    private float[]             mEndPos                           = new float[10];
+    private ProcessGL           mProcessGL;
 
     public LineShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -74,10 +76,10 @@ public class LineShader extends Shader {
 
     public void init() {
         float length = 0;
-        ratio = ((float)mProcessGL.ScreenWidth/(float)mProcessGL.ScreenHeight);
-        mDist = ratio*2;
+        ratio = ((float) mProcessGL.ScreenWidth / (float) mProcessGL.ScreenHeight);
+        mDist = ratio * 2;
 
-        for(int i=0; i<10; i++) {
+        for(int i = 0; i < 10; i++) {
             mArea[i] = ratio * 2 * mWidth[i];
             mXPos[i] = ratio;
 
@@ -97,15 +99,16 @@ public class LineShader extends Shader {
         CalcVertices();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
-            int mTextureId, ElementInfo mElementInfo, int mType) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo, int mType) {
 
         long mElapseTime;
         long timer = mElementInfo.timer.getElapse();
         Effect mEffect = mElementInfo.effect.getEffect(timer);
 
-        if(mEffect == null) return;
-        else mElapseTime = mElementInfo.effect.getElapseTime(timer);
+        if(mEffect == null)
+            return;
+        else
+            mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
         boolean IsGone = mEffect.getMaskType(mElapseTime) == Mask.GONE;
 
@@ -115,8 +118,7 @@ public class LineShader extends Shader {
         float[] mLeft = mProcessGL.getLeftFilter();
         float[] mRight = mProcessGL.getRightFilter();
 
-        if((!mIsTrans && !mIsInit) || IsGone != mIsGone || mHashCode != mElementInfo.hashCode() ||
-                mIsReverse != IsGone) {
+        if((!mIsTrans && !mIsInit) || IsGone != mIsGone || mHashCode != mElementInfo.hashCode() || mIsReverse != IsGone) {
             Log.e(TAG, "Do reset");
             CreateProgram();
             mIsGone = IsGone;
@@ -125,7 +127,8 @@ public class LineShader extends Shader {
             mIsReverse = IsGone;
         }
 
-        if(!mIsGone && progress < 0.05f && mIsTrans) return;
+        if(!mIsGone && progress < 0.05f && mIsTrans)
+            return;
 
         GLES20.glUseProgram(mProgram);
 
@@ -133,29 +136,27 @@ public class LineShader extends Shader {
             if(mBitmap == null)
                 CreateBitmap();
 
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
             mActivity.mLoadTexture.BindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
 
             GLES20.glUniform1i(mSamplerHandle, mTextureId);
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
 
             mTriangleVertices.position(TRIANGLE_VERTICES_DATA_POS_OFFSET);
-            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,
-                    20, mTriangleVertices);
+            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 20, mTriangleVertices);
             GLES20.glEnableVertexAttribArray(mPositionHandle);
 
             mTriangleVertices.position(TRIANGLE_VERTICES_DATA_UV_OFFSET);
-            GLES20.glVertexAttribPointer(mTextureHandle, 3, GLES20.GL_FLOAT, false,
-                    20, mTriangleVertices);
+            GLES20.glVertexAttribPointer(mTextureHandle, 3, GLES20.GL_FLOAT, false, 20, mTriangleVertices);
             GLES20.glEnableVertexAttribArray(mTextureHandle);
         } else {
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
             GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
             if(mType == Shader.STRING) {
-            	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
+                mProcessGL.mStringLoader.mStringTextureCoords.position(0);
                 GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
                 GLES20.glEnableVertexAttribArray(mTextureHandle);
 
@@ -184,26 +185,26 @@ public class LineShader extends Shader {
         GLES20.glUniform1f(mThemeHandle, mProcessGL.getScriptFilter());
 
         if(mIsTrans && ((mIsGone && progress > 0.05f) || !mIsGone)) {
-            progress = progress*10/9.5f;
+            progress = progress * 10 / 9.5f;
             int mStart = 0, mEnd = 0;
             float mPos = -ratio;
-            for(int i=0; i<10; i++) {
+            for(int i = 0; i < 10; i++) {
                 if(progress < mSTime[i]) {
                     mEnd = i;
                     break;
                 }
 
                 if(progress < mETime[i]) {
-                    float eprogress = (progress - mSTime[i])/(mETime[i]-mSTime[i]);
+                    float eprogress = (progress - mSTime[i]) / (mETime[i] - mSTime[i]);
                     mXPos[i] = mStartPos[i] - (mDist * eprogress);
                 } else {
                     mXPos[i] = mEndPos[i];
                     if(i < 9) {
-                        mPos = mEndPos[i+1];
+                        mPos = mEndPos[i + 1];
                     } else {
-                        mPos = ratio*2-mArea[9];
+                        mPos = ratio * 2 - mArea[9];
                     }
-                    mStart = i+1;
+                    mStart = i + 1;
                 }
 
                 if(IsGone)
@@ -219,7 +220,8 @@ public class LineShader extends Shader {
             }
             GLES20.glUniform1i(mStartHandle, mStart);
 
-            if(mEnd == 0) mEnd = 10;
+            if(mEnd == 0)
+                mEnd = 10;
             GLES20.glUniform1i(mEndHandle, mEnd);
 
             GLES20.glUniform1f(mTransHandle, 1.0f);
@@ -252,14 +254,15 @@ public class LineShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("DefaultShader");
-        //Create the new program
+        // Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mProgram == 0) {
+        if(mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to the program.
+        // Set program handles. These will later be used to pass in values to
+        // the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");
@@ -290,16 +293,12 @@ public class LineShader extends Shader {
     private void CalcVertices() {
         float mRatio = mProcessGL.ScreenRatio;
         final float[] mTriangleVerticesData = {
-            // X, Y, Z, U, V
-            -mRatio, -1.0f, 0.0f, 0.0f, 0.0f,
-             mRatio, -1.0f, 0.0f, 1.0f, 0.0f,
-            -mRatio,  1.0f, 0.0f, 0.0f, 1.0f,
-             mRatio,  1.0f, 0.0f, 1.0f, 1.0f
-        };
+                // X, Y, Z, U, V
+                -mRatio, -1.0f, 0.0f, 0.0f, 0.0f, mRatio, -1.0f, 0.0f, 1.0f, 0.0f, -mRatio, 1.0f, 0.0f, 0.0f, 1.0f, mRatio, 1.0f, 0.0f, 1.0f, 1.0f };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);
     }
@@ -322,7 +321,7 @@ public class LineShader extends Shader {
 
     @Override
     public void Reset() {
-        for(int i=0; i<mXPos.length; i++) {
+        for(int i = 0; i < mXPos.length; i++) {
             mXPos[i] = 2;
         }
     }

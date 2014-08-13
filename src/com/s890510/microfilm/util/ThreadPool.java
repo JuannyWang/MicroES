@@ -7,38 +7,40 @@ import java.util.concurrent.TimeUnit;
 
 import android.util.Log;
 
-
 public class ThreadPool {
-	private static final String TAG = "ThreadPool";
-    public static final int CORE_POOL_SIZE = 4;
-    public static final int MAX_POOL_SIZE = 8;
-    private static final int KEEP_ALIVE_TIME = 10; // 10 seconds
+    private static final String TAG             = "ThreadPool";
+    public static final int     CORE_POOL_SIZE  = 4;
+    public static final int     MAX_POOL_SIZE   = 8;
+    private static final int    KEEP_ALIVE_TIME = 10;                    // 10
+                                                                          // seconds
 
     // Resource type
-    public static final int MODE_NONE = 0;
-    public static final int MODE_CPU = 1;
-    public static final int MODE_NETWORK = 2;
+    public static final int     MODE_NONE       = 0;
+    public static final int     MODE_CPU        = 1;
+    public static final int     MODE_NETWORK    = 2;
 
-    ResourceCounter mCpuCounter = new ResourceCounter(2);
-    ResourceCounter mNetworkCounter = new ResourceCounter(2);
+    ResourceCounter             mCpuCounter     = new ResourceCounter(2);
+    ResourceCounter             mNetworkCounter = new ResourceCounter(2);
 
-	private final Executor mExecutor;
+    private final Executor      mExecutor;
 
-	public interface Job<T> {
+    public interface Job<T> {
         public T run(JobContext jc);
     }
 
-	public interface JobContext {
+    public interface JobContext {
         boolean isCancelled();
+
         void setCancelListener(CancelListener listener);
+
         boolean setMode(int mode);
     }
 
-	public interface CancelListener {
+    public interface CancelListener {
         public void onCancel();
     }
 
-	// Submit a job to the thread pool. The listener will be called when the
+    // Submit a job to the thread pool. The listener will be called when the
     // job is finished (or cancelled).
     public <T> Future<T> submit(Job<T> job, FutureListener<T> listener) {
         Worker<T> w = new Worker<T>(job, listener);
@@ -46,31 +48,30 @@ public class ThreadPool {
         return w;
     }
 
-	public ThreadPool(int initPoolSize, int maxPoolSize, String name) {
-        mExecutor = new ThreadPoolExecutor(
-                initPoolSize, maxPoolSize, KEEP_ALIVE_TIME,
-                TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
-                new PriorityThreadFactory(name,
-                android.os.Process.THREAD_PRIORITY_BACKGROUND));
+    public ThreadPool(int initPoolSize, int maxPoolSize, String name) {
+        mExecutor = new ThreadPoolExecutor(initPoolSize, maxPoolSize, KEEP_ALIVE_TIME, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(),
+                new PriorityThreadFactory(name, android.os.Process.THREAD_PRIORITY_BACKGROUND));
     }
 
-	private static class ResourceCounter {
+    private static class ResourceCounter {
         public int value;
+
         public ResourceCounter(int v) {
             value = v;
         }
     }
+
     private class Worker<T> implements Runnable, Future<T>, JobContext {
         @SuppressWarnings("hiding")
         private static final String TAG = "Worker";
-        private Job<T> mJob;
-        private FutureListener<T> mListener;
-        private CancelListener mCancelListener;
-        private ResourceCounter mWaitOnResource;
-        private volatile boolean mIsCancelled;
-        private boolean mIsDone;
-        private T mResult;
-        private int mMode;
+        private Job<T>              mJob;
+        private FutureListener<T>   mListener;
+        private CancelListener      mCancelListener;
+        private ResourceCounter     mWaitOnResource;
+        private volatile boolean    mIsCancelled;
+        private boolean             mIsDone;
+        private T                   mResult;
+        private int                 mMode;
 
         public Worker(Job<T> job, FutureListener<T> listener) {
             mJob = job;
@@ -84,10 +85,10 @@ public class ThreadPool {
 
             // A job is in CPU mode by default. setMode returns false
             // if the job is cancelled.
-            if (setMode(MODE_CPU)) {
+            if(setMode(MODE_CPU)) {
                 try {
                     result = mJob.run(this);
-                } catch (Throwable ex) {
+                } catch(Throwable ex) {
                     Log.w(TAG, "Exception in running a job", ex);
                 }
             }
@@ -98,20 +99,22 @@ public class ThreadPool {
                 mIsDone = true;
                 notifyAll();
             }
-            if (mListener != null) mListener.onFutureDone(this);
+            if(mListener != null)
+                mListener.onFutureDone(this);
         }
 
         // Below are the methods for Future.
         @Override
         public synchronized void cancel() {
-            if (mIsCancelled) return;
+            if(mIsCancelled)
+                return;
             mIsCancelled = true;
-            if (mWaitOnResource != null) {
-                synchronized (mWaitOnResource) {
+            if(mWaitOnResource != null) {
+                synchronized(mWaitOnResource) {
                     mWaitOnResource.notifyAll();
                 }
             }
-            if (mCancelListener != null) {
+            if(mCancelListener != null) {
                 mCancelListener.onCancel();
             }
         }
@@ -128,10 +131,10 @@ public class ThreadPool {
 
         @Override
         public synchronized T get() {
-            while (!mIsDone) {
+            while(!mIsDone) {
                 try {
                     wait();
-                } catch (Exception ex) {
+                } catch(Exception ex) {
                     Log.w(TAG, "ingore exception", ex);
                     // ignore.
                 }
@@ -149,7 +152,7 @@ public class ThreadPool {
         @Override
         public synchronized void setCancelListener(CancelListener listener) {
             mCancelListener = listener;
-            if (mIsCancelled && mCancelListener != null) {
+            if(mIsCancelled && mCancelListener != null) {
                 mCancelListener.onCancel();
             }
         }
@@ -158,13 +161,14 @@ public class ThreadPool {
         public boolean setMode(int mode) {
             // Release old resource
             ResourceCounter rc = modeToCounter(mMode);
-            if (rc != null) releaseResource(rc);
+            if(rc != null)
+                releaseResource(rc);
             mMode = MODE_NONE;
 
             // Acquire new resource
             rc = modeToCounter(mode);
-            if (rc != null) {
-                if (!acquireResource(rc)) {
+            if(rc != null) {
+                if(!acquireResource(rc)) {
                     return false;
                 }
                 mMode = mode;
@@ -174,9 +178,9 @@ public class ThreadPool {
         }
 
         private ResourceCounter modeToCounter(int mode) {
-            if (mode == MODE_CPU) {
+            if(mode == MODE_CPU) {
                 return mCpuCounter;
-            } else if (mode == MODE_NETWORK) {
+            } else if(mode == MODE_NETWORK) {
                 return mNetworkCounter;
             } else {
                 return null;
@@ -184,30 +188,30 @@ public class ThreadPool {
         }
 
         private boolean acquireResource(ResourceCounter counter) {
-            while (true) {
-                synchronized (this) {
-                    if (mIsCancelled) {
+            while(true) {
+                synchronized(this) {
+                    if(mIsCancelled) {
                         mWaitOnResource = null;
                         return false;
                     }
                     mWaitOnResource = counter;
                 }
 
-                synchronized (counter) {
-                    if (counter.value > 0) {
+                synchronized(counter) {
+                    if(counter.value > 0) {
                         counter.value--;
                         break;
                     } else {
                         try {
                             counter.wait();
-                        } catch (InterruptedException ex) {
+                        } catch(InterruptedException ex) {
                             // ignore.
                         }
                     }
                 }
             }
 
-            synchronized (this) {
+            synchronized(this) {
                 mWaitOnResource = null;
             }
 
@@ -215,7 +219,7 @@ public class ThreadPool {
         }
 
         private void releaseResource(ResourceCounter counter) {
-            synchronized (counter) {
+            synchronized(counter) {
                 counter.value++;
                 counter.notifyAll();
             }

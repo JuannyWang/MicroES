@@ -4,20 +4,20 @@ import java.util.ArrayList;
 
 /************************************************
  * Effect<----BasicEffect<----ComboEffect
- *
+ * 
  * ComboEffect can combo other effects to one effect
- *
+ * 
  ************************************************/
 
 public class ComboEffect extends BasicEffect {
-    private static final String TAG = "ComboEffect";
+    private static final String TAG       = "ComboEffect";
     protected ArrayList<Effect> mElements = new ArrayList<Effect>();
-    private boolean mShowBK = false;
+    private boolean             mShowBK   = false;
 
-    public ComboEffect(){
+    public ComboEffect() {
     }
 
-    public ComboEffect(ArrayList<Effect> elements){
+    public ComboEffect(ArrayList<Effect> elements) {
         mElements = elements;
         initCombo();
     }
@@ -29,8 +29,7 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public Effect getEffect(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
@@ -44,13 +43,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public long getElapseTime(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return elapse;
             }
         }
@@ -60,13 +57,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float[] getMVPMatrixByElapse(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getMVPMatrixByElapse(elapse);
             }
         }
@@ -75,13 +70,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float getScaleSize(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getScaleSize(elapse);
             }
         }
@@ -90,13 +83,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float getProgressByElapse(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getProgressByElapse(elapse);
             }
         }
@@ -105,13 +96,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float getAlpha(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getAlpha(elapse);
             }
         }
@@ -120,13 +109,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public int getMaskType(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getMaskType(elapse);
             }
         }
@@ -135,13 +122,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public int getDuration(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getDuration();
             }
         }
@@ -150,13 +135,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public boolean getTransition(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getTransition(elapse);
             }
         }
@@ -165,13 +148,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public int getCount(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getCount(elapse);
             }
         }
@@ -180,13 +161,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float[] getBGColor(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getBGColor(elapse);
             }
         }
@@ -195,13 +174,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float getTextSize(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getTextSize(elapse);
             }
         }
@@ -210,13 +187,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public int getFixBound(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getFixBound(elapse);
             }
         }
@@ -225,13 +200,11 @@ public class ComboEffect extends BasicEffect {
 
     @Override
     public float[] getRunPos(long elapse) {
-        for(int i = 0 ; i < mElements.size() ; i++ )
-        {
+        for(int i = 0; i < mElements.size(); i++) {
             if(elapse > mElements.get(i).getDuration()) {
                 elapse -= mElements.get(i).getDuration();
                 continue;
-            }
-            else {
+            } else {
                 return mElements.get(i).getRunPos(elapse);
             }
         }
@@ -243,11 +216,11 @@ public class ComboEffect extends BasicEffect {
         return mDuration;
     }
 
-    private void initCombo(){
+    private void initCombo() {
         mDuration = 0;
         mSleep = 0;
 
-        for(Effect e : mElements){
+        for(Effect e : mElements) {
             mDuration += e.getDuration();
             mSleep += e.getSleep();
             if(e.showBackground()) {

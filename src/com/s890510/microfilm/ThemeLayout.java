@@ -9,9 +9,9 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 public class ThemeLayout extends LinearLayout {
-    private String TAG = "ThemeLayout";
+    private String  TAG    = "ThemeLayout";
     private boolean mFirst = false;
-    View mView;
+    View            mView;
     ArrayList<View> mThemeList;
 
     public ThemeLayout(Context context, AttributeSet attrs) {
@@ -23,8 +23,9 @@ public class ThemeLayout extends LinearLayout {
         int AdapterCount = adapter.getCount();
         Log.e(TAG, "AdapterCount:" + AdapterCount);
 
-        for (int i = 0; i < AdapterCount; i++) {
-            if(!adapter.mThemeState[adapter.mOrder[i]]) continue;
+        for(int i = 0; i < AdapterCount; i++) {
+            if(!adapter.mThemeState[adapter.mOrder[i]])
+                continue;
 
             View mView = this.getChildAt(i);
             if(mView != null) {
@@ -40,8 +41,7 @@ public class ThemeLayout extends LinearLayout {
                 mView.setClickable(true);
                 mThemeList.add(mView);
                 this.setOrientation(VERTICAL);
-                this.addView(mView, new LinearLayout.LayoutParams(
-                        android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                this.addView(mView, new LinearLayout.LayoutParams(android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
                         android.view.ViewGroup.LayoutParams.WRAP_CONTENT));
             }
 
@@ -50,11 +50,13 @@ public class ThemeLayout extends LinearLayout {
     }
 
     public View GetThemeView(int position, ThemeAdapter adapter) {
-        //get the key
+        // get the key
         int key = 0;
-        for(int i=0; i<adapter.getCount(); i++) {
-            if(!adapter.mThemeState[adapter.mOrder[i]]) continue;
-            if(adapter.mOrder[i] == position) break;
+        for(int i = 0; i < adapter.getCount(); i++) {
+            if(!adapter.mThemeState[adapter.mOrder[i]])
+                continue;
+            if(adapter.mOrder[i] == position)
+                break;
             key++;
         }
         return this.getChildAt(key);

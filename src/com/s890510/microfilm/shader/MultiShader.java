@@ -7,15 +7,15 @@ import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.ProcessGL;
 
 public class MultiShader {
-    private static final String TAG = "MultiShader";
-    private MicroMovieActivity mActivity;
-    private ArrayList<Integer> mTextureId = new ArrayList<Integer>();
+    private static final String    TAG          = "MultiShader";
+    private MicroMovieActivity     mActivity;
+    private ArrayList<Integer>     mTextureId   = new ArrayList<Integer>();
     private ArrayList<ElementInfo> mElementInfo = new ArrayList<ElementInfo>();
 
-    private LatticeShader mLatticeShader;
-    private FadeShader mFadeShader;
-    private ShuttersShader mShuttersShader;
-    private ProcessGL mProcessGL;
+    private LatticeShader          mLatticeShader;
+    private FadeShader             mFadeShader;
+    private ShuttersShader         mShuttersShader;
+    private ProcessGL              mProcessGL;
 
     public MultiShader(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;

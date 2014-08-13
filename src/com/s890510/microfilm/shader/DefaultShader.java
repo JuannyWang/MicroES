@@ -13,30 +13,31 @@ import com.s890510.microfilm.draw.StringLoader;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class DefaultShader extends Shader {
-    private static final String TAG = "DefaultShader";
-    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final String TAG              = "DefaultShader";
+    public static final int     FLOAT_SIZE_BYTES = 4;              // float =
+                                                                    // 4bytes
 
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureHandle;
-    private int mSamplerHandle;
-    private int mAlphaHandle;
-    private int mMVPMatrixHandle;
-    private int mMVMMatrixHandle;
-    private int mResolutionHandle;
-    private int mThemeHandle;
-    private int mStringBKHandle;
-    private int mStringBKRHandle;
-    private int mStringBKGHandle;
-    private int mStringBKBHandle;
-    private int mBoundHandle;
-    private int mSetBoundHandle;
-    private int mLeftFilterHandle;
-    private int mRightFilterHandle;
-    private float[] mMVPMatrix = new float[16];
-    private ProcessGL mProcessGL;
+    private int                 mProgram;
+    private int                 mPositionHandle;
+    private int                 mTextureHandle;
+    private int                 mSamplerHandle;
+    private int                 mAlphaHandle;
+    private int                 mMVPMatrixHandle;
+    private int                 mMVMMatrixHandle;
+    private int                 mResolutionHandle;
+    private int                 mThemeHandle;
+    private int                 mStringBKHandle;
+    private int                 mStringBKRHandle;
+    private int                 mStringBKGHandle;
+    private int                 mStringBKBHandle;
+    private int                 mBoundHandle;
+    private int                 mSetBoundHandle;
+    private int                 mLeftFilterHandle;
+    private int                 mRightFilterHandle;
+    private float[]             mMVPMatrix       = new float[16];
+    private ProcessGL           mProcessGL;
 
-    private float mAlpha = 1.0f;
+    private float               mAlpha           = 1.0f;
 
     public DefaultShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -44,27 +45,28 @@ public class DefaultShader extends Shader {
         CreateProgram();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
-            int mTextureId, ElementInfo mElementInfo, int mType) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo, int mType) {
 
         long mElapseTime;
         long timer = mElementInfo.timer.getElapse();
         Effect mEffect = mElementInfo.effect.getEffect(timer);
 
-        if(mEffect == null) return;
-        else mElapseTime = mElementInfo.effect.getElapseTime(timer);
+        if(mEffect == null)
+            return;
+        else
+            mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
         float[] mLeft = mProcessGL.getLeftFilter();
         float[] mRight = mProcessGL.getRightFilter();
 
         GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
         if(mType == Shader.STRING) {
-        	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
+            mProcessGL.mStringLoader.mStringTextureCoords.position(0);
             GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
             GLES20.glEnableVertexAttribArray(mTextureHandle);
 
@@ -90,15 +92,19 @@ public class DefaultShader extends Shader {
             GLES20.glUniform1f(mThemeHandle, 0);
 
             int SType = mEffect.getMaskType(mElapseTime);
-            if(SType == StringLoader.STRING_NOBK || SType == StringLoader.STRING_WHITE_NOBK || SType == StringLoader.STRING_WHITE_NOBK_ANIM ||
-                    SType == StringLoader.STRING_WHITE_NOBK_GEO || SType == StringLoader.STRING_DATE_CITY || SType == StringLoader.STRING_NOBK_SCALE ||
-                    SType == StringLoader.STRING_YEAR_COUNTRY || SType == StringLoader.STRING_YEAR_COUNTRY_FADEIN || SType == StringLoader.STRING_YEAR_COUNTRY_FADEOUT ||
-                    SType == StringLoader.STRING_WHITE_NOBK_LINE || SType == StringLoader.STRING_WHITE_NOBK_LOVER || SType == StringLoader.STRING_DATE_LOVER || SType == StringLoader.STRING_DATE_CITY_TRANS ||
-                    SType == StringLoader.STRING_KIDS_CIRCLE_DATE || SType == StringLoader.STRING_KIDS_ICON_A || SType == StringLoader.STRING_KIDS_ICON_B) {
-                if(SType == StringLoader.STRING_WHITE_NOBK || SType == StringLoader.STRING_WHITE_NOBK_ANIM || SType == StringLoader.STRING_DATE_CITY ||
-                        SType == StringLoader.STRING_YEAR_COUNTRY || SType == StringLoader.STRING_YEAR_COUNTRY_FADEIN || SType == StringLoader.STRING_YEAR_COUNTRY_FADEOUT ||
-                        SType == StringLoader.STRING_WHITE_NOBK_LINE || SType == StringLoader.STRING_WHITE_NOBK_LOVER || SType == StringLoader.STRING_DATE_CITY_TRANS ||
-                        SType == StringLoader.STRING_KIDS_ICON_A || SType == StringLoader.STRING_KIDS_ICON_B) {
+            if(SType == StringLoader.STRING_NOBK || SType == StringLoader.STRING_WHITE_NOBK || SType == StringLoader.STRING_WHITE_NOBK_ANIM
+                    || SType == StringLoader.STRING_WHITE_NOBK_GEO || SType == StringLoader.STRING_DATE_CITY
+                    || SType == StringLoader.STRING_NOBK_SCALE || SType == StringLoader.STRING_YEAR_COUNTRY
+                    || SType == StringLoader.STRING_YEAR_COUNTRY_FADEIN || SType == StringLoader.STRING_YEAR_COUNTRY_FADEOUT
+                    || SType == StringLoader.STRING_WHITE_NOBK_LINE || SType == StringLoader.STRING_WHITE_NOBK_LOVER
+                    || SType == StringLoader.STRING_DATE_LOVER || SType == StringLoader.STRING_DATE_CITY_TRANS
+                    || SType == StringLoader.STRING_KIDS_CIRCLE_DATE || SType == StringLoader.STRING_KIDS_ICON_A
+                    || SType == StringLoader.STRING_KIDS_ICON_B) {
+                if(SType == StringLoader.STRING_WHITE_NOBK || SType == StringLoader.STRING_WHITE_NOBK_ANIM || SType == StringLoader.STRING_DATE_CITY
+                        || SType == StringLoader.STRING_YEAR_COUNTRY || SType == StringLoader.STRING_YEAR_COUNTRY_FADEIN
+                        || SType == StringLoader.STRING_YEAR_COUNTRY_FADEOUT || SType == StringLoader.STRING_WHITE_NOBK_LINE
+                        || SType == StringLoader.STRING_WHITE_NOBK_LOVER || SType == StringLoader.STRING_DATE_CITY_TRANS
+                        || SType == StringLoader.STRING_KIDS_ICON_A || SType == StringLoader.STRING_KIDS_ICON_B) {
                     GLES20.glUniform1f(mStringBKHandle, 2);
                 } else if(SType == StringLoader.STRING_DATE_LOVER || SType == StringLoader.STRING_KIDS_CIRCLE_DATE) {
                     GLES20.glUniform1f(mStringBKHandle, 3);
@@ -121,10 +127,10 @@ public class DefaultShader extends Shader {
             Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, mModelMatrix, 0);
         }
 
-        //Set show bound
+        // Set show bound
         int mBound = mEffect.getFixBound(mElapseTime);
         if(mBound == Shader.BOUNDING) {
-            float[] bound = new float[2]; //0: X, 1: Y
+            float[] bound = new float[2]; // 0: X, 1: Y
             bound[0] = mElementInfo.x;
             bound[1] = mElementInfo.y;
             GLES20.glUniform1f(mSetBoundHandle, 1.0f);
@@ -169,14 +175,15 @@ public class DefaultShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("DefaultShader");
-        //Create the new program
+        // Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mProgram == 0) {
+        if(mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to the program.
+        // Set program handles. These will later be used to pass in values to
+        // the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");

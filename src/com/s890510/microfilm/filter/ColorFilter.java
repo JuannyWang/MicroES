@@ -6,19 +6,19 @@ import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.R;
 
 public class ColorFilter extends DefaultFilter {
-    private int mBxAPositionHandle;
-    private int mByAPositionHandle;
-    private int mBxBPositionHandle;
-    private int mByBPositionHandle;
-    
-    private int mVxAPositionHandle;
-    private int mVyAPositionHandle;
-    private int mVxBPositionHandle;
-    private int mVyBPositionHandle;
+    private int   mBxAPositionHandle;
+    private int   mByAPositionHandle;
+    private int   mBxBPositionHandle;
+    private int   mByBPositionHandle;
 
-    private long StartTime = 0;
-    private float TimaA = 3.5f;
-    private float TimeB = -0.2f;
+    private int   mVxAPositionHandle;
+    private int   mVyAPositionHandle;
+    private int   mVxBPositionHandle;
+    private int   mVyBPositionHandle;
+
+    private long  StartTime = 0;
+    private float TimaA     = 3.5f;
+    private float TimeB     = -0.2f;
 
     public ColorFilter(MicroMovieActivity activity) {
         super(activity);
@@ -42,20 +42,20 @@ public class ColorFilter extends DefaultFilter {
 
     @Override
     public void drawBitmap() {
-    	setTimeAB();
-        GLES20.glUniform1f(mBxAPositionHandle, (float) (0.5 + Math.cos(TimaA)/2.0));
-        GLES20.glUniform1f(mByAPositionHandle, (float) (0.5 + Math.sin(TimaA)/2.0));
-        GLES20.glUniform1f(mBxBPositionHandle, (float) (0.5 + Math.cos(TimeB)/2.0));
-        GLES20.glUniform1f(mByBPositionHandle, (float) (0.5 + Math.sin(TimeB)/2.0));
+        setTimeAB();
+        GLES20.glUniform1f(mBxAPositionHandle, (float) (0.5 + Math.cos(TimaA) / 2.0));
+        GLES20.glUniform1f(mByAPositionHandle, (float) (0.5 + Math.sin(TimaA) / 2.0));
+        GLES20.glUniform1f(mBxBPositionHandle, (float) (0.5 + Math.cos(TimeB) / 2.0));
+        GLES20.glUniform1f(mByBPositionHandle, (float) (0.5 + Math.sin(TimeB) / 2.0));
     }
 
     @Override
     public void drawVideo() {
-    	setTimeAB();
-        GLES20.glUniform1f(mVxAPositionHandle, (float) (0.5 + Math.cos(TimaA)/2.0));
-        GLES20.glUniform1f(mVyAPositionHandle, (float) (0.5 + Math.sin(TimaA)/2.0));
-        GLES20.glUniform1f(mVxBPositionHandle, (float) (0.5 + Math.cos(TimeB)/2.0));
-        GLES20.glUniform1f(mVyBPositionHandle, (float) (0.5 + Math.sin(TimeB)/2.0));
+        setTimeAB();
+        GLES20.glUniform1f(mVxAPositionHandle, (float) (0.5 + Math.cos(TimaA) / 2.0));
+        GLES20.glUniform1f(mVyAPositionHandle, (float) (0.5 + Math.sin(TimaA) / 2.0));
+        GLES20.glUniform1f(mVxBPositionHandle, (float) (0.5 + Math.cos(TimeB) / 2.0));
+        GLES20.glUniform1f(mVyBPositionHandle, (float) (0.5 + Math.sin(TimeB) / 2.0));
     }
 
     @Override
@@ -68,17 +68,16 @@ public class ColorFilter extends DefaultFilter {
         return getShaderRaw(R.raw.video_fragment_color_shader);
     }
 
-    private void setTimeAB(){
-        if((System.currentTimeMillis() - StartTime > 1000 && !mActivity.checkPause()) || (mActivity.isSaving() && (mTimer-StartTime > 1000000000))) {
+    private void setTimeAB() {
+        if((System.currentTimeMillis() - StartTime > 1000 && !mActivity.checkPause()) || (mActivity.isSaving() && (mTimer - StartTime > 1000000000))) {
             if(mActivity.isSaving())
-            	StartTime = StartTime + 1000000000;
-            else StartTime = System.currentTimeMillis();
+                StartTime = StartTime + 1000000000;
+            else
+                StartTime = System.currentTimeMillis();
             float temp = TimaA;
             TimaA = TimeB;
             TimeB = temp;
         }
     }
-
-
 
 }

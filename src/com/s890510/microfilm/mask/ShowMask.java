@@ -5,14 +5,14 @@ import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.ProcessGL;
 
 public class ShowMask {
-    private final String TAG = "ShowMask";
+    private final String       TAG = "ShowMask";
     private MicroMovieActivity mActivity;
 
-    private SquareBorderMask mSquareBorderMask;
-    private CircleBorderMask mCircleBorderMask;
-    private TopBottomBarMask mTopBottomBarMask;
-    private FilterMask mFilterMask;
-    private ProcessGL mProcessGL;
+    private SquareBorderMask   mSquareBorderMask;
+    private CircleBorderMask   mCircleBorderMask;
+    private TopBottomBarMask   mTopBottomBarMask;
+    private FilterMask         mFilterMask;
+    private ProcessGL          mProcessGL;
 
     public ShowMask(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
@@ -33,8 +33,8 @@ public class ShowMask {
         mFilterMask.CalcVertices();
     }
 
-    public void DrawRandar(int ShaderMode, float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
-            ElementInfo mElementInfo, int mTextureId, int mType) {
+    public void DrawRandar(int ShaderMode, float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, ElementInfo mElementInfo,
+            int mTextureId, int mType) {
         if(ShaderMode == Mask.Square) {
             mSquareBorderMask.DrawRandar(mViewMatrix, mProjectionMatrix, mElementInfo);
         } else if(ShaderMode == Mask.Circle) {

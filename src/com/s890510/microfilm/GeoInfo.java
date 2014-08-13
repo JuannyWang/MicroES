@@ -15,14 +15,14 @@ import com.s890510.microfilm.util.ThreadPool.Job;
 import com.s890510.microfilm.util.ThreadPool.JobContext;
 
 public class GeoInfo {
-    private static String TAG = "GeoInfo";
-    private double[] mlatlng;
-    private final Handler mHandler;
-    private boolean mHAddress = false;
-    private Context mContext;
+    private static String      TAG       = "GeoInfo";
+    private double[]           mlatlng;
+    private final Handler      mHandler;
+    private boolean            mHAddress = false;
+    private Context            mContext;
     private MicroMovieActivity mActivity;
-    private Future<Address> mAddressLookupJob;
-    private ArrayList<String> mLocation;
+    private Future<Address>    mAddressLookupJob;
+    private ArrayList<String>  mLocation;
 
     public GeoInfo(Context context, MicroMovieActivity activity, double[] latlng) {
         mHandler = new Handler(Looper.getMainLooper());
@@ -32,43 +32,41 @@ public class GeoInfo {
     }
 
     public static boolean isCNSku() {
-	    String sku = AsusSystemProperties.get("ro.build.asus.sku").toLowerCase();
-	    String productName = AsusSystemProperties.get("ro.product.name").toLowerCase();
-	    if(sku == null || productName == null)
-	        return false;
-	    return sku.startsWith("cn") || sku.startsWith("cucc") ||
-	            productName.startsWith("cn") || productName.startsWith("cucc") ? true : false;
-	}
- 
-	public static boolean isCTA() {
-	    String cta = AsusSystemProperties.get("ro.asus.cta");
-	    String ctaKK = AsusSystemProperties.get("persist.sys.cta.security");
-	    return TextUtils.equals(cta, "1") || TextUtils.equals(ctaKK, "1");
-	}
-    
+        String sku = AsusSystemProperties.get("ro.build.asus.sku").toLowerCase();
+        String productName = AsusSystemProperties.get("ro.product.name").toLowerCase();
+        if(sku == null || productName == null)
+            return false;
+        return sku.startsWith("cn") || sku.startsWith("cucc") || productName.startsWith("cn") || productName.startsWith("cucc") ? true : false;
+    }
+
+    public static boolean isCTA() {
+        String cta = AsusSystemProperties.get("ro.asus.cta");
+        String ctaKK = AsusSystemProperties.get("persist.sys.cta.security");
+        return TextUtils.equals(cta, "1") || TextUtils.equals(ctaKK, "1");
+    }
+
     public void LoadAddress() {
         if(!isCNSku() && !isCTA()) {
-	        mAddressLookupJob = ((MediaPool)mActivity.getApplicationContext()).getLocationThreadPool().submit(
-	            new AddressLookupJob(mlatlng),
-	            new FutureListener<Address>() {
-	                @Override
-	                public void onFutureDone(final Future<Address> future) {
-	                    mAddressLookupJob = null;
-	                    if (!future.isCancelled()) {
-	                        mHandler.post(new Runnable() {
-	                            @Override
-	                            public void run() {
-	                                updateLocation(future.get());
-	                            }
-	                        });
-	                    }
-	                }
-	            });
+            mAddressLookupJob = ((MediaPool) mActivity.getApplicationContext()).getLocationThreadPool().submit(new AddressLookupJob(mlatlng),
+                    new FutureListener<Address>() {
+                        @Override
+                        public void onFutureDone(final Future<Address> future) {
+                            mAddressLookupJob = null;
+                            if(!future.isCancelled()) {
+                                mHandler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        updateLocation(future.get());
+                                    }
+                                });
+                            }
+                        }
+                    });
         }
     }
 
     private void updateLocation(Address address) {
-        if (address != null) {
+        if(address != null) {
             mLocation = new ArrayList<String>();
             mHAddress = true;
             if(address.getAdminArea() != null) {
@@ -91,7 +89,7 @@ public class GeoInfo {
     }
 
     public void cancel() {
-        if (mAddressLookupJob != null) {
+        if(mAddressLookupJob != null) {
             mAddressLookupJob.cancel();
             mAddressLookupJob = null;
         }
@@ -111,19 +109,20 @@ public class GeoInfo {
         }
     }
 
-    public static class AsusSystemProperties{
-    	public static String get(String key){
-    		Class clazz = null;
-    		String prop = null;
-    		try{
-    			clazz = Class.forName("android.os.SystemProperties");
-    			Method method = clazz.getDeclaredMethod("get", String.class);
-    			prop = (String)method.invoke(null, key);
-    		}catch(java.lang.Exception e){
-    		}
-    		if(prop == null)
-    			return "";
-    		else return prop;
-    	}
+    public static class AsusSystemProperties {
+        public static String get(String key) {
+            Class clazz = null;
+            String prop = null;
+            try {
+                clazz = Class.forName("android.os.SystemProperties");
+                Method method = clazz.getDeclaredMethod("get", String.class);
+                prop = (String) method.invoke(null, key);
+            } catch(java.lang.Exception e) {
+            }
+            if(prop == null)
+                return "";
+            else
+                return prop;
+        }
     }
 }

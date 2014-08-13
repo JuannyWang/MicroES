@@ -5,19 +5,18 @@ import android.opengl.Matrix;
 import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.util.Easing;
 
-public class EffectTranslateX extends BasicEffect
-{
-    private final static int DURATION = 1000;
-    private float mTransX;
-    private float mStartTrans = 1.0f;
-    private float mEndTrans = 1.0f;
-    private float mStartAlpha = 1.0f;
-    private float mEndAlpha = 1.0f;
-    private float mStartScale = -1;
-    private float mEndScale = -1;
-    private int mUtil = 0;
-    private float[] mMVPMatrix = new float[16]; //the texture
-    private float scale = 1.0f;
+public class EffectTranslateX extends BasicEffect {
+    private final static int DURATION    = 1000;
+    private float            mTransX;
+    private float            mStartTrans = 1.0f;
+    private float            mEndTrans   = 1.0f;
+    private float            mStartAlpha = 1.0f;
+    private float            mEndAlpha   = 1.0f;
+    private float            mStartScale = -1;
+    private float            mEndScale   = -1;
+    private int              mUtil       = 0;
+    private float[]          mMVPMatrix  = new float[16]; // the texture
+    private float            scale       = 1.0f;
 
     public EffectTranslateX(ProcessGL processGL) {
         mDuration = DURATION;
@@ -79,7 +78,8 @@ public class EffectTranslateX extends BasicEffect
         mMask = mask;
     }
 
-    public EffectTranslateX(int duration, float StartPos, float EndPos, float Startscale, float Endscale, float StartAlpha, float EndAlpha, int mask, int util) {
+    public EffectTranslateX(int duration, float StartPos, float EndPos, float Startscale, float Endscale, float StartAlpha, float EndAlpha, int mask,
+            int util) {
         mDuration = duration;
         mSleep = duration;
         mStartTrans = StartPos;
@@ -101,11 +101,11 @@ public class EffectTranslateX extends BasicEffect
     public float[] getMVPMatrixByElapse(long elapse) {
         Matrix.setIdentityM(mMVPMatrix, 0);
         if(mUtil != 0) {
-            //mTransX = mStartTrans * getProgressByElapse(elapse) - mEndTrans;
+            // mTransX = mStartTrans * getProgressByElapse(elapse) - mEndTrans;
             if(mEndTrans < 0) {
-                mTransX = -Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
+                mTransX = -Easing.Easing(mUtil, getProgressByElapse(elapse) * mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
             } else {
-                mTransX = Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
+                mTransX = Easing.Easing(mUtil, getProgressByElapse(elapse) * mDuration, 0, Math.abs(mEndTrans), mDuration) + mStartTrans;
             }
         } else {
             mTransX = mStartTrans * getProgressByElapse(elapse) - mEndTrans;

@@ -4,13 +4,13 @@ import java.util.ArrayList;
 
 import android.opengl.Matrix;
 
-public class EffectShowInCenter extends BasicEffect
-{
-    private final static int DURATION = 3000;
-    private float[] mMVPMatrix = new float[16]; //the texture
-    private float mScale = 1;
-    private float transX = 0;
-    private float transY = 0;
+public class EffectShowInCenter extends BasicEffect {
+    private final static int DURATION   = 3000;
+    private float[]          mMVPMatrix = new float[16]; // the texture
+    private float            mScale     = 1;
+    private float            transX     = 0;
+    private float            transY     = 0;
+
     public EffectShowInCenter() {
         mDuration = DURATION;
         mSleep = DURATION;

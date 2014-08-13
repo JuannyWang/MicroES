@@ -4,22 +4,21 @@ import android.opengl.Matrix;
 
 import com.s890510.microfilm.util.Easing;
 
-public class EffectBySetting extends BasicEffect
-{
-    private String TAG = "EffectBySetting";
-    private float[] mMVPMatrix = new float[16]; //the texture
-    private float mStartScale = 1;
-    private float mFinalScale = 1;
-    private float mStartAlpha = 1.0f;
-    private float mEndAlpha = 1.0f;
-    private float mStartX = 0;
-    private float mStartY = 0;
-    private float mFinalX = 0;
-    private float mFinalY = 0;
-    private int mUtil = 0;
-    private float scale = 1.0f;
+public class EffectBySetting extends BasicEffect {
+    private String  TAG         = "EffectBySetting";
+    private float[] mMVPMatrix  = new float[16];    // the texture
+    private float   mStartScale = 1;
+    private float   mFinalScale = 1;
+    private float   mStartAlpha = 1.0f;
+    private float   mEndAlpha   = 1.0f;
+    private float   mStartX     = 0;
+    private float   mStartY     = 0;
+    private float   mFinalX     = 0;
+    private float   mFinalY     = 0;
+    private int     mUtil       = 0;
+    private float   scale       = 1.0f;
 
-    public EffectBySetting(int duration, int sleep, float startScale, float finalScale , float startX, float startY, float finalX, float finalY) {
+    public EffectBySetting(int duration, int sleep, float startScale, float finalScale, float startX, float startY, float finalX, float finalY) {
         mDuration = duration;
         mSleep = sleep;
         mStartScale = startScale;
@@ -30,7 +29,8 @@ public class EffectBySetting extends BasicEffect
         mFinalY = finalY;
     }
 
-    public EffectBySetting(int duration, int sleep, float startScale, float finalScale , float startX, float startY, float finalX, float finalY, int mask) {
+    public EffectBySetting(int duration, int sleep, float startScale, float finalScale, float startX, float startY, float finalX, float finalY,
+            int mask) {
         mDuration = duration;
         mSleep = sleep;
         mStartScale = startScale;
@@ -42,7 +42,8 @@ public class EffectBySetting extends BasicEffect
         mMask = mask;
     }
 
-    public EffectBySetting(int duration, float startScale, float finalScale, float startalpha, float endalpha, float startX, float startY, float finalX, float finalY) {
+    public EffectBySetting(int duration, float startScale, float finalScale, float startalpha, float endalpha, float startX, float startY,
+            float finalX, float finalY) {
         mDuration = duration;
         mSleep = duration;
         mStartScale = startScale;
@@ -55,7 +56,8 @@ public class EffectBySetting extends BasicEffect
         mFinalY = finalY;
     }
 
-    public EffectBySetting(int duration, float startScale, float finalScale, float startalpha, float endalpha, float startX, float startY, float finalX, float finalY, int util) {
+    public EffectBySetting(int duration, float startScale, float finalScale, float startalpha, float endalpha, float startX, float startY,
+            float finalX, float finalY, int util) {
         mDuration = duration;
         mSleep = duration;
         mStartScale = startScale;
@@ -69,7 +71,8 @@ public class EffectBySetting extends BasicEffect
         mUtil = util;
     }
 
-    public EffectBySetting(int duration, float startScale, float finalScale, float startalpha, float endalpha, float startX, float startY, float finalX, float finalY, int util, int mask) {
+    public EffectBySetting(int duration, float startScale, float finalScale, float startalpha, float endalpha, float startX, float startY,
+            float finalX, float finalY, int util, int mask) {
         mDuration = duration;
         mSleep = duration;
         mStartScale = startScale;
@@ -101,11 +104,11 @@ public class EffectBySetting extends BasicEffect
         if(mUtil == 0) {
             transX = (mFinalX - mStartX) * progress + mStartX;
             transY = (mFinalY - mStartY) * progress + mStartY;
-            scale = (mFinalScale - mStartScale ) * progress + mStartScale;
+            scale = (mFinalScale - mStartScale) * progress + mStartScale;
         } else {
-            transX = (mFinalX - mStartX) * Easing.Easing(mUtil, progress*mDuration, 0, 1, mDuration) + mStartX;
-            transY = (mFinalY - mStartY) * Easing.Easing(mUtil, progress*mDuration, 0, 1, mDuration) + mStartY;
-            scale = (mFinalScale - mStartScale ) * Easing.Easing(mUtil, progress*mDuration, 0, 1, mDuration) + mStartScale;
+            transX = (mFinalX - mStartX) * Easing.Easing(mUtil, progress * mDuration, 0, 1, mDuration) + mStartX;
+            transY = (mFinalY - mStartY) * Easing.Easing(mUtil, progress * mDuration, 0, 1, mDuration) + mStartY;
+            scale = (mFinalScale - mStartScale) * Easing.Easing(mUtil, progress * mDuration, 0, 1, mDuration) + mStartScale;
         }
 
         Matrix.setIdentityM(mMVPMatrix, 0);

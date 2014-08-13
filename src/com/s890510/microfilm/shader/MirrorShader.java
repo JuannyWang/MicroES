@@ -13,28 +13,30 @@ import com.s890510.microfilm.script.effects.Effect;
 import com.s890510.microfilm.util.Easing;
 
 public class MirrorShader extends Shader {
-    private static final String TAG = "MirrorShader";
-    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
-    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
-    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
-    private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
+    private static final String TAG                                 = "MirrorShader";
+    private static final int    TRIANGLE_VERTICES_DATA_POS_OFFSET   = 0;
+    private static final int    TRIANGLE_VERTICES_DATA_UV_OFFSET    = 3;
+    public static final int     FLOAT_SIZE_BYTES                    = 4;                   // float
+                                                                                            // =
+                                                                                            // 4bytes
+    private static final int    TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
 
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureHandle;
-    private int mSamplerHandle;
-    private int mAlphaHandle;
-    private int mMVPMatrixHandle;
-    private int mResolutionHandle;
-    private int mSizeHandle;
-    private int mTransHandle;
-    private int mDirectHandle;
-    private int mCoverHandle;
-    private int mThemeHandle;
-    private int mLeftFilterHandle;
-    private int mRightFilterHandle;
-    private float[] mMVPMatrix = new float[16];
-    private ProcessGL mProcessGL;
+    private int                 mProgram;
+    private int                 mPositionHandle;
+    private int                 mTextureHandle;
+    private int                 mSamplerHandle;
+    private int                 mAlphaHandle;
+    private int                 mMVPMatrixHandle;
+    private int                 mResolutionHandle;
+    private int                 mSizeHandle;
+    private int                 mTransHandle;
+    private int                 mDirectHandle;
+    private int                 mCoverHandle;
+    private int                 mThemeHandle;
+    private int                 mLeftFilterHandle;
+    private int                 mRightFilterHandle;
+    private float[]             mMVPMatrix                          = new float[16];
+    private ProcessGL           mProcessGL;
 
     public MirrorShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -42,31 +44,33 @@ public class MirrorShader extends Shader {
         CreateProgram();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
-            int mTextureId, ElementInfo mElementInfo, int mMirrorType) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo,
+            int mMirrorType) {
 
         long mElapseTime;
         long timer = mElementInfo.timer.getElapse();
         Effect mEffect = mElementInfo.effect.getEffect(timer);
 
-        if(mEffect == null) return;
-        else mElapseTime = mElementInfo.effect.getElapseTime(timer);
+        if(mEffect == null)
+            return;
+        else
+            mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
         float[] mLeft = mProcessGL.getLeftFilter();
         float[] mRight = mProcessGL.getRightFilter();
 
         float duration = mEffect.getDuration(mElapseTime);
         float progress = mEffect.getProgressByElapse(mElapseTime);
-        float elapse = progress*duration;
+        float elapse = progress * duration;
         boolean mTrans = mEffect.getTransition(mElapseTime);
 
         GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
-        //First
+        // First
         mElementInfo.mSTextureCoords.position(0);
         GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mElementInfo.mSTextureCoords);
         GLES20.glEnableVertexAttribArray(mTextureHandle);
@@ -82,7 +86,7 @@ public class MirrorShader extends Shader {
 
         GLES20.glUniform1f(mSizeHandle, 0);
 
-        if(mMirrorType == Shader.MIRROR_VERTICAL) { //Left
+        if(mMirrorType == Shader.MIRROR_VERTICAL) { // Left
             GLES20.glUniform1f(mDirectHandle, 0.0f);
             GLES20.glUniform1f(mTransHandle, 0.0f);
         } else if(mMirrorType == Shader.MIRROR_VERTICAL_TB) {
@@ -92,7 +96,7 @@ public class MirrorShader extends Shader {
                 GLES20.glUniform1f(mTransHandle, 1.0f);
 
                 GLES20.glUniform1f(mCoverHandle, 3.0f);
-                GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, 2, duration*0.6f) - 1));
+                GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, 2, duration * 0.6f) - 1));
             } else {
                 GLES20.glUniform1f(mTransHandle, 0.0f);
             }
@@ -122,7 +126,7 @@ public class MirrorShader extends Shader {
         GLES20.glDisable(GLES20.GL_BLEND);
 
         if((mMirrorType == Shader.MIRROR_TILTED_MASK && mTrans) || mMirrorType != Shader.MIRROR_TILTED_MASK) {
-            //Second
+            // Second
             mElementInfo.mSTextureCoords.position(0);
             GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mElementInfo.mSTextureCoords);
             GLES20.glEnableVertexAttribArray(mTextureHandle);
@@ -148,7 +152,7 @@ public class MirrorShader extends Shader {
                     GLES20.glUniform1f(mTransHandle, 1.0f);
 
                     GLES20.glUniform1f(mCoverHandle, 2.0f);
-                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, 2, duration*0.6f) - 1);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, 2, duration * 0.6f) - 1);
                 } else {
                     GLES20.glUniform1f(mTransHandle, 0.0f);
                 }
@@ -182,14 +186,15 @@ public class MirrorShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("MirrorShader");
-        //Create the new program
+        // Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mProgram == 0) {
+        if(mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to the program.
+        // Set program handles. These will later be used to pass in values to
+        // the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");

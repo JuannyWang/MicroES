@@ -4,19 +4,18 @@ import android.opengl.Matrix;
 
 import com.s890510.microfilm.ProcessGL;
 
-public class EffectShowInLeftHalf extends BasicEffect
-{
-    private final static int DURATION = 3000;
-    private final static int SLEEP = 1000;
-    private float[] mMVPMatrix = new float[16]; //the texture
+public class EffectShowInLeftHalf extends BasicEffect {
+    private final static int DURATION    = 3000;
+    private final static int SLEEP       = 1000;
+    private float[]          mMVPMatrix  = new float[16]; // the texture
 
-    private boolean NeedScale = false;
-    private float mStartScale = 0.5f;
-    private float mEndScale = 0.5f;
-    private float mStartAlpha = 1.0f;
-    private float mEndAlpha = 1.0f;
-    private float scale = 1.0f;
-    private ProcessGL mProcessGL;
+    private boolean          NeedScale   = false;
+    private float            mStartScale = 0.5f;
+    private float            mEndScale   = 0.5f;
+    private float            mStartAlpha = 1.0f;
+    private float            mEndAlpha   = 1.0f;
+    private float            scale       = 1.0f;
+    private ProcessGL        mProcessGL;
 
     public EffectShowInLeftHalf(ProcessGL processGL) {
         mDuration = DURATION;
@@ -65,7 +64,7 @@ public class EffectShowInLeftHalf extends BasicEffect
             scale = mStartScale + getProgressByElapse(elapse) * (mEndScale - mStartScale);
             Matrix.scaleM(mMVPMatrix, 0, scale, scale, 0);
         }
-        Matrix.translateM(mMVPMatrix, 0, -mProcessGL.ScreenRatio/2, 0, 0);
+        Matrix.translateM(mMVPMatrix, 0, -mProcessGL.ScreenRatio / 2, 0, 0);
         return mMVPMatrix;
     }
 
@@ -79,4 +78,3 @@ public class EffectShowInLeftHalf extends BasicEffect
         return scale;
     }
 }
-

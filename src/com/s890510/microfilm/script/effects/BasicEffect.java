@@ -5,28 +5,28 @@ import java.util.ArrayList;
 import com.s890510.microfilm.shader.Shader;
 
 public class BasicEffect extends Effect {
-    private static final String TAG = "BasicEffect";
-    protected int mDuration = 5000;
-    protected int mDrawType = 1;
-    protected int mSleep = 5000;
-    protected int mMask = 0;
+    private static final String TAG             = "BasicEffect";
+    protected int               mDuration       = 5000;
+    protected int               mDrawType       = 1;
+    protected int               mSleep          = 5000;
+    protected int               mMask           = 0;
     protected ArrayList<String> mString;
-    protected String mShader = Shader.Default;
-    protected int mTextCount = 0;
-    protected float mTextureScaleX = 1.0f;
-    protected float mTextureScaleY = 1.0f;
-    protected boolean mTransition = false;
-    protected boolean mBackGround = false;
-    protected boolean mShowBackGround = false;
-    protected int mFixBound = 0;
-    protected float[] mColor = {1.0f, 1.0f, 1.0f, 1.0f};
-    protected float mTextSize = 110;
-    protected float[] mPos = {1.0f, 1.0f};
-    protected int mConvertType = 0;
-    protected int mConvertSize = 0;
-    protected boolean mIsNoItem = false;
-    protected boolean mIsInCount = true;
-    protected int mStringType = 0;
+    protected String            mShader         = Shader.Default;
+    protected int               mTextCount      = 0;
+    protected float             mTextureScaleX  = 1.0f;
+    protected float             mTextureScaleY  = 1.0f;
+    protected boolean           mTransition     = false;
+    protected boolean           mBackGround     = false;
+    protected boolean           mShowBackGround = false;
+    protected int               mFixBound       = 0;
+    protected float[]           mColor          = { 1.0f, 1.0f, 1.0f, 1.0f };
+    protected float             mTextSize       = 110;
+    protected float[]           mPos            = { 1.0f, 1.0f };
+    protected int               mConvertType    = 0;
+    protected int               mConvertSize    = 0;
+    protected boolean           mIsNoItem       = false;
+    protected boolean           mIsInCount      = true;
+    protected int               mStringType     = 0;
 
     public BasicEffect() {
 
@@ -68,10 +68,12 @@ public class BasicEffect extends Effect {
     }
 
     @Override
-    public float getProgressByElapse(long elapse){
-        float progress = ((float)elapse/(float)mDuration);
-        if(progress > 1 ) progress = 1;
-        else if(progress < 0 ) progress = 0;
+    public float getProgressByElapse(long elapse) {
+        float progress = ((float) elapse / (float) mDuration);
+        if(progress > 1)
+            progress = 1;
+        else if(progress < 0)
+            progress = 0;
         return progress;
     }
 
@@ -223,38 +225,38 @@ public class BasicEffect extends Effect {
         return mConvertSize;
     }
 
-	@Override
-	public void setIsNoItem(boolean set) {
-		mIsNoItem = set;
-	}
+    @Override
+    public void setIsNoItem(boolean set) {
+        mIsNoItem = set;
+    }
 
-	@Override
-	public boolean getIsNoItem() {
-		return mIsNoItem;
-	}
+    @Override
+    public boolean getIsNoItem() {
+        return mIsNoItem;
+    }
 
-	@Override
-	public void setStringType(int type) {
-		mStringType = type;
-	}
+    @Override
+    public void setStringType(int type) {
+        mStringType = type;
+    }
 
-	@Override
-	public int getStringType() {
-		return mStringType;
-	}
+    @Override
+    public int getStringType() {
+        return mStringType;
+    }
 
-	@Override
-	public void setIsInCount(boolean set) {
-		mIsInCount = set;
-	}
+    @Override
+    public void setIsInCount(boolean set) {
+        mIsInCount = set;
+    }
 
-	@Override
-	public boolean getIsInCount() {
-		return mIsInCount;
-	}
+    @Override
+    public boolean getIsInCount() {
+        return mIsInCount;
+    }
 
-	@Override
-	public float getScaleSize(long elapse) {
-		return 1.0f;
-	}
+    @Override
+    public float getScaleSize(long elapse) {
+        return 1.0f;
+    }
 }

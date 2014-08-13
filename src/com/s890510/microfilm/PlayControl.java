@@ -5,10 +5,11 @@ import java.util.ArrayList;
 import android.util.Log;
 
 import com.s890510.microfilm.script.Timer;
+
 public class PlayControl {
-    private static String TAG = "PlayControl";
+    private static String         TAG           = "PlayControl";
     private MicroMovieSurfaceView mSurfaceView;
-    private ThemeControl mThemeControl = null;
+    private ThemeControl          mThemeControl = null;
 
     public PlayControl(MicroMovieSurfaceView surfaceview) {
         mSurfaceView = surfaceview;
@@ -40,7 +41,7 @@ public class PlayControl {
     public void join() {
         try {
             mThemeControl.join();
-        } catch (InterruptedException e) {
+        } catch(InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -68,19 +69,18 @@ public class PlayControl {
     }
 
     private static class ThemeControl extends Thread {
-        private Object mPauseLock;
-        private int mSleep = 0;
-        private Timer mTimer;
-        private MicroMovieSurfaceView mSurfaceView;
+        private Object                 mPauseLock;
+        private int                    mSleep       = 0;
+        private Timer                  mTimer;
+        private MicroMovieSurfaceView  mSurfaceView;
         private ArrayList<ElementInfo> mFileOrder;
-        private boolean firstStrat = true;
-        private boolean mIsDone = false;
-        private boolean mSetProgress = false;
-        public int playIndex = 0;
-        private long mTime = 0;
-        private long mElapseTime = 0;
-        private int mLossTime = 0;
-        private boolean misVideo = false;
+        private boolean                firstStrat   = true;
+        private boolean                mIsDone      = false;
+        private boolean                mSetProgress = false;
+        public int                     playIndex    = 0;
+        private long                   mTime        = 0;
+        private long                   mElapseTime  = 0;
+        private int                    mLossTime    = 0;
 
         public ThemeControl(ArrayList<ElementInfo> FileOrder, MicroMovieSurfaceView surfaceview) {
             mPauseLock = new Object();
@@ -89,12 +89,11 @@ public class PlayControl {
             mTimer = surfaceview.getTimer();
         }
 
-        public void setSleep(int sleep)
-        {
+        public void setSleep(int sleep) {
             mSleep = sleep;
         }
 
-        public void resetTimer(){
+        public void resetTimer() {
             mTimer.resetTimer();
         }
 
@@ -116,10 +115,10 @@ public class PlayControl {
                 if(mLossTime > 0) {
                     mLossTime = 0;
                 }
-            } catch (InterruptedException e) {
+            } catch(InterruptedException e) {
                 mLossTime = time - (int) (System.currentTimeMillis() - mTime);
-            } catch (IllegalArgumentException e) {
-                //do nothing
+            } catch(IllegalArgumentException e) {
+                // do nothing
             }
         }
 
@@ -129,11 +128,10 @@ public class PlayControl {
             int effectsize = mSurfaceView.getScript().geteffectsize();
 
             /*
-            for(int i=0; i<mFileOrder.size(); i++) {
-                ElementInfo a = mFileOrder.get(i);
-                Log.e(TAG, "mFileOrder(" + i + ") [0]=>" + a.Type + ", [1]=>" + a.TextureId);
-            }
-            */
+             * for(int i=0; i<mFileOrder.size(); i++) { ElementInfo a =
+             * mFileOrder.get(i); Log.e(TAG, "mFileOrder(" + i + ") [0]=>" +
+             * a.Type + ", [1]=>" + a.TextureId); }
+             */
 
             if(firstStrat) {
                 firstStrat = false;
@@ -141,7 +139,8 @@ public class PlayControl {
             }
 
             do {
-                if(mIsDone) break;
+                if(mIsDone)
+                    break;
 
                 if(mLossTime == 0) {
                     if(playIndex < effectsize) {
@@ -149,30 +148,17 @@ public class PlayControl {
                             eInfo = mFileOrder.get(playIndex % mFileOrder.size());
                             playIndex++;
 
-                            //Need to find sometime to rewrite...
+                            // Need to find sometime to rewrite...
                             if(eInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
                                 mSurfaceView.changeBitmap(eInfo, true);
-                                if(misVideo) {
-                                    mSurfaceView.stopMediaPlayer();
-                                    misVideo = false;
-                                }
-                            } else if(eInfo.Type == MediaInfo.MEDIA_TYPE_VIDEO) {
-                                if(mSleep > 0) {
-                                    Log.e(TAG, "We need to seek the video!");
-                                    int time = eInfo.time - mSleep;
-                                    mSurfaceView.SeekVideo(eInfo.TextureId, eInfo.Videopart, time);
-                                }
-                                misVideo = true;
-                                //mSurfaceView.changeVideo(info[1], info[2]);
-                                mSurfaceView.changeVideo(eInfo.TextureId);
                             }
 
-                            //here we need to check again for mSetProgress
+                            // here we need to check again for mSetProgress
                             if(!mSetProgress && !mSurfaceView.checkPause()) {
                                 if(mElapseTime == 0)
                                     doSleep(eInfo.time);
                                 else
-                                    doSleep(eInfo.time - (int)(System.currentTimeMillis() - mElapseTime));
+                                    doSleep(eInfo.time - (int) (System.currentTimeMillis() - mElapseTime));
                                 mElapseTime = System.currentTimeMillis();
                             }
                         }
@@ -188,32 +174,23 @@ public class PlayControl {
                 }
 
                 if(mSurfaceView.checkPause()) {
-                    if(misVideo) {
-                        mSurfaceView.pauseMediaPlayer();
-                    }
-
-                    synchronized (mPauseLock) {
+                    synchronized(mPauseLock) {
                         try {
                             mPauseLock.wait();
-                        } catch (InterruptedException e) {
+                        } catch(InterruptedException e) {
 
                         }
                     }
 
-                    //If mLossTime > 0 it's means actually sleep times != need sleep times
+                    // If mLossTime > 0 it's means actually sleep times != need
+                    // sleep times
                     if(mLossTime > 0 && !mSetProgress && !mIsDone) {
-                        if(misVideo) {
-                            mSurfaceView.resumeMediaPlayer();
-                        }
                         doSleep(mLossTime);
                         mElapseTime = System.currentTimeMillis();
                     }
                 }
 
             } while(playIndex < effectsize && !mIsDone);
-
-            if(misVideo)
-                mSurfaceView.stopMediaPlayer();
 
             if(!mIsDone) {
                 mSurfaceView.IsPlayFin(true);
@@ -226,26 +203,26 @@ public class PlayControl {
 
             try {
                 super.finalize();
-            } catch (Throwable e) {
+            } catch(Throwable e) {
                 e.printStackTrace();
             }
         }
 
         public void terminate() {
             mIsDone = true;
-            synchronized (mPauseLock) {
+            synchronized(mPauseLock) {
                 mPauseLock.notifyAll();
             }
         }
 
         public void onPause() {
-            synchronized (mPauseLock) {
-                //Do nothing
+            synchronized(mPauseLock) {
+                // Do nothing
             }
         }
 
         public void onResume() {
-            synchronized (mPauseLock) {
+            synchronized(mPauseLock) {
                 mPauseLock.notifyAll();
             }
         }

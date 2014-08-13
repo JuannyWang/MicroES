@@ -14,19 +14,21 @@ import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class BackgroundShader extends Shader {
-    private static final String TAG = "BackgroundShader";
-    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final String TAG              = "BackgroundShader";
+    public static final int     FLOAT_SIZE_BYTES = 4;                 // float
+                                                                       // =
+                                                                       // 4bytes
 
-    private int mProgram;
-    private int mPositionHandle;
-    private int mColorHandle;
-    private int mMVPMatrixHandle;
-    private float[] mMVPMatrix = new float[16];
-    private float[] mModelMatrix = new float[16];
+    private int                 mProgram;
+    private int                 mPositionHandle;
+    private int                 mColorHandle;
+    private int                 mMVPMatrixHandle;
+    private float[]             mMVPMatrix       = new float[16];
+    private float[]             mModelMatrix     = new float[16];
 
-    private FloatBuffer mVertices = null;
-    
-    private ProcessGL mProcessGL;
+    private FloatBuffer         mVertices        = null;
+
+    private ProcessGL           mProcessGL;
 
     public BackgroundShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -63,14 +65,15 @@ public class BackgroundShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("BackgroundShader");
-        //Create the new program
+        // Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mProgram == 0) {
+        if(mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to the program.
+        // Set program handles. These will later be used to pass in values to
+        // the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
 
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
@@ -81,36 +84,22 @@ public class BackgroundShader extends Shader {
     }
 
     public static String VertexShader() {
-        return
-                "uniform mat4 uMVPMatrix;       \n" +
-                "attribute vec4 aPosition;      \n" +
-                "void main() {                  \n" +
-                "    gl_Position = uMVPMatrix   \n" +
-                "                * aPosition;   \n" +
-                "}                              \n";
+        return "uniform mat4 uMVPMatrix;       \n" + "attribute vec4 aPosition;      \n" + "void main() {                  \n"
+                + "    gl_Position = uMVPMatrix   \n" + "                * aPosition;   \n" + "}                              \n";
     }
 
     public static String FragmentShader() {
-        return
-                "precision mediump float;                       \n" +
-                "uniform float Color[4];                        \n" +
-                "void main() {                                  \n" +
-                "    gl_FragColor = vec4(Color[0], Color[1], Color[2], Color[3]);   \n" +
-                "}                                              \n";
+        return "precision mediump float;                       \n" + "uniform float Color[4];                        \n"
+                + "void main() {                                  \n" + "    gl_FragColor = vec4(Color[0], Color[1], Color[2], Color[3]);   \n"
+                + "}                                              \n";
     }
 
     public void CalcVertices() {
         float mRatio = mProcessGL.ScreenRatio;
-        float[] mVerticesData = new float[]{
-                -mRatio, -1.0f, 0.0f,
-                 mRatio, -1.0f, 0.0f,
-                -mRatio,  1.0f, 0.0f,
-                 mRatio,  1.0f, 0.0f
-        };
+        float[] mVerticesData = new float[] { -mRatio, -1.0f, 0.0f, mRatio, -1.0f, 0.0f, -mRatio, 1.0f, 0.0f, mRatio, 1.0f, 0.0f };
 
         // Initialize the buffers.
-        mVertices = ByteBuffer.allocateDirect(mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mVertices = ByteBuffer.allocateDirect(mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mVertices.put(mVerticesData).position(0);
     }

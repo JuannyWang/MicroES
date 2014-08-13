@@ -7,8 +7,7 @@ import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.script.effects.ComboFactory;
 import com.s890510.microfilm.shader.Shader;
 
-public class Script5 extends BasicScript
-{
+public class Script5 extends BasicScript {
     public Script5(boolean isFromEncode, MicroMovieActivity activity, ProcessGL processGL) {
         this(activity, processGL);
         mIsFromEncode = isFromEncode;

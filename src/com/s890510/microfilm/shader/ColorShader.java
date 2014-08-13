@@ -11,26 +11,27 @@ import com.s890510.microfilm.R;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class ColorShader extends Shader {
-    private static final String TAG = "DefaultShader";
-    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final String TAG              = "DefaultShader";
+    public static final int     FLOAT_SIZE_BYTES = 4;                                 // float
+                                                                                       // =
+                                                                                       // 4bytes
 
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureHandle;
-    private int mSamplerHandle;
-    private int mAlphaHandle;
-    private int mMVPMatrixHandle;
-    private int mResolutionHandle;
-    private int mMatrixHandle;
-    private int mColorTypeHandle;
-    private float[] mMVPMatrix = new float[16];
+    private int                 mProgram;
+    private int                 mPositionHandle;
+    private int                 mTextureHandle;
+    private int                 mSamplerHandle;
+    private int                 mAlphaHandle;
+    private int                 mMVPMatrixHandle;
+    private int                 mResolutionHandle;
+    private int                 mMatrixHandle;
+    private int                 mColorTypeHandle;
+    private float[]             mMVPMatrix       = new float[16];
 
-    private float mAlpha = 1.0f;
-    private ProcessGL mProcessGL;
+    private float               mAlpha           = 1.0f;
+    private ProcessGL           mProcessGL;
 
-    private float[] mSepiaWeight = { 805.0f / 2048.0f, 715.0f / 2048.0f, 557.0f / 2048.0f,
-            1575.0f / 2048.0f, 1405.0f / 2048.0f, 1097.0f / 2048.0f,
-            387.0f / 2048.0f, 344.0f / 2048.0f, 268.0f / 2048.0f };
+    private float[]             mSepiaWeight     = { 805.0f / 2048.0f, 715.0f / 2048.0f, 557.0f / 2048.0f, 1575.0f / 2048.0f, 1405.0f / 2048.0f,
+            1097.0f / 2048.0f, 387.0f / 2048.0f, 344.0f / 2048.0f, 268.0f / 2048.0f };
 
     public ColorShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -38,12 +39,12 @@ public class ColorShader extends Shader {
         CreateProgram();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
-            int mTextureId, ElementInfo mElementInfo, int mColorType) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo,
+            int mColorType) {
 
         GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
@@ -84,14 +85,15 @@ public class ColorShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("DefaultShader");
-        //Create the new program
+        // Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mProgram == 0) {
+        if(mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to the program.
+        // Set program handles. These will later be used to pass in values to
+        // the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");

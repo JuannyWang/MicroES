@@ -22,36 +22,38 @@ import com.s890510.microfilm.script.effects.Effect;
 import com.s890510.microfilm.util.Easing;
 
 public class CoverShader extends Shader {
-    private static final String TAG = "CoverShader";
-    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
-    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
-    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final String TAG                               = "CoverShader";
+    private static final int    TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
+    private static final int    TRIANGLE_VERTICES_DATA_UV_OFFSET  = 3;
+    public static final int     FLOAT_SIZE_BYTES                  = 4;            // float
+                                                                                   // =
+                                                                                   // 4bytes
 
-    private int mProgram;
-    private int mPositionHandle;
-    private int mTextureHandle;
-    private int mSamplerHandle;
-    private int mAlphaHandle;
-    private int mMVPMatrixHandle;
-    private int mMVMMatrixHandle;
-    private int mResolutionHandle;
-    private int mSizeHandle;
-    private int mTransHandle;
-    private int mDirectHandle;
-    private int mReverseHandle;
-    private int mThemeHandle;
-    private int mIsEmptyHandle;
-    private int mBoundHandle;
-    private int mSetBoundHandle;
-    private int mLeftFilterHandle;
-    private int mRightFilterHandle;
-    private FloatBuffer mTriangleVertices;
-    private float[] mMVPMatrix = new float[16];
+    private int                 mProgram;
+    private int                 mPositionHandle;
+    private int                 mTextureHandle;
+    private int                 mSamplerHandle;
+    private int                 mAlphaHandle;
+    private int                 mMVPMatrixHandle;
+    private int                 mMVMMatrixHandle;
+    private int                 mResolutionHandle;
+    private int                 mSizeHandle;
+    private int                 mTransHandle;
+    private int                 mDirectHandle;
+    private int                 mReverseHandle;
+    private int                 mThemeHandle;
+    private int                 mIsEmptyHandle;
+    private int                 mBoundHandle;
+    private int                 mSetBoundHandle;
+    private int                 mLeftFilterHandle;
+    private int                 mRightFilterHandle;
+    private FloatBuffer         mTriangleVertices;
+    private float[]             mMVPMatrix                        = new float[16];
 
-    private Bitmap mBitmap = null;
-    private int mColor = Color.WHITE;
+    private Bitmap              mBitmap                           = null;
+    private int                 mColor                            = Color.WHITE;
 
-    private ProcessGL mProcessGL;
+    private ProcessGL           mProcessGL;
 
     public CoverShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -59,15 +61,17 @@ public class CoverShader extends Shader {
         CreateProgram();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
-            int mTextureId, ElementInfo mElementInfo, int mCoverType) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo,
+            int mCoverType) {
 
         long mElapseTime;
         long timer = mElementInfo.timer.getElapse();
         Effect mEffect = mElementInfo.effect.getEffect(timer);
 
-        if(mEffect == null) return;
-        else mElapseTime = mElementInfo.effect.getElapseTime(timer);
+        if(mEffect == null)
+            return;
+        else
+            mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
         float[] mLeft = mProcessGL.getLeftFilter();
         float[] mRight = mProcessGL.getRightFilter();
@@ -79,33 +83,31 @@ public class CoverShader extends Shader {
             if(mBitmap == null)
                 CreateBitmap();
 
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
             mActivity.mLoadTexture.BindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
             GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, mBitmap, 0);
 
             GLES20.glUniform1i(mSamplerHandle, mTextureId);
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
 
             mTriangleVertices.position(TRIANGLE_VERTICES_DATA_POS_OFFSET);
-            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false,
-                    20, mTriangleVertices);
+            GLES20.glVertexAttribPointer(mPositionHandle, 3, GLES20.GL_FLOAT, false, 20, mTriangleVertices);
             GLES20.glEnableVertexAttribArray(mPositionHandle);
 
             mTriangleVertices.position(TRIANGLE_VERTICES_DATA_UV_OFFSET);
-            GLES20.glVertexAttribPointer(mTextureHandle, 3, GLES20.GL_FLOAT, false,
-                    20, mTriangleVertices);
+            GLES20.glVertexAttribPointer(mTextureHandle, 3, GLES20.GL_FLOAT, false, 20, mTriangleVertices);
             GLES20.glEnableVertexAttribArray(mTextureHandle);
 
             GLES20.glUniform1f(mIsEmptyHandle, 1.0f);
 
             mCoverType = Shader.LEFT;
         } else {
-            GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
+            GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
             GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
             GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
             if(mCoverType == Shader.STRING_LEFT) {
-            	mProcessGL.mStringLoader.mStringTextureCoords.position(0);
+                mProcessGL.mStringLoader.mStringTextureCoords.position(0);
                 GLES20.glVertexAttribPointer(mTextureHandle, 2, GLES20.GL_FLOAT, false, 0, mProcessGL.mStringLoader.mStringTextureCoords);
                 GLES20.glEnableVertexAttribArray(mTextureHandle);
 
@@ -133,11 +135,10 @@ public class CoverShader extends Shader {
         if(mEffect.getTransition(mElapseTime)) {
             float duration = mEffect.getDuration(mElapseTime);
             float progress = mEffect.getProgressByElapse(mElapseTime);
-            float elapse = progress*duration;
+            float elapse = progress * duration;
 
-            if(mCoverType == Shader.LEFT || mCoverType == Shader.HALF_LEFT ||
-                    mCoverType == Shader.RIGHT || mCoverType == Shader.HALF_RIGHT ||
-                    mCoverType == Shader.GFRAG_LEFT || mCoverType == Shader.HALF_LEFT_Q || mCoverType == Shader.HALF_RIGHT_Q) {
+            if(mCoverType == Shader.LEFT || mCoverType == Shader.HALF_LEFT || mCoverType == Shader.RIGHT || mCoverType == Shader.HALF_RIGHT
+                    || mCoverType == Shader.GFRAG_LEFT || mCoverType == Shader.HALF_LEFT_Q || mCoverType == Shader.HALF_RIGHT_Q) {
                 if(mCoverType == Shader.LEFT || mCoverType == Shader.HALF_LEFT || mCoverType == Shader.HALF_LEFT_Q) {
                     GLES20.glUniform1f(mDirectHandle, 0.0f);
                 } else if(mCoverType == Shader.GFRAG_LEFT) {
@@ -147,20 +148,22 @@ public class CoverShader extends Shader {
                 }
 
                 if(mCoverType == Shader.LEFT || mCoverType == Shader.GFRAG_LEFT) {
-                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio*2, duration) - mProcessGL.ScreenRatio);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio * 2, duration) - mProcessGL.ScreenRatio);
                 } else if(mCoverType == Shader.RIGHT) {
-                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio*2, duration) - mProcessGL.ScreenRatio));
+                    GLES20.glUniform1f(mSizeHandle,
+                            -(Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio * 2, duration) - mProcessGL.ScreenRatio));
                 } else if(mCoverType == Shader.HALF_LEFT) {
-                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio, duration) - mProcessGL.ScreenRatio/2.0f);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio, duration) - mProcessGL.ScreenRatio
+                            / 2.0f);
                 } else if(mCoverType == Shader.HALF_LEFT_Q) {
-                    GLES20.glUniform1f(mSizeHandle, Easing.easeOutCubic(elapse, 0, mElementInfo.x*2, duration) - mElementInfo.x);
+                    GLES20.glUniform1f(mSizeHandle, Easing.easeOutCubic(elapse, 0, mElementInfo.x * 2, duration) - mElementInfo.x);
                 } else if(mCoverType == Shader.HALF_RIGHT) {
-                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio, duration) - mProcessGL.ScreenRatio/2.0f));
+                    GLES20.glUniform1f(mSizeHandle,
+                            -(Easing.easeInOutCubic(elapse, 0, mProcessGL.ScreenRatio, duration) - mProcessGL.ScreenRatio / 2.0f));
                 } else if(mCoverType == Shader.HALF_RIGHT_Q) {
-                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeOutCubic(elapse, 0, mElementInfo.x*2, duration) - mElementInfo.x));
+                    GLES20.glUniform1f(mSizeHandle, -(Easing.easeOutCubic(elapse, 0, mElementInfo.x * 2, duration) - mElementInfo.x));
                 }
-            } else if(mCoverType == Shader.TOP || mCoverType == Shader.HALF_TOP ||
-                    mCoverType == Shader.BOTTOM || mCoverType == Shader.HALF_BOTTOM) {
+            } else if(mCoverType == Shader.TOP || mCoverType == Shader.HALF_TOP || mCoverType == Shader.BOTTOM || mCoverType == Shader.HALF_BOTTOM) {
                 if(mCoverType == Shader.TOP || mCoverType == Shader.HALF_TOP) {
                     GLES20.glUniform1f(mDirectHandle, 2.0f);
                 } else {
@@ -178,15 +181,16 @@ public class CoverShader extends Shader {
                 }
             } else if(mCoverType == Shader.CENTER_H) {
                 GLES20.glUniform1f(mDirectHandle, 5.0f);
-                GLES20.glUniform1f(mSizeHandle, 1-Easing.easeInOutCubic(elapse, 0, 1, duration));
+                GLES20.glUniform1f(mSizeHandle, 1 - Easing.easeInOutCubic(elapse, 0, 1, duration));
             } else if(mCoverType == Shader.PERCENT_L) {
                 GLES20.glUniform1f(mDirectHandle, 0.0f);
                 float[] mPos = mEffect.getRunPos(mElapseTime);
-                GLES20.glUniform1f(mSizeHandle, (mPos[0] + ((mPos[1] - mPos[0])*Easing.easeInOutCubic(elapse, 0, 1, duration)))*mProcessGL.ScreenRatio*2 - mPos[1]*mProcessGL.ScreenRatio);
+                GLES20.glUniform1f(mSizeHandle, (mPos[0] + ((mPos[1] - mPos[0]) * Easing.easeInOutCubic(elapse, 0, 1, duration)))
+                        * mProcessGL.ScreenRatio * 2 - mPos[1] * mProcessGL.ScreenRatio);
             } else if(mCoverType == Shader.PERCENT_B) {
                 GLES20.glUniform1f(mDirectHandle, 3.0f);
                 float[] mPos = mEffect.getRunPos(mElapseTime);
-                GLES20.glUniform1f(mSizeHandle, -((mPos[0] + ((mPos[1] - mPos[0])*Easing.easeInOutCubic(elapse, 0, 1, duration)))*2 - mPos[1]));
+                GLES20.glUniform1f(mSizeHandle, -((mPos[0] + ((mPos[1] - mPos[0]) * Easing.easeInOutCubic(elapse, 0, 1, duration))) * 2 - mPos[1]));
             } else if(mCoverType == Shader.PERCENT_R) {
                 GLES20.glUniform1f(mDirectHandle, 1.0f);
             }
@@ -202,20 +206,20 @@ public class CoverShader extends Shader {
             GLES20.glUniform1f(mDirectHandle, 3.0f);
             GLES20.glUniform1f(mTransHandle, 1.0f);
             float[] mPos = mEffect.getRunPos(mElapseTime);
-            GLES20.glUniform1f(mSizeHandle, -(mPos[0]*2 - mPos[1]));
+            GLES20.glUniform1f(mSizeHandle, -(mPos[0] * 2 - mPos[1]));
         } else if(mCoverType == Shader.PERCENT_L) {
             GLES20.glUniform1f(mDirectHandle, 0.0f);
             GLES20.glUniform1f(mTransHandle, 1.0f);
             float[] mPos = mEffect.getRunPos(mElapseTime);
-            GLES20.glUniform1f(mSizeHandle, mPos[0]*mProcessGL.ScreenRatio*2 - mPos[1]*mProcessGL.ScreenRatio);
+            GLES20.glUniform1f(mSizeHandle, mPos[0] * mProcessGL.ScreenRatio * 2 - mPos[1] * mProcessGL.ScreenRatio);
         } else {
             GLES20.glUniform1f(mTransHandle, 0.0f);
         }
 
-        //Set show bound
+        // Set show bound
         int mBound = mEffect.getFixBound(mElapseTime);
         if(mBound == Shader.BOUNDING) {
-            float[] bound = new float[2]; //0: X, 1: Y
+            float[] bound = new float[2]; // 0: X, 1: Y
             bound[0] = mElementInfo.x;
             bound[1] = mElementInfo.y;
             GLES20.glUniform1f(mSetBoundHandle, 1.0f);
@@ -223,7 +227,7 @@ public class CoverShader extends Shader {
         } else if(mBound == Shader.LIMIT_COVER_X) {
             float[] mPos = mEffect.getRunPos(mElapseTime);
             float[] bound = new float[2];
-            bound[0] = mPos[0]*mProcessGL.ScreenRatio*2 - mProcessGL.ScreenRatio;
+            bound[0] = mPos[0] * mProcessGL.ScreenRatio * 2 - mProcessGL.ScreenRatio;
             bound[1] = 0;
             GLES20.glUniform1f(mSetBoundHandle, 4.0f);
             GLES20.glUniform1fv(mBoundHandle, bound.length, bound, 0);
@@ -255,14 +259,15 @@ public class CoverShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("CoverShader");
-        //Create the new program
+        // Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if (mProgram == 0) {
+        if(mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to the program.
+        // Set program handles. These will later be used to pass in values to
+        // the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");
@@ -289,16 +294,12 @@ public class CoverShader extends Shader {
     public void CalcVertices() {
         float mRatio = mProcessGL.ScreenRatio;
         final float[] mTriangleVerticesData = {
-            // X, Y, Z, U, V
-            -mRatio, -1.0f, 0.0f, 0.0f, 0.0f,
-             mRatio, -1.0f, 0.0f, 1.0f, 0.0f,
-            -mRatio,  1.0f, 0.0f, 0.0f, 1.0f,
-             mRatio,  1.0f, 0.0f, 1.0f, 1.0f
-        };
+                // X, Y, Z, U, V
+                -mRatio, -1.0f, 0.0f, 0.0f, 0.0f, mRatio, -1.0f, 0.0f, 1.0f, 0.0f, -mRatio, 1.0f, 0.0f, 0.0f, 1.0f, mRatio, 1.0f, 0.0f, 1.0f, 1.0f };
 
         // Initialize the buffers.
-        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
-        .order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mTriangleVertices = ByteBuffer.allocateDirect(mTriangleVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder())
+                .asFloatBuffer();
 
         mTriangleVertices.put(mTriangleVerticesData).position(0);
     }
