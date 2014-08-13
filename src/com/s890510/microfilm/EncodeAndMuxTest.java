@@ -37,23 +37,18 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
-import android.opengl.EGL14;
-import android.opengl.EGLConfig;
-import android.opengl.EGLContext;
-import android.opengl.EGLDisplay;
-import android.opengl.EGLExt;
-import android.opengl.EGLSurface;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Surface;
 import android.widget.Toast;
 
 import com.asus.ephotomusicprovider.ICallback;
 import com.asus.ephotomusicprovider.IEPhotoMusicProviderService;
 import com.s890510.microfilm.MicroMovieActivity.SaveCallback;
+import com.s890510.microfilm.gles.EglCore;
+import com.s890510.microfilm.gles.WindowSurface;
 import com.s890510.microfilm.script.Carnival;
 import com.s890510.microfilm.script.City;
 import com.s890510.microfilm.script.Country;
@@ -63,8 +58,6 @@ import com.s890510.microfilm.script.Lover;
 import com.s890510.microfilm.script.Memory;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Sports;
-import com.s890510.microfilm.script.Timer;
-import com.s890510.microfilm.script.effects.Effect;
 
 /**
  * Generate an MP4 file using OpenGL ES drawing commands.  Demonstrates the use of MediaMuxer
@@ -86,7 +79,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int FRAME_RATE = 60;               // 30fps
+    private static final int FRAME_RATE = 45;               // 30fps
     private static final int IFRAME_INTERVAL = 5;          // 1 second between I-frames
     //public static final int TOTAL_FRAMES = 900;  //30 seconds stand for 900 frames
     public int TOTAL_FRAMES;
@@ -99,7 +92,8 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 
     // encoder / muxer state
     private MediaCodec mEncoder;
-    private CodecInputSurface mInputSurface;
+    private EglCore mEglCore;
+    private WindowSurface mInputSurface;
     private MediaMuxer mMuxer;
     private int mVideoTrackIndex;
     private boolean mMuxerStarted;
@@ -168,8 +162,8 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
      */
     public void testEncodeVideoToMp4(SaveCallback callback, final ProgressDialog progressDialog) {
         // QVGA at 2Mbps
-        mWidth = mActivity.mVisioWidth;
-        mHeight = mActivity.mVisioHeight;
+        mWidth = MicroMovieActivity.mVisioWidth;
+        mHeight = MicroMovieActivity.mVisioHeight;
         //mBitRate = 7741440; // 1280 * 720 * 30 * 4(high motion, low motion(5fps):1) * 0.07
         //mBitRate = (int)(mWidth * mHeight * 30 * 4 * 0.15);
         mBitRate = 20000000;
@@ -192,8 +186,6 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         try {          
             prepareEncoder();
             Log.e(TAG, "prepareEncoder");
-            mInputSurface.makeCurrent();
-            Log.e(TAG, "makeCurrent");
             OpenglPrepare();
             Log.e(TAG, "OpenglPrepare");
             
@@ -207,10 +199,6 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
             
 
             for(int i=0; i< processNum && totalFrame < TOTAL_FRAMES && !Thread.currentThread().isInterrupted(); i++) {  
-            	int preVideoPosition = 0;
-            	int preElipseTime = 0;
-            	boolean firstProcessVideo = true;
-            	boolean dropFirstVideo = true;
             	int numFrame;
             	long interval;
                
@@ -269,12 +257,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 	                    //mInputSurface.setPresentationTime(computePresentationTimeNsec(frameNum));
                     	mInputSurface.setPresentationTime(presentationTime);
                     	mProcessGL.setTimerForFilter(presentationTime);
-	                    // Submit it to the encoder.  The eglSwapBuffers call will block if the input
-	                    // is full, which would be bad if it stayed full until we dequeued an output
-	                    // buffer (which we can't do, since we're stuck here).  So long as we fully drain
-	                    // the encoder before supplying additional input, the system guarantees that we
-	                    // can supply another frame without blocking.
-	                    if (VERBOSE) Log.d(TAG, "sending frame " + i + " to encoder");
+
 	                    mInputSurface.swapBuffers();
                     }else{
                     	break;
@@ -492,7 +475,9 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         // take eglGetCurrentContext() as the share_context argument.
         mEncoder = MediaCodec.createEncoderByType(MIME_TYPE);
         mEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        mInputSurface = new CodecInputSurface(mEncoder.createInputSurface());
+        mEglCore = new EglCore(null, EglCore.FLAG_RECORDABLE);
+        mInputSurface = new WindowSurface(mEglCore, mEncoder.createInputSurface(), true);
+        mInputSurface.makeCurrent();
         mEncoder.start();
 
         
@@ -553,6 +538,10 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         if (mInputSurface != null) {
             mInputSurface.release();
             mInputSurface = null;
+        }
+        if (mEglCore != null) {
+            mEglCore.release();
+            mEglCore = null;
         }
         if (mMuxer != null) {
         	try{
@@ -709,166 +698,15 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         //updateSurface = true;
     }
 
-
-
     private void generateSurfaceFrame(int frameNumber) {
         mProcessGL.doDraw(computePresentationTimeMsec(frameNumber));
     }
 
-    /**
-     * Generates the presentation time for frame N, in nanoseconds.
-     */
-    private static long computePresentationTimeNsec(int frameIndex) {
-        final long ONE_BILLION = 1000000000;
-        return frameIndex * ONE_BILLION / FRAME_RATE;
-    }
-    
     /**
      * Generates the presentation time for frame N, in miliseconds.
      */
     private static long computePresentationTimeMsec(int frameIndex) {
         final long ONE_THOUSAND = 1000;
         return frameIndex * ONE_THOUSAND / FRAME_RATE;
-    }    
-
-
-    /**
-     * Holds state associated with a Surface used for MediaCodec encoder input.
-     * <p>
-     * The constructor takes a Surface obtained from MediaCodec.createInputSurface(), and uses that
-     * to create an EGL window surface.  Calls to eglSwapBuffers() cause a frame of data to be sent
-     * to the video encoder.
-     * <p>
-     * This object owns the Surface -- releasing this will release the Surface too.
-     */
-    private static class CodecInputSurface {
-        private static final int EGL_RECORDABLE_ANDROID = 0x3142;
-
-        private EGLDisplay mEGLDisplay = EGL14.EGL_NO_DISPLAY;
-        private EGLContext mEGLContext = EGL14.EGL_NO_CONTEXT;
-        private EGLSurface mEGLSurface = EGL14.EGL_NO_SURFACE;
-
-        private Surface mSurface;
-
-        /**
-         * Creates a CodecInputSurface from a Surface.
-         */
-        public CodecInputSurface(Surface surface) {
-            if (surface == null) {
-                throw new NullPointerException();
-            }
-            mSurface = surface;
-
-            eglSetup();
-        }
-
-        public Surface getSurface() {
-            return mSurface;
-        }
-
-        /**
-         * Prepares EGL.  We want a GLES 2.0 context and a surface that supports recording.
-         */
-        private void eglSetup() {
-            mEGLDisplay = EGL14.eglGetDisplay(EGL14.EGL_DEFAULT_DISPLAY);
-            if (mEGLDisplay == EGL14.EGL_NO_DISPLAY) {
-                throw new RuntimeException("unable to get EGL14 display");
-            }
-            int[] version = new int[2];
-            if (!EGL14.eglInitialize(mEGLDisplay, version, 0, version, 1)) {
-                throw new RuntimeException("unable to initialize EGL14");
-            }
-
-            // Configure EGL for recording and OpenGL ES 2.0.
-            int[] attribList = {
-                    EGL14.EGL_ALPHA_SIZE, 8,
-                    EGL14.EGL_RED_SIZE, 8,
-                    EGL14.EGL_GREEN_SIZE, 8,
-                    EGL14.EGL_BLUE_SIZE, 8,
-                    EGL14.EGL_RENDERABLE_TYPE, EGL14.EGL_OPENGL_ES2_BIT,
-                    EGL_RECORDABLE_ANDROID, 1,
-                    EGL14.EGL_NONE
-            };
-            EGLConfig[] configs = new EGLConfig[1];
-            int[] numConfigs = new int[1];
-            EGL14.eglChooseConfig(mEGLDisplay, attribList, 0, configs, 0, configs.length,
-                    numConfigs, 0);
-            checkEglError("eglCreateContext ARGB8888+recordable ES2");
-
-            // Configure context for OpenGL ES 2.0.
-            int[] attrib_list = {
-                    EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,
-                    EGL14.EGL_NONE
-            };
-            mEGLContext = EGL14.eglCreateContext(mEGLDisplay, configs[0], EGL14.EGL_NO_CONTEXT,
-                    attrib_list, 0);
-            checkEglError("eglCreateContext");
-
-            // Create a window surface, and attach it to the Surface we received.
-            int[] surfaceAttribs = {
-                    EGL14.EGL_NONE
-            };
-            mEGLSurface = EGL14.eglCreateWindowSurface(mEGLDisplay, configs[0], mSurface,
-                    surfaceAttribs, 0);
-            checkEglError("eglCreateWindowSurface");
-        }
-
-        /**
-         * Discards all resources held by this class, notably the EGL context.  Also releases the
-         * Surface that was passed to our constructor.
-         */
-        public void release() {
-            if (mEGLDisplay != EGL14.EGL_NO_DISPLAY) {
-                EGL14.eglMakeCurrent(mEGLDisplay, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE,
-                        EGL14.EGL_NO_CONTEXT);
-                EGL14.eglDestroySurface(mEGLDisplay, mEGLSurface);
-                EGL14.eglDestroyContext(mEGLDisplay, mEGLContext);
-                EGL14.eglReleaseThread();
-                EGL14.eglTerminate(mEGLDisplay);
-            }
-
-            mSurface.release();
-
-            mEGLDisplay = EGL14.EGL_NO_DISPLAY;
-            mEGLContext = EGL14.EGL_NO_CONTEXT;
-            mEGLSurface = EGL14.EGL_NO_SURFACE;
-
-            mSurface = null;
-        }
-
-        /**
-         * Makes our EGL context and surface current.
-         */
-        public void makeCurrent() {
-            EGL14.eglMakeCurrent(mEGLDisplay, mEGLSurface, mEGLSurface, mEGLContext);
-            checkEglError("eglMakeCurrent");
-        }
-
-        /**
-         * Calls eglSwapBuffers.  Use this to "publish" the current frame.
-         */
-        public boolean swapBuffers() {
-            boolean result = EGL14.eglSwapBuffers(mEGLDisplay, mEGLSurface);
-            checkEglError("eglSwapBuffers");
-            return result;
-        }
-
-        /**
-         * Sends the presentation time stamp to EGL.  Time is expressed in nanoseconds.
-         */
-        public void setPresentationTime(long nsecs) {
-            EGLExt.eglPresentationTimeANDROID(mEGLDisplay, mEGLSurface, nsecs);
-            checkEglError("eglPresentationTimeANDROID");
-        }
-
-        /**
-         * Checks for EGL errors.  Throws an exception if one is found.
-         */
-        private void checkEglError(String msg) {
-            int error;
-            if ((error = EGL14.eglGetError()) != EGL14.EGL_SUCCESS) {
-                throw new RuntimeException(msg + ": EGL error: 0x" + Integer.toHexString(error));
-            }
-        }
     }
 }
