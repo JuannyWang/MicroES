@@ -16,44 +16,39 @@ import com.s890510.microfilm.gles.WindowSurface;
 /**
  * This class handles all OpenGL rendering.
  * <p>
- * We use Choreographer to coordinate with the device vsync. We deliver one
- * frame per vsync. We can't actually know when the frame we render will be
- * drawn, but at least we get a consistent frame interval.
+ * We use Choreographer to coordinate with the device vsync.  We deliver one frame
+ * per vsync.  We can't actually know when the frame we render will be drawn, but at
+ * least we get a consistent frame interval.
  * <p>
  * Start the render thread after the Surface has been created.
  */
 public class RenderThread extends Thread {
-    private static final String    TAG        = "RenderThread";
+	private static final String TAG = "RenderThread";
 
-    // Object must be created on render thread to get correct Looper, but is
-    // used from
-    // UI thread, so we need to declare it volatile to ensure the UI thread sees
-    // a fully
+    // Object must be created on render thread to get correct Looper, but is used from
+    // UI thread, so we need to declare it volatile to ensure the UI thread sees a fully
     // constructed object.
     private volatile RenderHandler mHandler;
 
     // Used to wait for the thread to start.
-    private Object                 mStartLock = new Object();
-    private boolean                mReady     = false;
-    private GLDraw                 mGLDraw;
+    private Object mStartLock = new Object();
+    private boolean mReady = false;
+    private GLDraw mGLDraw;
 
-    private volatile SurfaceHolder mSurfaceHolder;             // may be
-                                                                // updated by UI
-                                                                // thread
-    private EglCore                mEglCore;
-    private WindowSurface          mWindowSurface;
-    private FlatShadedProgram      mProgram;
+    private volatile SurfaceHolder mSurfaceHolder;  // may be updated by UI thread
+    private EglCore mEglCore;
+    private WindowSurface mWindowSurface;
+    private FlatShadedProgram mProgram;
 
-    private final float[]          mIdentityMatrix;
+    private final float[] mIdentityMatrix;
 
     // FPS / drop counter.
-    private long                   mRefreshPeriodNanos;
-    private long                   mFpsCountStartNanos;
-    private int                    mFpsCountFrame;
+    private long mRefreshPeriodNanos;
+    private long mFpsCountStartNanos;
+    private int mFpsCountFrame;
 
     /**
-     * Pass in the SurfaceView's SurfaceHolder. Note the Surface may not yet
-     * exist.
+     * Pass in the SurfaceView's SurfaceHolder.  Note the Surface may not yet exist.
      */
     public RenderThread(SurfaceHolder holder, long refreshPeriodNs, GLDraw glDraw) {
         mSurfaceHolder = holder;
@@ -67,18 +62,18 @@ public class RenderThread extends Thread {
     /**
      * Thread entry point.
      * <p>
-     * The thread should not be started until the Surface associated with the
-     * SurfaceHolder has been created. That way we don't have to wait for a
-     * separate "surface created" message to arrive.
+     * The thread should not be started until the Surface associated with the SurfaceHolder
+     * has been created.  That way we don't have to wait for a separate "surface created"
+     * message to arrive.
      */
     @Override
     public void run() {
         Looper.prepare();
         mHandler = new RenderHandler(this);
         mEglCore = new EglCore(null, EglCore.FLAG_RECORDABLE | EglCore.FLAG_TRY_GLES3);
-        synchronized(mStartLock) {
+        synchronized (mStartLock) {
             mReady = true;
-            mStartLock.notify(); // signal waitUntilReady()
+            mStartLock.notify();    // signal waitUntilReady()
         }
 
         Looper.loop();
@@ -87,7 +82,7 @@ public class RenderThread extends Thread {
         releaseGl();
         mEglCore.release();
 
-        synchronized(mStartLock) {
+        synchronized (mStartLock) {
             mReady = false;
         }
     }
@@ -98,12 +93,11 @@ public class RenderThread extends Thread {
      * Call from the UI thread.
      */
     public void waitUntilReady() {
-        synchronized(mStartLock) {
-            while(!mReady) {
+        synchronized (mStartLock) {
+            while (!mReady) {
                 try {
                     mStartLock.wait();
-                } catch(InterruptedException ie) { /* not expected */
-                }
+                } catch (InterruptedException ie) { /* not expected */ }
             }
         }
     }
@@ -117,7 +111,7 @@ public class RenderThread extends Thread {
     }
 
     /**
-     * Returns the render thread's Handler. This may be called from any thread.
+     * Returns the render thread's Handler.  This may be called from any thread.
      */
     public RenderHandler getHandler() {
         return mHandler;
@@ -143,14 +137,14 @@ public class RenderThread extends Thread {
         mGLDraw.prepare();
     }
 
-    /**
-     * Handles changes to the size of the underlying surface. Adjusts viewport
-     * as needed. Must be called before we start drawing. (Called from
-     * RenderHandler.)
+   /**
+     * Handles changes to the size of the underlying surface.  Adjusts viewport as needed.
+     * Must be called before we start drawing.
+     * (Called from RenderHandler.)
      */
     public void surfaceChanged(int width, int height) {
-        mGLDraw.setView(width, height);
-        mGLDraw.setEye();
+    	mGLDraw.setView(width, height);
+    	mGLDraw.setEye();
     }
 
     /**
@@ -161,11 +155,11 @@ public class RenderThread extends Thread {
     private void releaseGl() {
         GlUtil.checkGlError("releaseGl start");
 
-        if(mWindowSurface != null) {
+        if (mWindowSurface != null) {
             mWindowSurface.release();
             mWindowSurface = null;
         }
-        if(mProgram != null) {
+        if (mProgram != null) {
             mProgram.release();
             mProgram = null;
         }
@@ -179,35 +173,27 @@ public class RenderThread extends Thread {
      * Advance state and draw frame in response to a vsync event.
      */
     public void doFrame(long timeStampNanos) {
-        // If we're not keeping up 60fps -- maybe something in the system is
-        // busy, maybe
-        // recording is too expensive, maybe the CPU frequency governor thinks
-        // we're
-        // not doing and wants to drop the clock frequencies -- we need to drop
-        // frames
-        // to catch up. The "timeStampNanos" value is based on the system
-        // monotonic
-        // clock, as is System.nanoTime(), so we can compare the values
-        // directly.
+        // If we're not keeping up 60fps -- maybe something in the system is busy, maybe
+        // recording is too expensive, maybe the CPU frequency governor thinks we're
+        // not doing and wants to drop the clock frequencies -- we need to drop frames
+        // to catch up.  The "timeStampNanos" value is based on the system monotonic
+        // clock, as is System.nanoTime(), so we can compare the values directly.
         //
-        // Our clumsy collision detection isn't sophisticated enough to deal
-        // with large
-        // time gaps, but it's nearly cost-free, so we go ahead and do the
-        // computation
+        // Our clumsy collision detection isn't sophisticated enough to deal with large
+        // time gaps, but it's nearly cost-free, so we go ahead and do the computation
         // either way.
         //
-        // We can reduce the overhead of recording, as well as the size of the
-        // movie,
-        // by recording at ~30fps instead of the display refresh rate. As a
-        // quick hack
+        // We can reduce the overhead of recording, as well as the size of the movie,
+        // by recording at ~30fps instead of the display refresh rate.  As a quick hack
         // we just record every-other frame, using a "recorded previous" flag.
 
+ 
         long diff = System.nanoTime() - timeStampNanos;
-        long max = mRefreshPeriodNanos - 2000000; // if we're within 2ms, don't
-                                                  // bother
-        if(diff > max) {
+        long max = mRefreshPeriodNanos - 2000000;   // if we're within 2ms, don't bother
+        if (diff > max) {
             // too much, drop a frame
-            Log.d(TAG, "diff is " + (diff / 1000000.0) + " ms, max " + (max / 1000000.0) + ", skipping render");
+            Log.d(TAG, "diff is " + (diff / 1000000.0) + " ms, max " + (max / 1000000.0) +
+                    ", skipping render");
             return;
         }
 
@@ -217,9 +203,8 @@ public class RenderThread extends Thread {
         mGLDraw.draw();
         swapResult = mWindowSurface.swapBuffers();
 
-        if(!swapResult) {
-            // This can happen if the Activity stops without waiting for us to
-            // halt.
+        if (!swapResult) {
+            // This can happen if the Activity stops without waiting for us to halt.
             Log.w(TAG, "swapBuffers failed, killing renderer thread");
             shutdown();
             return;
@@ -227,17 +212,16 @@ public class RenderThread extends Thread {
 
         // Update the FPS counter.
         //
-        // Ideally we'd generate something approximate quickly to make the UI
-        // look
+        // Ideally we'd generate something approximate quickly to make the UI look
         // reasonable, then ease into longer sampling periods.
         final int NUM_FRAMES = 120;
         final long ONE_TRILLION = 1000000000000L;
-        if(mFpsCountStartNanos == 0) {
+        if (mFpsCountStartNanos == 0) {
             mFpsCountStartNanos = timeStampNanos;
             mFpsCountFrame = 0;
         } else {
             mFpsCountFrame++;
-            if(mFpsCountFrame == NUM_FRAMES) {
+            if (mFpsCountFrame == NUM_FRAMES) {
                 // compute thousands of frames per second
                 long elapsed = timeStampNanos - mFpsCountStartNanos;
 

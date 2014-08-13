@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimeZone;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -61,12 +60,18 @@ public class MediaInfo {
 	public GeoInfo mGeoInfo = null;
 	public int TextureId;
     public int CountId;
+	public boolean IsFake = false;
 	public float x;
     public float y;
 	
 	public int mFaceCount = 0;
     public float[] mFBorder = {-1, -1, -1, -1}; //0->left, 1->right, 2->top, 3->bottom
     public ArrayList<long[]> mFaceRect = new ArrayList<long[]>();
+    
+    //Use for movie
+    public int Count = 0;
+    public ArrayList<int[]> VId = new ArrayList<int[]>();
+    public int VOId = 0;    //Video original Id
 	
 	public MediaInfo(Activity activity) {
 		mActivity = activity;
@@ -201,8 +206,7 @@ public class MediaInfo {
         return -1;
     }
     
-    @SuppressLint("SimpleDateFormat")
-	private long getTime(Uri uri, String datetime) {
+    private long getTime(Uri uri, String datetime) {
     	if(datetime == null) return getTime(uri);
 
     	SimpleDateFormat sFormatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");

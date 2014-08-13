@@ -15,6 +15,7 @@
  */
 package com.s890510.microfilm.util;
 
+
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -25,9 +26,9 @@ import android.os.Process;
  */
 public class PriorityThreadFactory implements ThreadFactory {
 
-    private final int           mPriority;
+    private final int mPriority;
     private final AtomicInteger mNumber = new AtomicInteger();
-    private final String        mName;
+    private final String mName;
 
     public PriorityThreadFactory(String name, int priority) {
         mName = name;

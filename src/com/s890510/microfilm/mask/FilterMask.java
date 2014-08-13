@@ -15,17 +15,17 @@ import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class FilterMask extends Mask {
-    private static final String TAG        = "SquareBorderMask";
+    private static final String TAG = "SquareBorderMask";
 
-    private int                 mProgram;
-    private int                 mPositionHandle;
-    private int                 mColorHandle;
-    private int                 mAlphaHandle;
-    private int                 mMVPMatrixHandle;
-    private float[]             mMVPMatrix = new float[16];
+    private int mProgram;
+    private int mPositionHandle;
+    private int mColorHandle;
+    private int mAlphaHandle;
+    private int mMVPMatrixHandle;
+    private float[] mMVPMatrix = new float[16];
 
-    public FloatBuffer          mVertices  = null;
-    private ProcessGL           mProcessGL;
+    public FloatBuffer mVertices = null;
+    private ProcessGL mProcessGL;
 
     public FilterMask(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -38,10 +38,8 @@ public class FilterMask extends Mask {
         long timer = mElementInfo.timer.getElapse();
         Effect mEffect = mElementInfo.effect.getEffect(timer);
 
-        if(mEffect == null)
-            return;
-        else
-            mElapseTime = mElementInfo.effect.getElapseTime(timer);
+        if(mEffect == null) return;
+        else mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
         GLES20.glUseProgram(mProgram);
 
@@ -72,15 +70,14 @@ public class FilterMask extends Mask {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("BorderMask");
-        // Create the new program
+        //Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if(mProgram == 0) {
+        if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to
-        // the program.
+        // Set program handles. These will later be used to pass in values to the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mColorHandle = GLES20.glGetUniformLocation(mProgram, "mColor");
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
@@ -91,26 +88,37 @@ public class FilterMask extends Mask {
 
     public void CalcVertices() {
         float mRatio = mProcessGL.ScreenRatio;
-        float[] mVerticesData = new float[] { -mRatio, -1.0f, 0.0f, mRatio, -1.0f, 0.0f, -mRatio, 1.0f, 0.0f, mRatio, 1.0f, 0.0f };
+        float[] mVerticesData = new float[]{
+                -mRatio, -1.0f, 0.0f,
+                 mRatio, -1.0f, 0.0f,
+                -mRatio,  1.0f, 0.0f,
+                 mRatio,  1.0f, 0.0f
+        };
 
-        mVertices = ByteBuffer.allocateDirect(mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        mVertices = ByteBuffer.allocateDirect(
+                mVerticesData.length * ProcessGL.FLOAT_SIZE_BYTES)
+                    .order(ByteOrder.nativeOrder()).asFloatBuffer();
         mVertices.put(mVerticesData).position(0);
     }
 
     private String VertexShader() {
-        return "uniform mat4 uMVPMatrix;                               \n" + "attribute vec4 aPosition;                              \n"
-                + "void main() {                                          \n" + "    gl_Position = uMVPMatrix * aPosition;              \n"
-                + "}                                                      \n";
+        return
+                "uniform mat4 uMVPMatrix;                               \n" +
+                "attribute vec4 aPosition;                              \n" +
+                "void main() {                                          \n" +
+                "    gl_Position = uMVPMatrix * aPosition;              \n" +
+                "}                                                      \n";
     }
 
     private String FragmentShader() {
-        return "precision mediump float;                                                                                   \n"
-                + "uniform vec4 mColor;                                                                                       \n"
-                + "uniform float mAlpha;                                                                                      \n"
-                + "void main() {                                                                                              \n"
-                + "    gl_FragColor = mColor;                                                                                 \n"
-                + "    gl_FragColor.w = mAlpha;                                                                               \n"
-                + "}                                                                                                          \n";
+        return
+                "precision mediump float;                                                                                   \n" +
+                "uniform vec4 mColor;                                                                                       \n" +
+                "uniform float mAlpha;                                                                                      \n" +
+                "void main() {                                                                                              \n" +
+                "    gl_FragColor = mColor;                                                                                 \n" +
+                "    gl_FragColor.w = mAlpha;                                                                               \n" +
+                "}                                                                                                          \n";
     }
 
     public void Reset() {

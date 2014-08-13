@@ -12,22 +12,22 @@ import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class PhotoShader extends Shader {
-    private static final String TAG        = "PhotoShader";
+    private static final String TAG = "PhotoShader";
 
-    private int                 mProgram;
-    private int                 mPositionHandle;
-    private int                 mTextureHandle;
-    private int                 mSamplerHandle;
-    private int                 mAlphaHandle;
-    private int                 mMVPMatrixHandle;
-    private int                 mMVMMatrixHandle;
-    private int                 mResolutionHandle;
-    private int                 mGapHandle;
-    private int                 mBoundHandle;
-    private int                 mSetBoundHandle;
-    private float[]             mMVPMatrix = new float[16];
-
-    private ProcessGL           mProcessGL;
+    private int mProgram;
+    private int mPositionHandle;
+    private int mTextureHandle;
+    private int mSamplerHandle;
+    private int mAlphaHandle;
+    private int mMVPMatrixHandle;
+    private int mMVMMatrixHandle;
+    private int mResolutionHandle;
+    private int mGapHandle;
+    private int mBoundHandle;
+    private int mSetBoundHandle;
+    private float[] mMVPMatrix = new float[16];
+    
+    private ProcessGL mProcessGL;
 
     public PhotoShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -35,20 +35,19 @@ public class PhotoShader extends Shader {
         CreateProgram();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo, int mType) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
+            int mTextureId, ElementInfo mElementInfo, int mType) {
 
         long mElapseTime;
         long timer = mElementInfo.timer.getElapse();
         Effect mEffect = mElementInfo.effect.getEffect(timer);
 
-        if(mEffect == null)
-            return;
-        else
-            mElapseTime = mElementInfo.effect.getElapseTime(timer);
+        if(mEffect == null) return;
+        else mElapseTime = mElementInfo.effect.getElapseTime(timer);
 
         GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
@@ -64,27 +63,27 @@ public class PhotoShader extends Shader {
         GLES20.glUniform2f(mResolutionHandle, mProcessGL.ScreenWidth, mProcessGL.ScreenHeight);
 
         float scale = mElementInfo.effect.getScaleSize(mElementInfo.timer.getElapse());
-        float ratio_a = (float) mProcessGL.ScreenHeight / (float) mProcessGL.ScreenWidth;
+        float ratio_a = (float)mProcessGL.ScreenHeight/(float)mProcessGL.ScreenWidth;
         int mBound = mEffect.getFixBound(mElapseTime);
         if(mBound == Shader.BOUNDING) {
-            float[] mGap = new float[2]; // 0: X, 1: Y
-            mGap[0] = mElementInfo.x * (1.0f - 0.04f * ratio_a);
-            mGap[1] = mElementInfo.y * (1.0f - 0.04f);
+            float[] mGap = new float[2]; //0: X, 1: Y
+            mGap[0] = mElementInfo.x*(1.0f-0.04f*ratio_a);
+            mGap[1] = mElementInfo.y*(1.0f-0.04f);
             GLES20.glUniform1fv(mGapHandle, mGap.length, mGap, 0);
 
-            float[] bound = new float[2]; // 0: X, 1: Y
+            float[] bound = new float[2]; //0: X, 1: Y
             bound[0] = mElementInfo.x;
             bound[1] = mElementInfo.y;
             GLES20.glUniform1f(mSetBoundHandle, 1.0f);
             GLES20.glUniform1fv(mBoundHandle, bound.length, bound, 0);
         } else {
-            float[] mGap = new float[2]; // 0: X, 1: Y
-            if(mElementInfo.x * ratio_a < mElementInfo.y) {
-                mGap[0] = mElementInfo.x * (1.0f - 0.04f) * scale;
-                mGap[1] = mElementInfo.y * (1.0f - 0.04f) * scale;
+            float[] mGap = new float[2]; //0: X, 1: Y
+            if(mElementInfo.x*ratio_a < mElementInfo.y) {
+                mGap[0] = mElementInfo.x*(1.0f-0.04f)*scale;
+                mGap[1] = mElementInfo.y*(1.0f-0.04f)*scale;
             } else {
-                mGap[0] = mElementInfo.x * (1.0f - 0.04f * ratio_a) * scale;
-                mGap[1] = mElementInfo.y * (1.0f - 0.04f) * scale;
+                mGap[0] = mElementInfo.x*(1.0f-0.04f*ratio_a)*scale;
+                mGap[1] = mElementInfo.y*(1.0f-0.04f)*scale;
             }
             GLES20.glUniform1f(mSetBoundHandle, 0.0f);
             GLES20.glUniform1fv(mGapHandle, mGap.length, mGap, 0);
@@ -111,15 +110,14 @@ public class PhotoShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("PhotoShader");
-        // Create the new program
+        //Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if(mProgram == 0) {
+        if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to
-        // the program.
+        // Set program handles. These will later be used to pass in values to the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");

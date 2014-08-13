@@ -1,3 +1,4 @@
+
 package com.s890510.microfilm.script;
 
 import com.s890510.microfilm.MicroMovieActivity;
@@ -6,7 +7,8 @@ import com.s890510.microfilm.ProcessGL;
 import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.script.effects.ComboFactory;
 
-public class Script1 extends BasicScript {
+public class Script1 extends BasicScript
+{
     public Script1(boolean isFromEncode, MicroMovieActivity activity, ProcessGL processGL) {
         this(activity, processGL);
         mIsFromEncode = isFromEncode;
@@ -40,3 +42,4 @@ public class Script1 extends BasicScript {
         return FilterChooser.DEFAULT;
     }
 }
+

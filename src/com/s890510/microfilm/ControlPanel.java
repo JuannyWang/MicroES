@@ -1,5 +1,6 @@
 package com.s890510.microfilm;
 
+
 import android.content.Context;
 import android.os.Handler;
 import android.widget.ImageButton;
@@ -13,41 +14,41 @@ import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Timer;
 
 public class ControlPanel extends LinearLayout {
-    private static final String   TAG                     = "ControlPanel";
+    private static final String TAG = "ControlPanel";
 
-    private SeekBar               mSeekbar;
-    private ImageButton           mButton;
+    private SeekBar mSeekbar;
+    private ImageButton mButton;
 
-    private Context               mContext;
-    private MicroMovieActivity    mActivity;
+    private Context mContext;
+    private MicroMovieActivity mActivity;
     private MicroMovieSurfaceView mMovieSurfaceView;
-    private TextView              mElpaseTime, mElpaseTime_total;
+    private TextView mElpaseTime, mElpaseTime_total;
 
-    private final int             SEEKBAR_UPDATE_INTERVAL = 100;
-    private int                   mTimerPause;
-    private Timer                 mTimer;
-    private boolean               IsPause                 = false;
-    private boolean               mPButton                = false;
+    private final int SEEKBAR_UPDATE_INTERVAL = 100;
+    private int mTimerPause;
+    private Timer mTimer;
+    private boolean IsPause = false;
+    private boolean mPButton = false;
 
-    private Handler               mHandler                = new Handler();
+    private Handler mHandler = new Handler();
+    
+    private boolean mIsDDSSave = false;
+    private SaveCallback mSaveCallback = null;
 
-    private boolean               mIsDDSSave              = false;
-    private SaveCallback          mSaveCallback           = null;
-
-    Runnable                      mUpdate                 = new Runnable() {
-                                                              @Override
-                                                              public void run() {
-                                                                  if(!mActivity.checkPause()) {
-                                                                      mSeekbar.setProgress((int) mTimer.SeekBarElapse());
-                                                                      mHandler.postDelayed(mUpdate, SEEKBAR_UPDATE_INTERVAL);
-
-                                                                      if(mIsDDSSave) {
-                                                                          mIsDDSSave = false;
-                                                                          mSaveCallback.onDDSSave();
-                                                                      }
-                                                                  }
-                                                              }
-                                                          };
+    Runnable mUpdate =new Runnable(){
+        @Override
+        public void run() {
+            if(!mActivity.checkPause()) {
+                mSeekbar.setProgress((int)mTimer.SeekBarElapse());
+                mHandler.postDelayed(mUpdate, SEEKBAR_UPDATE_INTERVAL);
+                
+                if(mIsDDSSave){
+                	mIsDDSSave = false;
+                	mSaveCallback.onDDSSave();
+                }
+            }
+        }
+    };
 
     public ControlPanel(Context context) {
         super(context);
@@ -86,10 +87,10 @@ public class ControlPanel extends LinearLayout {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 int mProcessTime = mSeekbar.getProgress();
-                if((int) mProcessTime / 1000 < 10)
-                    mElpaseTime.setText("00:0" + (int) mProcessTime / 1000);
+                if((int)mProcessTime/1000 < 10)
+                    mElpaseTime.setText("00:0" + (int)mProcessTime/1000);
                 else
-                    mElpaseTime.setText("00:" + (int) mProcessTime / 1000);
+                    mElpaseTime.setText("00:" + (int)mProcessTime/1000);
             }
 
             @Override
@@ -101,9 +102,9 @@ public class ControlPanel extends LinearLayout {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                mTimerPause = ((int) seekBar.getProgress() / 1000) * 1000;
+                mTimerPause = ((int)seekBar.getProgress()/1000)*1000;
                 mTimer.setElapse(mTimerPause);
-                mMovieSurfaceView.resetItemElapse((long) mTimerPause);
+                mMovieSurfaceView.resetItemElapse((long)mTimerPause);
                 mMovieSurfaceView.setProgress(mTimerPause);
 
                 if(IsPause && !mPButton) {
@@ -115,11 +116,10 @@ public class ControlPanel extends LinearLayout {
         });
     }
 
-    // If the changeIcon is true means it's come from activity(pause button)
+    //If the changeIcon is true means it's come from activity(pause button)
     public void ControlPause(boolean changeIcon) {
         IsPause = true;
-        mTimerPause = (int) mTimer.SeekBarElapse(); // We get the time from
-                                                    // timer
+        mTimerPause = (int)mTimer.SeekBarElapse(); //We get the time from timer
 
         mActivity.setPause(true);
         mMovieSurfaceView.MusicPause();
@@ -141,7 +141,7 @@ public class ControlPanel extends LinearLayout {
             mPButton = false;
         }
 
-        mMovieSurfaceView.resetItemElapse((long) mTimerPause);
+        mMovieSurfaceView.resetItemElapse((long)mTimerPause);
 
         mActivity.setPause(false);
 
@@ -150,13 +150,13 @@ public class ControlPanel extends LinearLayout {
         mHandler.postDelayed(mUpdate, SEEKBAR_UPDATE_INTERVAL);
     }
 
-    public void startPlay(Script script) {
+    public void startPlay(Script script){
         mButton.setEnabled(true);
         mButton.setImageAlpha(225);
         mButton.setImageResource(R.drawable.asus_micromovie_press_icon);
         mMovieSurfaceView.StartPreview(script);
 
-        mElpaseTime_total.setText("00:" + (int) Math.ceil(mMovieSurfaceView.getDuration() / 1000));
+        mElpaseTime_total.setText("00:" + (int)Math.ceil(mMovieSurfaceView.getDuration()/1000));
 
         mHandler.postDelayed(mUpdate, SEEKBAR_UPDATE_INTERVAL);
     }
@@ -164,7 +164,7 @@ public class ControlPanel extends LinearLayout {
     public void drawScreen() {
         mTimerPause = mSeekbar.getProgress();
         mTimer.setElapse(mTimerPause);
-        mMovieSurfaceView.resetItemElapse((long) mTimerPause);
+        mMovieSurfaceView.resetItemElapse((long)mTimerPause);
         mMovieSurfaceView.setProgress(mTimerPause);
 
         if(IsPause && !mPButton) {
@@ -174,24 +174,24 @@ public class ControlPanel extends LinearLayout {
         }
     }
 
-    public void destroy() {
+    public void destroy(){
         mHandler.removeCallbacks(mUpdate);
     }
 
-    public void setSeekbarMax() {
+    public void setSeekbarMax(){
         mSeekbar.setMax(mMovieSurfaceView.getDuration());
     }
 
-    public void finishPlay() {
+    public void finishPlay(){
         mHandler.removeCallbacks(mUpdate);
         mSeekbar.setProgress(0);
         mElpaseTime.setText("00:00");
         mButton.setImageResource(R.drawable.asus_micromovie_replay_icon);
     }
-
-    public void setDDSSave(SaveCallback callback) {
-        mIsDDSSave = true;
-        if(mSaveCallback == null)
-            mSaveCallback = callback;
+    
+    public void setDDSSave(SaveCallback callback){
+    	mIsDDSSave = true;
+    	if(mSaveCallback == null)
+    		mSaveCallback = callback;
     }
 }

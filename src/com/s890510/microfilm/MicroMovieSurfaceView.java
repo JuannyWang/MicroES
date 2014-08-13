@@ -8,6 +8,7 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
@@ -18,30 +19,31 @@ import android.util.Log;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Timer;
 
-class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Renderer {
+class MicroMovieSurfaceView extends GLSurfaceView
+    implements GLSurfaceView.Renderer, SurfaceTexture.OnFrameAvailableListener {
 
-    private static String          TAG                  = "MicroMovieSurfaceView";
-    private ProcessGL              mProcessGL;
-    private PlayBackMusic          mPlayBackMusic       = null;
-    private ArrayList<MediaInfo>   mMediaInfo;
-    private ArrayList<ElementInfo> mFileOrder           = new ArrayList<ElementInfo>();
+    private static String TAG = "MicroMovieSurfaceView";
+    private ProcessGL mProcessGL;
+    private boolean updateSurface = false;
+    private PlayBackMusic mPlayBackMusic = null;
+    private ArrayList<MediaInfo> mMediaInfo;
+    private ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
 
-    private MicroMovieActivity     mActivity;
-    private MicroMovieListener     mUpdatelistener;
-    private final Handler          mHandler;
-    private PlayControl            mPlayControl         = null;
-    private int                    mWidth               = 0;
-    private int                    mHeight              = 0;
-    private boolean                mIsDone              = false;
-    private Timer                  mTimer;
-    private Script                 mScript;
-    public boolean                 mReadyInit           = false;
-    public boolean                 mIsPlayFin           = false;
+    private MicroMovieActivity mActivity;
+    private MicroMovieListener mUpdatelistener;
+    private final Handler mHandler;
+    private PlayControl mPlayControl = null;
+    private int mWidth = 0, mHeight = 0;
+    private boolean mIsDone = false;
+    private Timer mTimer;
+    private Script mScript;
+    public boolean mReadyInit = false;
+    public boolean mIsPlayFin = false;
 
-    public static final int        MSG_STARTPROGRASS    = 1;
-    public static final int        MSG_STOPPROGRASS     = 2;
-    public static final int        MSG_FINCHANGESURFACE = 3;
-    public static final int        MSG_PLAYFIN          = 4;
+    public static final int MSG_STARTPROGRASS = 1;
+    public static final int MSG_STOPPROGRASS = 2;
+    public static final int MSG_FINCHANGESURFACE = 3;
+    public static final int MSG_PLAYFIN = 4;
 
     public MicroMovieSurfaceView(MicroMovieActivity activity) {
         this(activity, null);
@@ -51,9 +53,8 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         mIsPlayFin = IsFin;
     }
 
-    private Context      mContext;
+    private Context mContext;
     private ControlPanel mControlPanel;
-
     public MicroMovieSurfaceView(MicroMovieActivity activity, AttributeSet attrs) {
         super(activity.getApplicationContext(), attrs);
         mContext = activity.getApplicationContext();
@@ -65,15 +66,15 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
             public void handleMessage(Message msg) {
                 switch (msg.what) {
                     case MSG_STARTPROGRASS:
-                        if(mUpdatelistener != null)
+                        if(mUpdatelistener!=null)
                             mUpdatelistener.doUpdate(MicroMovieListener.START_INIT_PROGRASSDIALOG);
                         break;
                     case MSG_STOPPROGRASS:
-                        if(mUpdatelistener != null)
+                        if(mUpdatelistener!=null)
                             mUpdatelistener.doUpdate(MicroMovieListener.STOP_INIT_PROGRASSDIALOG);
                         break;
                     case MSG_FINCHANGESURFACE:
-                        if(mUpdatelistener != null)
+                        if(mUpdatelistener!=null)
                             mUpdatelistener.doUpdate(MicroMovieListener.FINISH_CHANGESURFACE);
                         break;
                     case MSG_PLAYFIN:
@@ -83,7 +84,7 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
                             mProcessGL.clearProcessData();
                             ClearOrderTexture();
                         }
-                        if(mUpdatelistener != null)
+                        if(mUpdatelistener!=null)
                             mUpdatelistener.doUpdate(MicroMovieListener.FINISH_PLAY);
                         break;
                 }
@@ -112,7 +113,7 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     public void CanclePlay() {
-        synchronized(mPlayControl) {
+        synchronized (mPlayControl) {
             if(mPlayControl != null && mPlayControl.isAlive()) {
                 mPlayControl.terminate();
                 mPlayControl.interrupt();
@@ -129,7 +130,7 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
 
     public void MusicPause() {
         if(mPlayControl != null) {
-            synchronized(mPlayControl) {
+            synchronized (mPlayControl) {
                 if(mPlayBackMusic != null) {
                     if(mActivity.checkPause() && mPlayBackMusic.isPlaying()) {
                         mPlayControl.interrupt();
@@ -164,16 +165,16 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
             mPlayControl.CreateControl(mFileOrder);
         }
 
-        synchronized(mPlayControl) {
+        synchronized (mPlayControl) {
             mScript = script;
 
             try {
                 mPlayBackMusic.setAudioTrackFile(mContext, script.getMusicId());
                 mPlayBackMusic.prepareMusic();
                 mControlPanel.setSeekbarMax();
-            } catch(FileNotFoundException e) {
+            } catch (FileNotFoundException e) {
                 e.printStackTrace();
-            } catch(IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             mProcessGL.setScript(script);
@@ -194,8 +195,12 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         super.onPause();
     }
 
-    public Script getScript() {
+    public Script getScript(){
         return mProcessGL.getScript();
+    }
+
+    public void changeVideo(int VideoId) {
+        mProcessGL.changeVideo(VideoId);
     }
 
     public void changeSlogan() {
@@ -206,8 +211,12 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         mProcessGL.changeBitmap(eInfo, resetTimer);
     }
 
+    public void SeekVideo(int textureId, int videopart, int time) {
+        mProcessGL.SeekVideo(textureId, videopart, time);
+    }
+
     public void onDestroy() {
-        if(mPlayControl != null && mPlayControl.isAlive()) {
+        if(mPlayControl!=null && mPlayControl.isAlive()) {
             mPlayControl.terminate();
             mPlayControl.interrupt();
             mPlayControl.onDestory();
@@ -216,7 +225,20 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         mPlayBackMusic.destroy();
 
         mIsDone = true;
+        mProcessGL.onDestroy();
         GLES20.glFinish();
+    }
+
+    public void resumeMediaPlayer() {
+        mProcessGL.resumeMediaPlayer();
+    }
+
+    public void pauseMediaPlayer() {
+        mProcessGL.pauseMediaPlayer();
+    }
+
+    public void stopMediaPlayer() {
+        mProcessGL.stopMediaPlayer();
     }
 
     public void SendMSG(int msg) {
@@ -226,10 +248,20 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
     }
 
     public void InitData() {
-        // The same means all files are in init.
+        //The same means all files are in init.
         if(mActivity.getInitBitmapCount() == mMediaInfo.size()) {
             mActivity.setInitial(true);
             return;
+        }
+
+        for(int i=0; i<mMediaInfo.size(); i++) {
+            if(!mMediaInfo.get(i).IsFake) continue;
+
+            if(mMediaInfo.get(i).getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
+                mMediaInfo.get(i).mIsInitial = mProcessGL.setBitmap(mMediaInfo.get(i));
+            } else if(mMediaInfo.get(i).getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
+                mMediaInfo.get(i).mIsInitial = mProcessGL.setMediaPlayer(mMediaInfo.get(i));
+            }
         }
 
         mActivity.setInitial(true);
@@ -248,12 +280,12 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         return mPlayBackMusic.getduration();
     }
 
-    public int getProgress() {
+    public int getProgress(){
         return (int) mTimer.getElapse();
     }
 
     private void ClearOrderTexture() {
-        for(int i = 0; i < mFileOrder.size(); i++) {
+        for(int i=0; i<mFileOrder.size(); i++) {
             if(mFileOrder.get(i).Type == MediaInfo.MEDIA_TYPE_IMAGE)
                 mFileOrder.get(i).TextureId = -1;
         }
@@ -270,9 +302,13 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         mProcessGL.clearProcessData();
         ClearOrderTexture();
 
-        synchronized(mPlayControl) {
+        if(mProcessGL.getVideoStatus()) {
+            mProcessGL.stopMediaPlayer();
+        }
+
+        synchronized (mPlayControl) {
             mPlayControl.setElapse(progress);
-            mPlayControl.setSleep((int) mProcessGL.getScript().getSleepByElapse(progress));
+            mPlayControl.setSleep((int)mProcessGL.getScript().getSleepByElapse(progress));
         }
         mProcessGL.setTimerElapse(progress, mFileOrder);
 
@@ -295,9 +331,15 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
 
     @Override
     public void onDrawFrame(GL10 gl) {
-        if(mActivity.isSaving()) {
+        if(mActivity.isSaving()){
             mProcessGL.doDrawNothing();
-        } else {
+        }else{
+            synchronized(this) {
+                if (updateSurface) {
+                    mProcessGL.updateSurfaceTexture();
+                    updateSurface = false;
+                }
+            }
             mProcessGL.doDraw(-1);
         }
 
@@ -312,7 +354,7 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         mProcessGL.setEye();
         if(mWidth != width || mHeight != height) {
             SendMSG(MSG_STARTPROGRASS);
-            mProcessGL.setScreenScale((float) height / width, width, height);
+            mProcessGL.setScreenScale((float)height/width, width, height);
             mWidth = width;
             mHeight = height;
             SendMSG(MSG_STOPPROGRASS);
@@ -325,7 +367,10 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         SendMSG(MSG_STARTPROGRASS);
-        mProcessGL.prepareOpenGL();
+        mProcessGL.prepareOpenGL(this);
+        synchronized(this) {
+            updateSurface = false;
+        }
 
         mWidth = 0;
         mHeight = 0;
@@ -333,19 +378,24 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         GLES20.glDepthMask(false);
     }
 
-    public void setTimerElapse(long l, ArrayList<ElementInfo> FOrder) {
+    @Override
+    public void onFrameAvailable(SurfaceTexture surfaceTexture) {
+        updateSurface = true;
+    }
+
+    public void setTimerElapse(long l, ArrayList<ElementInfo> FOrder){
         mProcessGL.setTimerElapse(l, FOrder);
     }
 
-    public void setTimerElapse(long l) {
+    public void setTimerElapse(long l){
         mProcessGL.setTimerElapse(l);
     }
 
     public void setControlPanel(ControlPanel mCPanel) {
         mControlPanel = mCPanel;
     }
-
-    public ProcessGL getProcessGL() {
-        return mProcessGL;
+    
+    public ProcessGL getProcessGL(){
+    	return mProcessGL;
     }
 }

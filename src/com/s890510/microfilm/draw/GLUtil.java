@@ -10,12 +10,12 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 public class GLUtil {
-    private static final String TAG = "GLUtil";
+	private static final String TAG = "GLUtil";
 
-    public static int compileShader(final int shaderType, final String shaderSource) {
+	public static int compileShader(final int shaderType, final String shaderSource) {
         int shaderHandle = GLES20.glCreateShader(shaderType);
 
-        if(shaderHandle != 0) {
+        if (shaderHandle != 0) {
             GLES20.glShaderSource(shaderHandle, shaderSource);
 
             GLES20.glCompileShader(shaderHandle);
@@ -23,14 +23,14 @@ public class GLUtil {
             final int[] compileStatus = new int[1];
             GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
 
-            if(compileStatus[0] == 0) {
+            if (compileStatus[0] == 0) {
                 Log.e(TAG, "Error compiling shader: " + GLES20.glGetShaderInfoLog(shaderHandle));
                 GLES20.glDeleteShader(shaderHandle);
                 shaderHandle = 0;
             }
         }
 
-        if(shaderHandle == 0) {
+        if (shaderHandle == 0) {
             throw new RuntimeException("Error creating shader.");
         }
 
@@ -40,7 +40,7 @@ public class GLUtil {
     public static int createAndLinkProgram(final int vertexShaderHandle, final int fragmentShaderHandle) {
         int programHandle = GLES20.glCreateProgram();
 
-        if(programHandle != 0) {
+        if (programHandle != 0) {
             // Bind the vertex shader to the program.
             GLES20.glAttachShader(programHandle, vertexShaderHandle);
 
@@ -55,21 +55,21 @@ public class GLUtil {
             GLES20.glGetProgramiv(programHandle, GLES20.GL_LINK_STATUS, linkStatus, 0);
 
             // If the link failed, delete the program.
-            if(linkStatus[0] == 0) {
+            if (linkStatus[0] == 0) {
                 Log.e(TAG, "Error compiling program: " + GLES20.glGetProgramInfoLog(programHandle));
                 GLES20.glDeleteProgram(programHandle);
                 programHandle = 0;
             }
         }
 
-        if(programHandle == 0) {
+        if (programHandle == 0) {
             throw new RuntimeException("Error creating program.");
         }
 
         return programHandle;
     }
 
-    public static String readTextFileFromRawResource(final Context context, final int resourceId) {
+	public static String readTextFileFromRawResource(final Context context, final int resourceId) {
         final InputStream inputStream = context.getResources().openRawResource(resourceId);
         final InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
         final BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
@@ -78,11 +78,11 @@ public class GLUtil {
         final StringBuilder body = new StringBuilder();
 
         try {
-            while((nextLine = bufferedReader.readLine()) != null) {
+            while ((nextLine = bufferedReader.readLine()) != null) {
                 body.append(nextLine);
                 body.append('\n');
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             return null;
         }
 

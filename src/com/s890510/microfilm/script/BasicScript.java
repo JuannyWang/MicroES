@@ -12,16 +12,16 @@ import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.script.effects.Effect;
 
 public class BasicScript extends Script {
-    private String            TAG           = "BasicScript";
-    protected int             mStatus       = 0;
-    protected int             totalDuration = 0;
-    protected int             totalSleep    = 0;
-    protected boolean         mIsFromEncode = false;
-    protected int             mNoItem       = 0;
-    protected int             mNoCount      = 0;
-    ArrayList<Effect>         mEffects      = new ArrayList<Effect>();
+    private String TAG = "BasicScript";
+    protected int mStatus = 0;
+    protected int totalDuration =0;
+    protected int totalSleep =0;
+    protected boolean mIsFromEncode = false;
+    protected int mNoItem = 0;
+    protected int mNoCount = 0;
+    ArrayList<Effect> mEffects = new ArrayList<Effect>();
     public MicroMovieActivity mActivity;
-    private ProcessGL         mProcessGL;
+    private ProcessGL mProcessGL;
 
     public BasicScript(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
@@ -30,15 +30,14 @@ public class BasicScript extends Script {
 
     @Override
     public float[] getMVPMatrixByTimeElapse(long elapse, boolean wait, int type, int num) {
-        if(mMVPMatrix == null)
-            mMVPMatrix = new float[16];
+        if(mMVPMatrix == null) mMVPMatrix = new float[16];
         Matrix.setIdentityM(mMVPMatrix, 0);
 
-        elapse = elapse % totalSleep;
+        elapse = elapse%totalSleep;
         int effectElapse = 0;
-        for(int i = 0; i < mEffects.size(); i++) {
+        for(int i = 0;i < mEffects.size();i++){
             effectElapse += mEffects.get(i).getDuration();
-            if(elapse < effectElapse || wait) {
+            if(elapse < effectElapse || wait){
                 if(type == 1) {
                     mMVPMatrix = mEffects.get(i).getMVPMatrixByElapse(elapse - effectElapse + mEffects.get(i).getDuration());
                 } else if(type == 2) {
@@ -69,16 +68,16 @@ public class BasicScript extends Script {
 
     @Override
     public int getItemIndexByElapse(long elapse) {
-        int index = (int) (mEffects.size() * (elapse / totalSleep));
+        int index = (int) ( mEffects.size() * ( elapse / totalSleep )) ;
 
         if(elapse > totalSleep) {
             return mEffects.size();
         }
 
         elapse = elapse % totalSleep;
-        for(int i = 0; i < mEffects.size(); i++) {
+        for( int i = 0 ; i < mEffects.size() ; i++ ){
             elapse -= mEffects.get(i).getSleep();
-            if(elapse < 0) {
+            if( elapse < 0 ){
                 index += i;
                 break;
             }
@@ -91,8 +90,8 @@ public class BasicScript extends Script {
         return totalDuration;
     }
 
-    protected void init() {
-        for(int i = 0; i < mEffects.size(); i++) {
+    protected void  init() {
+        for(int i = 0 ; i <mEffects.size() ; i++){
             totalDuration += mEffects.get(i).getDuration();
             totalSleep += mEffects.get(i).getSleep();
             if(mEffects.get(i).getIsNoItem()) {
@@ -107,7 +106,7 @@ public class BasicScript extends Script {
     @Override
     public ArrayList<ElementInfo> setElementInfoTime(ArrayList<ElementInfo> info) {
         int effNum = mEffects.size();
-        for(int i = 0; i < info.size(); i++) {
+        for(int i = 0; i < info.size() ; i++) {
             info.get(i).effect = mEffects.get(i % effNum);
             info.get(i).time = mEffects.get(i % effNum).getSleep();
             info.get(i).timer = new Timer(mEffects.get(i % effNum).getDuration(), mActivity, mProcessGL);
@@ -116,8 +115,8 @@ public class BasicScript extends Script {
             if(mEffects.get(i % effNum).getEffectType() == Effect.VIDEO_EFFECT)
                 info.get(i).isVideo = true;
             if(info.get(i).effect.getStringType() == 1) {
-                info.get(i).mDate = info.get(i - 1).mDate;
-                info.get(i).mLocation = info.get(i - 1).mLocation;
+                info.get(i).mDate = info.get(i-1).mDate;
+                info.get(i).mLocation = info.get(i-1).mLocation;
             }
         }
         return info;
@@ -133,9 +132,9 @@ public class BasicScript extends Script {
     @Override
     public long getSleepByElapse(long elapse) {
         elapse = elapse % totalSleep;
-        for(int i = 0; i < mEffects.size(); i++) {
+        for( int i = 0 ; i < mEffects.size() ; i++ ){
             elapse -= mEffects.get(i).getSleep();
-            if(elapse < 0) {
+            if( elapse < 0 ){
                 elapse += mEffects.get(i).getSleep();
                 elapse = mEffects.get(i).getSleep() - elapse;
                 break;
@@ -162,14 +161,14 @@ public class BasicScript extends Script {
         if(elapse > totalSleep)
             return data;
 
-        do {
+        do{
             if(elapse <= info.get(i).effect.getDuration()) {
                 info.get(i).timer.setElapse(elapse);
                 data.add(info.get(i));
             }
             elapse -= info.get(i).effect.getSleep();
             i++;
-        } while((int) elapse >= 0);
+        }while((int)elapse >= 0);
         return data;
     }
 
@@ -183,7 +182,7 @@ public class BasicScript extends Script {
                 }
                 elapse -= info.get(i).effect.getSleep();
                 i++;
-            } while((int) elapse >= 0 && i < info.size());
+            }while((int)elapse >= 0 && i < info.size());
         }
     }
 
@@ -227,20 +226,19 @@ public class BasicScript extends Script {
         return -1;
     }
 
-    protected boolean shouldReturnDefaultColor() {
-        if(mIsFromEncode) {
+    protected boolean shouldReturnDefaultColor(){
+        if(mIsFromEncode){
             return false;
-        } else {
+        }else{
             if(mActivity.checkPlay())
                 return false;
-            else
-                return true;
+            else return true;
         }
     }
 
     @Override
     public int GetSloganType() {
-        // 0 -> Black, 1 -> White
+        //0 -> Black, 1 -> White
         return 0;
     }
 
@@ -254,13 +252,13 @@ public class BasicScript extends Script {
         return mEffects.get(Id).getIsInCount();
     }
 
-    @Override
-    public float[] getFilterLeft() {
-        return new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
-    }
+	@Override
+	public float[] getFilterLeft() {
+		return new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+	}
 
-    @Override
-    public float[] getFilterRight() {
-        return new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
-    }
+	@Override
+	public float[] getFilterRight() {
+		return new float[]{1.0f, 1.0f, 1.0f, 1.0f};
+	}
 }

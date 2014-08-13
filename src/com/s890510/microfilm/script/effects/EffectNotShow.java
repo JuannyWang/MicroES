@@ -1,8 +1,10 @@
+
 package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-public class EffectNotShow extends BasicEffect {
+public class EffectNotShow extends BasicEffect
+{
     private float[]          mMVPMatrix = new float[16];
     private final static int DURATION   = 1000;
 

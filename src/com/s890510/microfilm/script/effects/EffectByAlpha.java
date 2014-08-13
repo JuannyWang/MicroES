@@ -2,11 +2,12 @@ package com.s890510.microfilm.script.effects;
 
 import android.opengl.Matrix;
 
-public class EffectByAlpha extends BasicEffect {
-    private float[] mMVPMatrix  = new float[16]; // the texture
-    private float   mStartAlpha = 1.0f;
-    private float   mEndAlpha   = 0.0f;
-
+public class EffectByAlpha extends BasicEffect
+{
+    private float[] mMVPMatrix = new float[16]; //the texture
+    private float mStartAlpha = 1.0f;
+    private float mEndAlpha = 0.0f;
+    
     public EffectByAlpha(int duration, float startalpha, float endalpha) {
         mDuration = duration;
         mSleep = duration;
@@ -24,9 +25,9 @@ public class EffectByAlpha extends BasicEffect {
         Matrix.setIdentityM(mMVPMatrix, 0);
         return mMVPMatrix;
     }
-
+    
     @Override
     public float getAlpha(long elapse) {
-        return mStartAlpha - (mStartAlpha - mEndAlpha) * getProgressByElapse(elapse);
+    	return mStartAlpha - (mStartAlpha - mEndAlpha) * getProgressByElapse(elapse);
     }
 }

@@ -1,8 +1,10 @@
+
 package com.s890510.microfilm.script.effects;
 
 import java.util.ArrayList;
 
-public abstract class Effect {
+public abstract class Effect
+{
     public static final int VIDEO_EFFECT                         = 0;
     public static final int EFFECT_DEFAULT                       = 10;
     public static final int EFFECT_SHOW                          = 11;

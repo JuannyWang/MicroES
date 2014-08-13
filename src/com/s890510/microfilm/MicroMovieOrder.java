@@ -8,13 +8,13 @@ import android.util.Log;
 import com.s890510.microfilm.script.Script;
 
 public class MicroMovieOrder {
-    private static String                     TAG        = "MicroMovieOrder";
-    private int[][]                           mOrderList = new int[ThemeAdapter.TYPE_Count][];
-    private float[][]                         mCenterX   = new float[ThemeAdapter.TYPE_Count][];
-    private float[][]                         mCenterY   = new float[ThemeAdapter.TYPE_Count][];
+    private static String TAG = "MicroMovieOrder";
+    private int[][] mOrderList = new int[ThemeAdapter.TYPE_Count][];
+    private float[][] mCenterX = new float[ThemeAdapter.TYPE_Count][];
+    private float[][] mCenterY = new float[ThemeAdapter.TYPE_Count][];
     private ArrayList<ArrayList<ElementInfo>> mOrderInfo = new ArrayList<ArrayList<ElementInfo>>();
-    private final int                         mRange     = 3;
-    private final int                         mSpacing   = (mRange * 2) + 1;
+    private final int mRange = 3;
+    private final int mSpacing = (mRange * 2) + 1;
 
     public MicroMovieOrder(MicroMovieActivity activity) {
         Reset();
@@ -26,7 +26,7 @@ public class MicroMovieOrder {
         mCenterY = new float[ThemeAdapter.TYPE_Count][];
 
         mOrderInfo.clear();
-        for(int i = 0; i < ThemeAdapter.TYPE_Count; i++) {
+        for(int i=0; i<ThemeAdapter.TYPE_Count; i++) {
             mOrderInfo.add(new ArrayList<ElementInfo>());
         }
     }
@@ -44,7 +44,7 @@ public class MicroMovieOrder {
     }
 
     public boolean IsOrder(int i) {
-        return (mOrderInfo.get(i).size() > 0) ? true : false;
+        return (mOrderInfo.get(i).size() > 0)? true : false;
     }
 
     public ArrayList<ElementInfo> getOrderInfo(int i) {
@@ -56,7 +56,7 @@ public class MicroMovieOrder {
 
         mCenterX[i] = new float[info.size()];
         mCenterY[i] = new float[info.size()];
-        for(int j = 0; j < info.size(); j++) {
+        for(int j=0; j<info.size(); j++) {
             mCenterX[i][j] = info.get(j).centerX;
             mCenterY[i][j] = info.get(j).centerY;
         }
@@ -74,7 +74,7 @@ public class MicroMovieOrder {
         ArrayList<Integer> mRandomBucket = new ArrayList<Integer>();
         ArrayList<Integer> mSpaceBucket = new ArrayList<Integer>();
         Random mRandom = new Random(System.currentTimeMillis());
-        int mFileTotalCount = mMediaInfo.size(); // means remove fake file size
+        int mFileTotalCount = mMediaInfo.size(); //means remove fake file size
         int mEffectCount = mScript.geteffectsize();
         int mNoItemCount = mScript.getNoItemSize();
         int mNoCountSize = mScript.getNoCountSize();
@@ -89,54 +89,63 @@ public class MicroMovieOrder {
         boolean mPastVideo = false;
         int[] mOrder = new int[mEffectCount];
 
-        /*
-         * here we have several thing to do, 1.Do not let vedeo play after
-         * another video 2.First one not video
+        /* here we have several thing to do,
+         * 1.Do not let vedeo play after another video
+         * 2.First one not video
          */
 
-        // remove the fake info
+        //remove the fake info
         Log.e(TAG, "mMediaInfo.size():" + mMediaInfo.size());
-        for(int i = 0; i < mMediaInfo.size(); i++) {
+        for(int i=0; i<mMediaInfo.size(); i++) {
+            if(mMediaInfo.get(i).IsFake) {
+                mFileTotalCount--;
+            } else {
+                mFileBucket.add(i);
+            }
             mRandomBucket.add(i);
         }
 
         int[] ElementCount = new int[mMediaInfo.size()];
-        for(int i = 0; i < ElementCount.length; i++)
-            ElementCount[i] = 0;
+        for (int i=0; i<ElementCount.length; i++) ElementCount[i] = 0;
 
         mRunCount = mEffectCount - mNoItemCount - mNoCountSize;
 
-        // if file count can't fill into head and tile we random it
+        //if file count can't fill into head and tile we random it
         if(!IsShuffle) {
-            if(mFileTotalCount < mRunCount / 2) {
+            if(mFileTotalCount < mRunCount/2) {
                 IsShuffle = true;
             } else {
-                mStartCount = (int) Math.floor(mRunCount / 6);
-                mEndCount = (int) Math.floor(mRunCount / 6);
-                mCenterCount = (int) Math.floor(mRunCount / 6);
-                mFHalfCount = (int) Math.floor((mRunCount - mStartCount - mEndCount - mCenterCount) / 2);
+                mStartCount = (int) Math.floor(mRunCount/6);
+                mEndCount = (int) Math.floor(mRunCount/6);
+                mCenterCount = (int) Math.floor(mRunCount/6);
+                mFHalfCount = (int) Math.floor((mRunCount - mStartCount - mEndCount - mCenterCount)/2);
                 mLHalfCount = mRunCount - mCenterCount - mFHalfCount - mStartCount - mEndCount;
 
                 int sortcount = mStartCount + mEndCount + mCenterCount;
                 int recount = mFileBucket.size() - sortcount;
-                for(int i = 0; i < (int) Math.floor(recount / 2); i++) {
+                for(int i=0; i<(int)Math.floor(recount/2); i++) {
                     mFileBucket.remove(mStartCount);
                     recount--;
                 }
-                for(int i = 0; i < recount; i++) {
-                    mFileBucket.remove(mStartCount + mCenterCount);
+                for(int i=0; i<recount; i++) {
+                    mFileBucket.remove(mStartCount+mCenterCount);
                 }
             }
         }
-        mAvgCount = (int) (Math.ceil((float) (mEffectCount - mNoItemCount - mNoCountSize) / mFileTotalCount)) - 1;
+        mAvgCount = (int) (Math.ceil((float)(mEffectCount - mNoItemCount - mNoCountSize)/mFileTotalCount)) - 1;
 
-        Log.e(TAG, "mFileTotalCount:" + mFileTotalCount + ", mStartCount:" + mStartCount + ", mFHalfCount:" + mFHalfCount + ", mCenterCount:"
-                + mCenterCount + ", mLHalfCount:" + mLHalfCount + ", mEndCount:" + mEndCount + ", mRunCount:" + mRunCount + ", IsShuffle:"
-                + IsShuffle);
+        Log.e(TAG, "mFileTotalCount:" + mFileTotalCount +
+                ", mStartCount:" + mStartCount +
+                ", mFHalfCount:" + mFHalfCount +
+                ", mCenterCount:" + mCenterCount +
+                ", mLHalfCount:" + mLHalfCount +
+                ", mEndCount:" + mEndCount +
+                ", mRunCount:" + mRunCount +
+                ", IsShuffle:" + IsShuffle);
 
-        // now we need start to put order
-        // Default order is sort by date
-        for(int i = 0; i < mEffectCount; i++) {
+        //now we need start to put order
+        //Default order is sort by date
+        for(int i=0; i<mEffectCount; i++) {
             ElementInfo eInfo = new ElementInfo();
             MediaInfo info = null;
 
@@ -146,7 +155,7 @@ public class MicroMovieOrder {
                 eInfo.width = processGL.ScreenWidth;
                 mOrder[i] = -1;
             } else if(!mScript.CheckInCount(i)) {
-                // Random and push in...
+                //Random and push in...
                 info = mMediaInfo.get(mRandom.nextInt(mMediaInfo.size()));
                 eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                 eInfo.height = info.getImage().getHeight();
@@ -164,23 +173,19 @@ public class MicroMovieOrder {
                         if(mFileTotalCount >= mEffectCount) {
                             info = mMediaInfo.get(i);
                         } else {
-                            if(mFileBucket.size() > 0
-                                    && (mStartCount > 0 || (mFHalfCount == 0 && mCenterCount > 0) || (mLHalfCount == 0 && mEndCount > 0))) {
+                            if(mFileBucket.size() > 0 &&
+                                    (mStartCount > 0 || (mFHalfCount == 0 && mCenterCount > 0) || (mLHalfCount == 0 && mEndCount > 0))) {
                                 info = mMediaInfo.get(mFileBucket.get(0));
                                 mFileBucket.remove(0);
 
-                                if(mStartCount > 0)
-                                    mStartCount--;
-                                else if(mFHalfCount == 0 && mCenterCount > 0)
-                                    mCenterCount--;
-                                else if(mLHalfCount == 0 && mEndCount > 0)
-                                    mEndCount--;
+                                if(mStartCount > 0) mStartCount--;
+                                else if(mFHalfCount == 0 && mCenterCount > 0) mCenterCount--;
+                                else if(mLHalfCount == 0 && mEndCount > 0) mEndCount--;
                             } else {
                                 mSpaceBucket.clear();
                                 int count = 0;
-                                for(int j = i - 1; j >= 0; j--) {
-                                    if(count == mRange)
-                                        break;
+                                for(int j=i-1; j>=0; j--) {
+                                    if(count == mRange) break;
                                     if(mFileOrder.get(j).InfoId != -1) {
                                         mSpaceBucket.add(mFileOrder.get(j).InfoId);
                                         count++;
@@ -206,7 +211,7 @@ public class MicroMovieOrder {
                                     }
                                 }
 
-                                for(int j = 0; j < mPos; j++) {
+                                for(int j=0; j<mPos; j++) {
                                     mSpaceBucket.add(mMediaInfo.get(mFileBucket.get(j)).CountId);
                                 }
 
@@ -219,10 +224,8 @@ public class MicroMovieOrder {
                                 if(ElementCount[info.CountId] >= mAvgCount) {
                                     mRandomBucket.remove(tmp);
                                 }
-                                if(mFHalfCount > 0)
-                                    mFHalfCount--;
-                                else if(mLHalfCount > 0)
-                                    mLHalfCount--;
+                                if(mFHalfCount > 0) mFHalfCount--;
+                                else if(mLHalfCount > 0) mLHalfCount--;
                             }
                         }
                     } else {
@@ -248,7 +251,35 @@ public class MicroMovieOrder {
                     mSpaceBucket.add(info.CountId);
                 }
 
-                if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
+                if(info.getType() == MediaInfo.MEDIA_TYPE_VIDEO) {
+                    //First, Continuous, Last can't be Video
+                    if((i == 0 || mPastVideo || mEffectCount == i+1)) {
+                        eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
+
+                        //Get the fake fileinfo
+                        MediaInfo Finfo = mMediaInfo.get(info.VId.get(info.Count)[1]);
+                        eInfo.height = Finfo.getImage().getHeight();
+                        eInfo.width = Finfo.getImage().getWidth();
+                        eInfo.mFaceCount = Finfo.mFaceCount;
+                        eInfo.mFBorder = Finfo.mFBorder;
+                        eInfo.InfoId = Finfo.CountId;
+                        eInfo.mDate = Finfo.getDate();
+                        if(info.Count + 1 <= info.VId.size() - 1) {
+                            info.Count++;
+                        } else {
+                            info.Count = 0;
+                        }
+
+                        mPastVideo = false;
+                    } else {
+                        eInfo.Type = MediaInfo.MEDIA_TYPE_VIDEO;
+                        eInfo.TextureId = info.TextureId;
+                        eInfo.Videopart = ElementCount[info.CountId];
+                        eInfo.InfoId = info.CountId;
+                        eInfo.mDate = info.getDate();
+                        mPastVideo = true;
+                    }
+                } else if(info.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
                     eInfo.Type = MediaInfo.MEDIA_TYPE_IMAGE;
                     eInfo.height = info.getImage().getHeight();
                     eInfo.width = info.getImage().getWidth();
@@ -263,7 +294,8 @@ public class MicroMovieOrder {
                     mPastVideo = false;
                 }
 
-                ElementCount[info.CountId]++;
+                if(!info.IsFake)
+                    ElementCount[info.CountId]++;
 
                 mOrder[i] = info.CountId;
 
@@ -273,8 +305,7 @@ public class MicroMovieOrder {
             mFileOrder.add(eInfo);
         }
 
-        // for(int i=0; i<ElementCount.length; i++) Log.e(TAG, "i:" + i + ": " +
-        // ElementCount[i]);
+        //for(int i=0; i<ElementCount.length; i++) Log.e(TAG, "i:" + i + ": " + ElementCount[i]);
         mOrderList[mScriptId] = mOrder;
 
         return mFileOrder;
@@ -284,19 +315,20 @@ public class MicroMovieOrder {
         ArrayList<ElementInfo> mFileOrder = new ArrayList<ElementInfo>();
         int ElementCount = elementInfo.size();
 
-        // now we need start to put order
-        // the textureId ==> 1:movie, 2-11:bitmap, 12-21:videoBitmap
-        for(int i = 0; i < ElementCount; i++) {
+
+        //now we need start to put order
+        //the textureId ==> 1:movie, 2-11:bitmap, 12-21:videoBitmap
+        for(int i=0; i<ElementCount; i++) {
             ElementInfo eInfo = new ElementInfo();
             ElementInfo oldEInfo = elementInfo.get(i);
 
             int infoId = elementInfo.get(i).InfoId;
 
-            for(int j = 0; j < mMediaInfo.size(); j++) {
-                if(mMediaInfo.get(j).CountId == infoId) {
+            for(int j=0; j < mMediaInfo.size();j++){
+                if(mMediaInfo.get(j).CountId == infoId){
                     MediaInfo tmp = mMediaInfo.get(j);
-                    if(tmp.getType() == MediaInfo.MEDIA_TYPE_IMAGE) {
-                        if(oldEInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE) {
+                    if(tmp.getType() == MediaInfo.MEDIA_TYPE_IMAGE){
+                        if(oldEInfo.Type == MediaInfo.MEDIA_TYPE_IMAGE){
 
                             eInfo.height = tmp.getImage().getHeight();
                             eInfo.width = tmp.getImage().getWidth();
@@ -312,6 +344,12 @@ public class MicroMovieOrder {
                         eInfo.mDate = tmp.getDate();
                         eInfo.mFaceRect = tmp.mFaceRect;
 
+                    }else if(tmp.getType() == MediaInfo.MEDIA_TYPE_VIDEO){
+                        eInfo.Type = MediaInfo.MEDIA_TYPE_VIDEO;
+                        eInfo.TextureId = tmp.TextureId;
+                        eInfo.Videopart = oldEInfo.Videopart;
+                        eInfo.InfoId = tmp.CountId;
+                        eInfo.mDate = tmp.getDate();
                     }
 
                     break;

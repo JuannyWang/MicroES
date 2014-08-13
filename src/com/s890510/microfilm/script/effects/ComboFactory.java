@@ -1,3 +1,4 @@
+
 package com.s890510.microfilm.script.effects;
 
 import java.util.ArrayList;
@@ -38,14 +39,15 @@ public class ComboFactory {
     public static final int LATTICE_VERTICAL    = 46;
     public static final int LATTICE_HORIZONTAL  = 47;
     public static final int STRING_LONG         = 48;
-
-    /*
-     * public static Effect getComboEffect(int key, String shader, String str) {
-     * ComboEffect mEffect = (ComboEffect)getComboEffect(key, shader);
-     * mEffect.setString(str); return mEffect; }
-     */
+/*
+    public static Effect getComboEffect(int key, String shader, String str) {
+        ComboEffect mEffect = (ComboEffect)getComboEffect(key, shader);
+        mEffect.setString(str);
+        return mEffect;
+    }
+*/
     public static Effect getComboEffect(ProcessGL processGL, int key, String shader) {
-        ComboEffect mEffect = (ComboEffect) getComboEffect(processGL, key);
+        ComboEffect mEffect = (ComboEffect)getComboEffect(processGL, key);
         mEffect.setShader(shader);
         return mEffect;
     }
@@ -106,26 +108,30 @@ public class ComboFactory {
 
                 break;
             case SHOW_LEFT_HALF:
-                mElements.add(new EffectBySetting(1000, 1000, 1, 1, -0.5f, 0.5f, -0.5f, 0));
+                mElements.add(new EffectBySetting(1000, 1000, 1, 1, -0.5f,
+                        0.5f, -0.5f, 0));
                 mElements.add(new EffectShowInLeftHalf(processGL));
                 mEffect = new ComboEffect(mElements);
                 mEffect.setTextureRatio(0.5f, 1.0f);
                 mEffect.setSleep(1000);
                 break;
             case SHOW_RIGHT_HALF:
-                mElements.add(new EffectBySetting(1000, 1000, 1, 1, 0.5f, -0.5f, 0.5f, 0));
+                mElements.add(new EffectBySetting(1000, 1000, 1, 1, 0.5f,
+                        -0.5f, 0.5f, 0));
                 mElements.add(new EffectShowInRightHalf(processGL));
                 mEffect = new ComboEffect(mElements);
                 mEffect.setTextureRatio(0.5f, 1.0f);
                 break;
             case SEQUENTIAL_EFFECT_1:
-                mElements.add(new EffectBySetting(3000, 3000, 0.8f, 0.5f, -1f, 1f, -1f, 1f));
+                mElements.add(new EffectBySetting(3000, 3000, 0.8f, 0.5f, -1f,
+                        1f, -1f, 1f));
                 mElements.add(new EffectShowInCenter(4000, 0.5f, -1f, 1f));
                 mEffect = new ComboEffect(mElements);
                 mEffect.setSleep(1500);
                 break;
             case SEQUENTIAL_EFFECT_2:
-                mElements.add(new EffectBySetting(1500, 1500, 0.8f, 0.5f, 1f, 1f, 1f, 1f));
+                mElements.add(new EffectBySetting(1500, 1500, 0.8f, 0.5f, 1f,
+                        1f, 1f, 1f));
                 mElements.add(new EffectShowInCenter(4000, 0.5f, 1f, 1f));
                 mEffect = new ComboEffect(mElements);
                 mEffect.setSleep(1500);
@@ -144,7 +150,7 @@ public class ComboFactory {
                 mElements.add(new EffectShowInCenter(4000));
                 mEffect = new ComboEffect(mElements);
                 mEffect.setSleep(3000);
-                // mEffect.setMultiple(true);
+                //mEffect.setMultiple(true);
                 break;
             case STRING:
                 mElements.add(new EffectShowInCenter(2000));

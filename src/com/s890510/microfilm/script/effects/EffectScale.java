@@ -4,18 +4,16 @@ import android.opengl.Matrix;
 
 import com.s890510.microfilm.util.Easing;
 
-public class EffectScale extends BasicEffect {
-    private final static int DURATION    = 5000;
-    private float            mStartScale = 1.0f;
-    private float            mEndScale   = 1.3f;          // SCALE_RATE must
-                                                          // bigger than
-                                                          // SLIDE_RATE
-    private float            mStartAlpha = 1.0f;
-    private float            mEndAlpha   = 1.0f;
-    private float[]          mMVPMatrix  = new float[16];
-    private float            scale       = 0;
-    private int              mUtil       = 0;
-
+public class EffectScale extends BasicEffect
+{
+    private final static int DURATION = 5000;
+    private float mStartScale = 1.0f;
+    private float mEndScale = 1.3f;//SCALE_RATE must bigger than SLIDE_RATE
+    private float mStartAlpha = 1.0f;
+    private float mEndAlpha = 1.0f;
+    private float[] mMVPMatrix = new float[16];
+    private float scale = 0;
+    private int mUtil = 0;
     public EffectScale() {
         mDuration = DURATION;
         mSleep = DURATION;
@@ -87,9 +85,9 @@ public class EffectScale extends BasicEffect {
         Matrix.setIdentityM(mMVPMatrix, 0);
         if(mUtil != 0 && mStartScale != mEndScale) {
             if(mStartScale < mEndScale) {
-                scale = Easing.Easing(mUtil, getProgressByElapse(elapse) * mDuration, mStartScale, (mEndScale - mStartScale), mDuration);
+                scale = Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, mStartScale, (mEndScale - mStartScale), mDuration);
             } else {
-                scale = mStartScale - Easing.Easing(mUtil, getProgressByElapse(elapse) * mDuration, mEndScale, mStartScale, mDuration);
+                scale = mStartScale - Easing.Easing(mUtil, getProgressByElapse(elapse)*mDuration, mEndScale, mStartScale, mDuration);
             }
         } else {
             scale = mStartScale + getProgressByElapse(elapse) * (mEndScale - mStartScale);

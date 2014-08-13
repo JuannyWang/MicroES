@@ -4,26 +4,27 @@ import com.s890510.microfilm.MicroMovieActivity;
 import com.s890510.microfilm.ProcessGL;
 
 public class Timer {
-    private static String      TAG              = "Timer";
-    private long               mStartTime;
-    private long               mTotal;
-    private long               mElpaseOffset    = 0;
-    private long               mSystemTime      = 0;
+    private static String TAG = "Timer";
+    private long mStartTime;
+    private long mTotal;
+    private long mElpaseOffset = 0;
+    private long mSystemTime = 0;
     private MicroMovieActivity mActivity;
 
-    private long               mElapseForEncode = 0;
-    private ProcessGL          mProcessGL;
+    private long mElapseForEncode = 0;
+    private ProcessGL mProcessGL;
 
     public Timer(long total, MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
-        mTotal = total;
+        mTotal =  total;
         mProcessGL = processGL;
         resetTimer();
     }
 
-    public void setElapseForEncode(long elapse) {
+    public void setElapseForEncode(long elapse){
         mElapseForEncode = elapse;
     }
+
 
     public void setElapse(long elpase) {
         mStartTime = System.currentTimeMillis();
@@ -36,11 +37,13 @@ public class Timer {
     }
 
     public long getElapse() {
-        if(mProcessGL.isEncode()) {
+        if(mProcessGL.isEncode()){     	
             return mElapseForEncode;
         } else if(mActivity.checkPause()) {
             mSystemTime = System.currentTimeMillis();
             return mSystemTime - mStartTime + mElpaseOffset;
+        } else if(mProcessGL.getVideoWait()) {      	
+            return mTotal;
         } else {
             mSystemTime = System.currentTimeMillis();
             return mSystemTime - mStartTime + mElpaseOffset;

@@ -6,16 +6,16 @@ import com.s890510.microfilm.ProcessGL;
 
 public class SingleShader {
     private static final String TAG = "SingleShader";
-    private MicroMovieActivity  mActivity;
+    private MicroMovieActivity mActivity;
 
-    private DefaultShader       mDefaultShader;
-    private CoverShader         mCoverShader;
-    private LatticeShader       mLatticeShader;
-    private MirrorShader        mMirrorShader;
-    private RotateShader        mRotateShader;
-    private LineShader          mLineShader;
-    private PhotoShader         mPhotoShader;
-    private ProcessGL           mProcessGL;
+    private DefaultShader mDefaultShader;
+    private CoverShader mCoverShader;
+    private LatticeShader mLatticeShader;
+    private MirrorShader mMirrorShader;
+    private RotateShader mRotateShader;
+    private LineShader mLineShader;
+    private PhotoShader mPhotoShader;
+    private ProcessGL mProcessGL;
 
     public SingleShader(MicroMovieActivity activity, ProcessGL processGL) {
         mActivity = activity;
@@ -32,8 +32,8 @@ public class SingleShader {
         mPhotoShader = new PhotoShader(mActivity, mProcessGL);
     }
 
-    public void DrawRandar(int ShaderMode, int mTextureId, ElementInfo mElementInfo, float[] mModelMatrix, float[] mViewMatrix,
-            float[] mProjectionMatrix, int mType) {
+    public void DrawRandar(int ShaderMode, int mTextureId, ElementInfo mElementInfo,
+            float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mType) {
         if(ShaderMode == Shader.DefaultShader) {
             mDefaultShader.DrawRandar(mModelMatrix, mViewMatrix, mProjectionMatrix, mTextureId, mElementInfo, mType);
         } else if(ShaderMode == Shader.CoverShader) {
@@ -54,7 +54,7 @@ public class SingleShader {
 
     public void reset(int ShaderMode) {
         if(ShaderMode == Shader.DefaultShader) {
-            // do nothing
+            //do nothing
         }
     }
 

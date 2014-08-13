@@ -13,35 +13,33 @@ import com.s890510.microfilm.R;
 import com.s890510.microfilm.draw.GLUtil;
 
 public class OldfilmShader extends Shader {
-    private static final String TAG                                 = "OldfilmShader";
-    private static final int    TRIANGLE_VERTICES_DATA_POS_OFFSET   = 0;
-    private static final int    TRIANGLE_VERTICES_DATA_UV_OFFSET    = 3;
-    public static final int     FLOAT_SIZE_BYTES                    = 4;                   // float
-                                                                                            // =
-                                                                                            // 4bytes
-    private static final int    TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
+    private static final String TAG = "OldfilmShader";
+    private static final int TRIANGLE_VERTICES_DATA_POS_OFFSET = 0;
+    private static final int TRIANGLE_VERTICES_DATA_UV_OFFSET = 3;
+    public static final int FLOAT_SIZE_BYTES = 4; //float = 4bytes
+    private static final int TRIANGLE_VERTICES_DATA_STRIDE_BYTES = 5 * FLOAT_SIZE_BYTES;
 
-    private int                 mProgram;
-    private int                 mPositionHandle;
-    private int                 mTextureHandle;
-    private int                 mSamplerHandle;
-    private int                 mAlphaHandle;
-    private int                 mMVPMatrixHandle;
-    private int                 mResolutionHandle;
-    private int                 mSepiaValueHandle;
-    private int                 mInnerVignettingHandle;
-    private int                 mOuterVignettingHandle;
-    private int                 mRandomValueHandle;
-    private float[]             mMVPMatrix                          = new float[16];
+    private int mProgram;
+    private int mPositionHandle;
+    private int mTextureHandle;
+    private int mSamplerHandle;
+    private int mAlphaHandle;
+    private int mMVPMatrixHandle;
+    private int mResolutionHandle;
+    private int mSepiaValueHandle;
+    private int mInnerVignettingHandle;
+    private int mOuterVignettingHandle;
+    private int mRandomValueHandle;
+    private float[] mMVPMatrix = new float[16];
 
-    private float               mAlpha                              = 1.0f;
-    private final float         SEPIA                               = 0.4f;
-    private final float         IVIGNETTING                         = 0.75f;
-    private final float         OVIGNETTING                         = 0.85f;
-    private float               mRandomVaule;
-    private Random              mRandom                             = new Random();
-
-    private ProcessGL           mProcessGL;
+    private float mAlpha = 1.0f;
+    private final float SEPIA = 0.4f;
+    private final float IVIGNETTING = 0.75f;
+    private final float OVIGNETTING = 0.85f;
+    private float mRandomVaule;
+    private Random mRandom = new Random();
+    
+    private ProcessGL mProcessGL;
 
     public OldfilmShader(MicroMovieActivity activity, ProcessGL processGL) {
         super(activity);
@@ -49,11 +47,12 @@ public class OldfilmShader extends Shader {
         CreateProgram();
     }
 
-    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix, int mTextureId, ElementInfo mElementInfo) {
+    public void DrawRandar(float[] mModelMatrix, float[] mViewMatrix, float[] mProjectionMatrix,
+            int mTextureId, ElementInfo mElementInfo) {
 
         GLES20.glUseProgram(mProgram);
 
-        GLES20.glActiveTexture(GLES20.GL_TEXTURE0 + mTextureId);
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0+mTextureId);
         GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, mTextureId);
         GLES20.glUniform1i(mSamplerHandle, mTextureId);
 
@@ -75,9 +74,9 @@ public class OldfilmShader extends Shader {
 
         setRandomValues();
 
-        GLES20.glUniform1f(mSepiaValueHandle, SEPIA);
-        GLES20.glUniform1f(mInnerVignettingHandle, IVIGNETTING);
-        GLES20.glUniform1f(mOuterVignettingHandle, OVIGNETTING);
+        GLES20.glUniform1f(mSepiaValueHandle,SEPIA);
+        GLES20.glUniform1f(mInnerVignettingHandle,IVIGNETTING);
+        GLES20.glUniform1f(mOuterVignettingHandle,OVIGNETTING);
         GLES20.glUniform1f(mRandomValueHandle, mRandomVaule);
 
         GLES20.glEnable(GLES20.GL_BLEND);
@@ -95,15 +94,14 @@ public class OldfilmShader extends Shader {
         final int fragmentShaderHandle = GLUtil.compileShader(GLES20.GL_FRAGMENT_SHADER, FragmentShader());
 
         checkGlError("OldfilmShader");
-        // Create the new program
+        //Create the new program
         mProgram = GLUtil.createAndLinkProgram(vertexShaderHandle, fragmentShaderHandle);
-        if(mProgram == 0) {
+        if (mProgram == 0) {
             Log.e(TAG, "mProgram is 0");
             return;
         }
 
-        // Set program handles. These will later be used to pass in values to
-        // the program.
+        // Set program handles. These will later be used to pass in values to the program.
         mPositionHandle = GLES20.glGetAttribLocation(mProgram, "aPosition");
         mTextureHandle = GLES20.glGetAttribLocation(mProgram, "aTextureCoord");
         mSamplerHandle = GLES20.glGetUniformLocation(mProgram, "Texture");
@@ -128,9 +126,9 @@ public class OldfilmShader extends Shader {
         return getShaderRaw(R.raw.bitmap_fragment_oldfilm_shader);
     }
 
-    private void setRandomValues() {
-        if(!mActivity.checkPause() || mActivity.isSaving()) {
-            mRandomVaule = (float) mRandom.nextInt(1001) + 1000f;
+    private void setRandomValues(){
+        if(!mActivity.checkPause() || mActivity.isSaving()){
+            mRandomVaule = (float)mRandom.nextInt(1001) + 1000f;
         }
     }
 

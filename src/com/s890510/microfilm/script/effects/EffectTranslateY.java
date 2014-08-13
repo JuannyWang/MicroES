@@ -4,18 +4,19 @@ import android.opengl.Matrix;
 
 import com.s890510.microfilm.ProcessGL;
 
-public class EffectTranslateY extends BasicEffect {
-    private final static int DURATION    = 1000;
-    private float            mTransY;
-    private float            mStartTrans = 1.0f;
-    private float            mEndTrans   = 1.0f;
-    private float            mStartAlpha = 1.0f;
-    private float            mEndAlpha   = 1.0f;
-    private float            mStartScale = -1;
-    private float            mEndScale   = -1;
-    private float            mPosX       = 0;
-    private float[]          mMVPMatrix  = new float[16]; // the texture
-    private float            scale       = 1.0f;
+public class EffectTranslateY extends BasicEffect
+{
+    private final static int DURATION = 1000;
+    private float mTransY;
+    private float mStartTrans = 1.0f;
+    private float mEndTrans = 1.0f;
+    private float mStartAlpha = 1.0f;
+    private float mEndAlpha = 1.0f;
+    private float mStartScale = -1;
+    private float mEndScale = -1;
+    private float mPosX = 0;
+    private float[] mMVPMatrix = new float[16]; //the texture
+    private float scale = 1.0f;
 
     public EffectTranslateY(ProcessGL processGL) {
         mDuration = DURATION;
@@ -78,8 +79,7 @@ public class EffectTranslateY extends BasicEffect {
         mPosX = PosX;
     }
 
-    public EffectTranslateY(int duration, float StartPos, float EndPos, float StartScale, float EndScale, float StartAlpha, float EndAlpha,
-            float PosX, int mask) {
+    public EffectTranslateY(int duration, float StartPos, float EndPos, float StartScale, float EndScale, float StartAlpha, float EndAlpha, float PosX, int mask) {
         mDuration = duration;
         mSleep = duration;
         mStartTrans = StartPos;
