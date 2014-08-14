@@ -220,6 +220,28 @@ public class MediaInfo {
         }
     }
     
+    public void Destory() {
+    	if(mBitmapLookupJob != null && !mBitmapLookupJob.isDone()) {
+            mBitmapLookupJob.cancel();
+            mBitmapLookupJob = null;
+        }
+
+    	if(mBitmap != null) {
+    		mBitmap.recycle();
+    		mBitmap = null;
+    	}
+    	
+    	if(mThumbNail != null) {
+    		mThumbNail.recycle();
+    		mThumbNail = null;
+    	}
+    	
+    	if(mGeoInfo != null && !mGeoInfo.isDone()) {
+    		mGeoInfo.cancel();
+    		mGeoInfo = null;
+    	}
+    }
+    
     public void LoadBitmap() {
     	final MediaInfo mInfo = this;
         mBitmapLookupJob = ((MediaPool)mActivity.getApplicationContext()).getBitmapThreadPool().submit(
@@ -245,12 +267,6 @@ public class MediaInfo {
                     }
                 }
             });
-    }
-
-    public void onDestory() {
-        if(mBitmapLookupJob != null && !mBitmapLookupJob.isDone()) {
-            mBitmapLookupJob.cancel();
-        }
     }
 
     private class LoadBitmapJob implements Job<Bitmap> {

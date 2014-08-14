@@ -45,6 +45,10 @@ public class GeoInfo {
 	    String ctaKK = AsusSystemProperties.get("persist.sys.cta.security");
 	    return TextUtils.equals(cta, "1") || TextUtils.equals(ctaKK, "1");
 	}
+	
+	public boolean isDone() {
+		return mAddressLookupJob.isDone();
+	}
     
     public void LoadAddress() {
         if(!isCNSku() && !isCTA()) {
@@ -91,7 +95,7 @@ public class GeoInfo {
     }
 
     public void cancel() {
-        if (mAddressLookupJob != null) {
+        if (mAddressLookupJob != null && !mAddressLookupJob.isDone()) {
             mAddressLookupJob.cancel();
             mAddressLookupJob = null;
         }

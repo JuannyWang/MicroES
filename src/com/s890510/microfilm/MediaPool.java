@@ -56,6 +56,18 @@ public class MediaPool extends Application {
 		mLongitude.add(info.getLongitude());
 	}
 	
+	public void removeInfo(int index) {
+		mMediaInfo.remove(index);
+		
+		mPath.remove(index);
+		mUriPath.remove(index);
+		mType.remove(index);
+		mRotate.remove(index);
+		mDate.remove(index);
+		mLatitude.remove(index);
+		mLongitude.remove(index);
+	}
+	
 	public void setCount(int count) {
 		ItemCount = count;
 	}

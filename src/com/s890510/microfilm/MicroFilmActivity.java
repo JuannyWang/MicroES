@@ -12,6 +12,7 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -129,7 +130,6 @@ public class MicroFilmActivity extends Activity {
 
     	MediaInfo mInfo = new MediaInfo(this);
 		mInfo.setup(uri, mLoadStatus);
-		mUriPath.add(uri.getPath());
 
 		mInitBitmapCount++;
     }
@@ -146,16 +146,25 @@ public class MicroFilmActivity extends Activity {
 	            	mInitBitmapCount = 0;
 	            	mDoneBitmapCount = 0;
 	            	mUriPath = ((MediaPool)getApplicationContext()).getUriPath();
-
-	            	Uri SingleImage = imageReturnedIntent.getData();
-	                if(SingleImage == null) {
-	                	ClipData MultiImage = imageReturnedIntent.getClipData();
-	                	for(int i=0; i<MultiImage.getItemCount(); i++) {
-	                		setImage(MultiImage.getItemAt(i).getUri());	                		
-	                	}
-	                } else {
-	                	setImage(imageReturnedIntent.getData());
-	                }
+	            	Log.e(TAG, "size:" + mUriPath.size());
+	            	
+	            	//Asus Gallery return is very special...
+	            	ArrayList<String> imageList = imageReturnedIntent.getStringArrayListExtra("multi-select-picker");
+		            if (imageList != null) {
+		                for (String imageUriString : imageList) {
+		                	setImage(Uri.parse(imageUriString));
+		                }
+		            } else {
+		            	Uri SingleImage = imageReturnedIntent.getData();
+		                if(SingleImage == null) {
+		                	ClipData MultiImage = imageReturnedIntent.getClipData();
+		                	for(int i=0; i<MultiImage.getItemCount(); i++) {
+		                		setImage(MultiImage.getItemAt(i).getUri());	                		
+		                	}
+		                } else {
+		                	setImage(imageReturnedIntent.getData());
+		                }
+		            }
 	                
 	                if(mInitBitmapCount == 0) mProgressDialog.dismiss();
 	            }
@@ -207,13 +216,37 @@ public class MicroFilmActivity extends Activity {
         
         List<ResolveInfo> infoList = getPackageManager().queryIntentActivities(mIntent, 0);
         
+        if (infoList.isEmpty()) return;
+        
+        List<Intent> packageIntents = new ArrayList<Intent>();
+        
         for (ResolveInfo info : infoList) {
         	final String packageName = info.activityInfo.packageName;
         	Intent packageIntent;
+        	Log.e(TAG, "String:" + packageName);
         	if (("com.android.documentsui".equals(packageName) || "com.google.android.apps.docs".equals(packageName)) &&
         			Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
         		continue;
+        	} else if("com.asus.gallery".equals(packageName)) {
+        		packageIntent = new Intent("ASUS_MULTI_SELECT_PICKER");
+        		packageIntent.setType("image/*");
+        		packageIntent.setClassName("com.asus.gallery", "com.asus.gallery.app.EPhotoActivity");
+        	} else {
+        		packageIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                packageIntent.setType("image/*");
+                packageIntent.setPackage(packageName);
         	}
+
+        	packageIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        	packageIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        	packageIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+        	packageIntents.add(packageIntent);
         }
+        
+        if(packageIntents.size() <= 0) return;
+        
+        Intent chooserIntent = Intent.createChooser(packageIntents.remove(packageIntents.size()-1), null);
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, packageIntents.toArray(new Parcelable[packageIntents.size()-1]));
+        startActivityForResult(chooserIntent, SELECT_PHOTO);
     }
 }
