@@ -11,7 +11,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnKeyListener;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Path;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
@@ -38,10 +37,7 @@ import com.s890510.microfilm.script.Lover;
 import com.s890510.microfilm.script.Memory;
 import com.s890510.microfilm.script.Script;
 import com.s890510.microfilm.script.Sports;
-import com.s890510.microfilm.script.Timer;
-import com.s890510.microfilm.script.effects.Effect;
 import com.s890510.microfilm.util.AsusThemeUtility;
-import com.s890510.microfilm.util.ThreadPool;
 import com.s890510.microfilm.util.Util;
 
 public class MicroMovieActivity extends Activity {

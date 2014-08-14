@@ -1,27 +1,17 @@
 package com.s890510.microfilm;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
-import android.graphics.SurfaceTexture;
-import android.graphics.SurfaceTexture.OnFrameAvailableListener;
-import android.media.MediaPlayer;
-import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
-import android.view.Surface;
 
-import com.s890510.microfilm.draw.GLUtil;
 import com.s890510.microfilm.draw.Slogan;
 import com.s890510.microfilm.draw.StringLoader;
 import com.s890510.microfilm.filter.Filter;

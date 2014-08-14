@@ -2,8 +2,6 @@ package com.s890510.microfilm;
 
 import java.util.ArrayList;
 
-import android.util.Log;
-
 import com.s890510.microfilm.script.Timer;
 public class PlayControl {
     private static String TAG = "PlayControl";
@@ -93,19 +91,11 @@ public class PlayControl {
             mSleep = sleep;
         }
 
-        public void resetTimer(){
-            mTimer.resetTimer();
-        }
-
         public void setElapse(int elapse) {
             mTimer.setElapse(elapse);
             playIndex = mSurfaceView.getScript().getItemIndexByElapse(elapse);
             mSetProgress = true;
             mLossTime = 0;
-        }
-
-        public void setProgress(boolean mProgress) {
-            mSetProgress = mProgress;
         }
 
         private void doSleep(int time) {
@@ -211,12 +201,6 @@ public class PlayControl {
             mIsDone = true;
             synchronized (mPauseLock) {
                 mPauseLock.notifyAll();
-            }
-        }
-
-        public void onPause() {
-            synchronized (mPauseLock) {
-                //Do nothing
             }
         }
 

@@ -1,14 +1,16 @@
 package com.s890510.microfilm;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Intent;
-import android.graphics.Bitmap;
+import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -117,21 +119,7 @@ public class MicroFilmActivity extends Activity {
         btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//Asus Gallery not support multiple select
-				Intent i = new Intent("ASUS_MULTI_SELECT_PICKER");
-				i.setAction(Intent.ACTION_PICK);
-				i.addCategory(Intent.CATEGORY_DEFAULT);
-				i.setType("image/*");
-				i.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-				i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				//i.setClassName("com.asus.gallery", "com.asus.gallery.app.EPhotoActivity");
-				startActivityForResult(i, SELECT_PHOTO);
-				/*
-				Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
-				photoPickerIntent.setType("image/*");
-				photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-				startActivityForResult(photoPickerIntent, SELECT_PHOTO);
-				*/
+				onAddMedia();
 			}
 		});
     }
@@ -210,5 +198,22 @@ public class MicroFilmActivity extends Activity {
 	            mProgressDialog.dismiss();
 	        }
 	    }
+    }
+    
+    private void onAddMedia() {
+    	Intent mIntent = new Intent(Intent.ACTION_GET_CONTENT);
+    	mIntent.setType("image/*");
+    	mIntent.addCategory(Intent.CATEGORY_OPENABLE);
+        
+        List<ResolveInfo> infoList = getPackageManager().queryIntentActivities(mIntent, 0);
+        
+        for (ResolveInfo info : infoList) {
+        	final String packageName = info.activityInfo.packageName;
+        	Intent packageIntent;
+        	if (("com.android.documentsui".equals(packageName) || "com.google.android.apps.docs".equals(packageName)) &&
+        			Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        		continue;
+        	}
+        }
     }
 }

@@ -2,12 +2,11 @@ package com.s890510.microfilm;
 
 import java.util.ArrayList;
 
-import com.s890510.microfilm.util.ThreadPool;
-
 import android.app.Application;
-import android.content.ClipData.Item;
 import android.database.Cursor;
 import android.provider.MediaStore;
+
+import com.s890510.microfilm.util.ThreadPool;
 
 public class MediaPool extends Application {
 	private static final String TAG = "MediaPool";
