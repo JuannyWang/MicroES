@@ -118,10 +118,20 @@ public class MicroFilmActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				//Asus Gallery not support multiple select
+				Intent i = new Intent("ASUS_MULTI_SELECT_PICKER");
+				i.setAction(Intent.ACTION_PICK);
+				i.addCategory(Intent.CATEGORY_DEFAULT);
+				i.setType("image/*");
+				i.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+				i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+				//i.setClassName("com.asus.gallery", "com.asus.gallery.app.EPhotoActivity");
+				startActivityForResult(i, SELECT_PHOTO);
+				/*
 				Intent photoPickerIntent = new Intent(Intent.ACTION_PICK);
 				photoPickerIntent.setType("image/*");
 				photoPickerIntent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
 				startActivityForResult(photoPickerIntent, SELECT_PHOTO);
+				*/
 			}
 		});
     }
