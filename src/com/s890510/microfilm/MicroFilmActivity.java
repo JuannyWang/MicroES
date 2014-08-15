@@ -1,6 +1,5 @@
 package com.s890510.microfilm;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,7 @@ public class MicroFilmActivity extends Activity {
     private MenuItem mMakeMovie;
     private View mAddItemView;
     private int mMaxLimit = 20;
+    private boolean IsDoAdd = false;
     
     public static final int MSG_UPDATEINFO = 1;
     
@@ -130,7 +130,11 @@ public class MicroFilmActivity extends Activity {
         btn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onAddMedia();
+				Log.e(TAG, "onClick, IsDoAdd:" + IsDoAdd);
+				if(!IsDoAdd) {
+					IsDoAdd = true;
+					onAddMedia();
+				}
 			}
 		});
     }
@@ -191,7 +195,12 @@ public class MicroFilmActivity extends Activity {
 		                }
 		            }
 	                
-	                if(mInitBitmapCount == 0) mProgressDialog.dismiss();
+	                if(mInitBitmapCount == 0) {
+	                	IsDoAdd = false;
+	                	mProgressDialog.dismiss();
+	                }
+	            } else {
+	            	IsDoAdd = false;
 	            }
         }
     }
@@ -229,6 +238,7 @@ public class MicroFilmActivity extends Activity {
 
 	        if(mInitBitmapCount == mDoneBitmapCount) {
 	            mProgressDialog.dismiss();
+	            IsDoAdd = false;
 	        }
 	    }
     }
@@ -240,7 +250,10 @@ public class MicroFilmActivity extends Activity {
         
         List<ResolveInfo> infoList = getPackageManager().queryIntentActivities(mIntent, 0);
         
-        if (infoList.isEmpty()) return;
+        if (infoList.isEmpty()) {
+        	IsDoAdd = false;
+        	return;
+        }
         
         List<Intent> packageIntents = new ArrayList<Intent>();
         
@@ -267,7 +280,10 @@ public class MicroFilmActivity extends Activity {
         	packageIntents.add(packageIntent);
         }
         
-        if(packageIntents.size() <= 0) return;
+        if(packageIntents.size() <= 0) {
+        	IsDoAdd = false;
+        	return;
+        }
         
         Intent chooserIntent = Intent.createChooser(packageIntents.remove(packageIntents.size()-1), null);
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, packageIntents.toArray(new Parcelable[packageIntents.size()-1]));
