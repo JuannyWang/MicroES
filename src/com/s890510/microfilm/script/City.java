@@ -251,7 +251,7 @@ public class City extends BasicScript {
 
     @Override
     public int getMusicId() {
-        return MusicManager.MUISC_ASUS_CITY_STREET;
+        return MusicManager.MUISC_ASUS_CITY;
     }
 
     @Override

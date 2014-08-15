@@ -18,8 +18,8 @@ import com.s890510.microfilm.filter.Filter;
 import com.s890510.microfilm.filter.FilterChooser;
 import com.s890510.microfilm.mask.Mask;
 import com.s890510.microfilm.mask.ShowMask;
+import com.s890510.microfilm.script.BasicScript;
 import com.s890510.microfilm.script.Script;
-import com.s890510.microfilm.script.Script1;
 import com.s890510.microfilm.script.Timer;
 import com.s890510.microfilm.shader.BackgroundShader;
 import com.s890510.microfilm.shader.Shader;
@@ -83,7 +83,7 @@ public class ProcessGL {
 
     public ProcessGL(MicroMovieActivity activity, boolean isEncode) {
         mActivity = activity;
-        mScript = new Script1(mActivity, this);
+        mScript = new BasicScript(activity, this);
         mTimer = new Timer(mScript.getTotalDuration(), mActivity, this);
         mFilter = FilterChooser.getFilter(mActivity, mScript.getFilterId());
         mSingleShader = new SingleShader(mActivity, this);

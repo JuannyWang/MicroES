@@ -106,7 +106,7 @@ public class MediaInfo {
             if(mExif.getLatLong(mLatLong))
             	mHaveLatLong = true;
             
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		

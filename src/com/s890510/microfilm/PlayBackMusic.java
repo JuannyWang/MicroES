@@ -1,16 +1,12 @@
 
 package com.s890510.microfilm;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.content.res.Resources;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-
-
 
 public class PlayBackMusic
 {
@@ -19,30 +15,12 @@ public class PlayBackMusic
     private MediaPlayer     player;
     private AssetFileDescriptor mSrcFd;
 
-    public PlayBackMusic(Context context, int id) {
-        try {
-        	setAudioTrackFile(context, id);
-        } catch (FileNotFoundException e) {
-
-        } catch (IOException e) {
-
-        }
-    }
-
-
-    public void setAudioTrackFile(Context context, int musicId)
-            throws FileNotFoundException, IOException {
-    	int rawResourceId = MusicManager.getResourceId(context, musicId);
-    	Resources resources = MusicManager.getResources(context);
-    	mSrcFd = resources.openRawResourceFd(rawResourceId);
-    }
-
-    public void prepareMusic() {
+    public void prepareMusic(Context context, int musicId) {
         player = new MediaPlayer();
         player.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-        	player.setDataSource(mSrcFd.getFileDescriptor(), mSrcFd.getStartOffset(),
-                    mSrcFd.getLength());
+        	mSrcFd = context.getAssets().openFd(MusicManager.getFilePath(musicId));
+        	player.setDataSource(mSrcFd.getFileDescriptor(), mSrcFd.getStartOffset(), mSrcFd.getLength());
             player.prepare();
             player.setLooping(false);
         } catch (IllegalArgumentException e) {

@@ -202,7 +202,7 @@ public class Sports extends BasicScript {
 
     @Override
     public int getMusicId() {
-        return MusicManager.MUISC_ASUS_YOUNG;
+        return MusicManager.MUISC_ASUS_SPORTS;
     }
 
     @Override

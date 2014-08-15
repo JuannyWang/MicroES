@@ -1,14 +1,11 @@
 package com.s890510.microfilm;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.content.Context;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.os.Handler;
@@ -96,8 +93,8 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         mPlayControl = new PlayControl(this);
 
         // set music playback
-        mPlayBackMusic = new PlayBackMusic(mContext, 0);
-        mPlayBackMusic.prepareMusic();
+        mPlayBackMusic = new PlayBackMusic();
+        mPlayBackMusic.prepareMusic(mContext, 0);
 
         mTimer = new Timer(getDuration() * 1000, mActivity, mProcessGL);
     }
@@ -166,15 +163,8 @@ class MicroMovieSurfaceView extends GLSurfaceView implements GLSurfaceView.Rende
         synchronized (mPlayControl) {
             mScript = script;
 
-            try {
-                mPlayBackMusic.setAudioTrackFile(mContext, script.getMusicId());
-                mPlayBackMusic.prepareMusic();
-                mControlPanel.setSeekbarMax();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            mPlayBackMusic.prepareMusic(mContext, script.getMusicId());
+            mControlPanel.setSeekbarMax();
             mProcessGL.setScript(script);
             mProcessGL.setTimerElapse(0);
             mPlayBackMusic.start();

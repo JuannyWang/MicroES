@@ -27,15 +27,14 @@ public class AudioEncode {
     private MediaExtractor mExtractor;
     private AssetFileDescriptor mSrcFd;
     private HashMap<Integer, Integer> mIndexMap;
-    private int mAudioSourceId;
+    private int mMusicId;
     private int mEncodeTime;
 
     //public static void doEncode(Context context, String dstMediaPath, MediaFormat videoFormat){
     public void doEncode(Context context, String dstMediaPath, MediaMuxer muxer){
-        int source = mAudioSourceId;
         try {
             //cloneMediaUsingMuxer(context, videoFormat, source, dstMediaPath, 1, -1);
-            cloneMediaUsingMuxer(context, muxer, source, dstMediaPath, 1, -1);
+            cloneMediaUsingMuxer(context, muxer, dstMediaPath, 1, -1);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -44,18 +43,14 @@ public class AudioEncode {
     }
 
     public void setupAudioMuxer(Context context, MediaMuxer muxer, int time){
-        int source = mAudioSourceId;
         // Set up MediaExtractor to read from the source.
         //mSrcFd = context.getResources().openRawResourceFd(source);
-        Resources resources = MusicManager.getResources(context);
-        mSrcFd = resources.openRawResourceFd(source);
         
         mExtractor = new MediaExtractor();
         try {
-            mExtractor.setDataSource(mSrcFd.getFileDescriptor(), mSrcFd.getStartOffset(),
-                    mSrcFd.getLength());
+        	mSrcFd = context.getAssets().openFd(MusicManager.getFilePath(mMusicId));
+            mExtractor.setDataSource(mSrcFd.getFileDescriptor(), mSrcFd.getStartOffset(), mSrcFd.getLength());
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -79,7 +74,7 @@ public class AudioEncode {
      * Using the MediaMuxer to clone a media file.
      */
     //private static void cloneMediaUsingMuxer(Context context, MediaFormat videoFormat, int srcMedia, String dstMediaPath,
-    private void cloneMediaUsingMuxer(Context context, MediaMuxer muxer, int srcMedia, String dstMediaPath,
+    private void cloneMediaUsingMuxer(Context context, MediaMuxer muxer, String dstMediaPath,
             int expectedTrackCount, int degrees) throws IOException {
 
         // Copy the samples from MediaExtractor to MediaMuxer.
@@ -141,6 +136,6 @@ public class AudioEncode {
     }
     
     public void setAudioSource(Context context, int musicId){
-    	mAudioSourceId = MusicManager.getResourceId(context, musicId);
+    	mMusicId = musicId;
     }
 }

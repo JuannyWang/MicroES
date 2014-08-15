@@ -175,7 +175,7 @@ public class Carnival extends BasicScript {
 
     @Override
     public int getMusicId() {
-        return MusicManager.MUISC_ASUS_BEACH;
+        return MusicManager.MUISC_ASUS_CARNIVAL;
     }
 
     @Override

@@ -146,7 +146,7 @@ public class Lover extends BasicScript {
 
     @Override
     public int getMusicId() {
-        return MusicManager.MUISC_ASUS_ROMENTIC;
+        return MusicManager.MUISC_ASUS_LOVER;
     }
 
     @Override

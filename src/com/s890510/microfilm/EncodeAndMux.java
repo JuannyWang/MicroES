@@ -26,11 +26,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import android.app.ProgressDialog;
-import android.content.ComponentName;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.graphics.SurfaceTexture;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
@@ -38,14 +36,10 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
 import android.os.Environment;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.asus.ephotomusicprovider.ICallback;
-import com.asus.ephotomusicprovider.IEPhotoMusicProviderService;
 import com.s890510.microfilm.MicroMovieActivity.SaveCallback;
 import com.s890510.microfilm.gles.EglCore;
 import com.s890510.microfilm.gles.WindowSurface;
@@ -69,7 +63,7 @@ import com.s890510.microfilm.script.Sports;
  * (This was derived from bits and pieces of CTS tests, and is packaged as such, but is not
  * currently part of CTS.)
  */
-public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener {
+public class EncodeAndMux implements SurfaceTexture.OnFrameAvailableListener {
     private static final String TAG = "EncodeAndMuxTest";
     private static final boolean VERBOSE = false;           // lots of logging
 
@@ -79,7 +73,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 
     // parameters for the encoder
     private static final String MIME_TYPE = "video/avc";    // H.264 Advanced Video Coding
-    private static final int FRAME_RATE = 45;               // 30fps
+    private static final int FRAME_RATE = 50;               // 30fps
     private static final int IFRAME_INTERVAL = 5;          // 1 second between I-frames
     //public static final int TOTAL_FRAMES = 900;  //30 seconds stand for 900 frames
     public int TOTAL_FRAMES;
@@ -115,33 +109,8 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
     private boolean mPause = false;
     private Object mLock = new Object();
     private boolean mIsCancel = false;
-    
-    private IEPhotoMusicProviderService mService = null;  
 
-    
-    
-    
-    private ServiceConnection mConn = new ServiceConnection() {  
-    	  
-        @Override  
-        public void onServiceConnected(ComponentName name, IBinder service) {  
-            // TODO Auto-generated method stub  
-            mService = IEPhotoMusicProviderService.Stub.asInterface(service);  
-            Log.d(TAG, TAG + " Service Connected."); 
-        }  
-  
-        @Override  
-        public void onServiceDisconnected(ComponentName name) {  
-            // TODO Auto-generated method stub  
-            mService = null;  
-            Log.d(TAG, TAG + " Service Disconnected.");  
-        }  
-          
-    }; 
-    
-
-
-    public EncodeAndMuxTest(MicroMovieActivity activity, ArrayList<MediaInfo> fileList,
+    public EncodeAndMux(MicroMovieActivity activity, ArrayList<MediaInfo> fileList,
             ArrayList<ElementInfo> fileOrder, Script script, int scriptSelect) {
         mContext = activity.getApplicationContext();
         mActivity = activity;
@@ -173,8 +142,6 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
         Intent intent = new Intent();
         intent.setClassName("com.asus.ephotomusicprovider", "com.asus.ephotomusicprovider.EPhotoMusicProviderService");
         intent.setAction("com.asus.ephotomusicprovider.action");
-    	mContext.bindService(intent, mConn, Context.BIND_AUTO_CREATE);
-
         
         File outputDir = new File(OUTPUT_DIR);
         if(!outputDir.exists()){
@@ -297,20 +264,22 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
             	return;
             }else{
             	boolean result = true;
-            	if(mService != null){
-	                try {  
-	                    result = mService.encodeAudio(OUTPUT_DIR, MusicManager.getResourceId(mContext, mScript.getMusicId()), MusicManager.getFileName(mContext, mScript.getMusicId()),
-	                    		mVideoPath, mOutputPath, new ICallback.Stub() {  
-	                    			@Override
-	                    			public void incrementBy(int num) throws RemoteException {
-	                    				progressDialog.incrementProgressBy(num);
-	                    			}  
-	                    	    });
-	                } catch (RemoteException e) {  
-	                    // TODO Auto-generated catch block  
-	                    e.printStackTrace();  
-	                }  
-            	}
+
+            	AudioMux mMux = null;
+    			try{				
+    				mMux = new AudioMux(OUTPUT_DIR, progressDialog);
+    				
+    				//Here need to give audio file path to EncodeMux
+    				mMux.setAudio(mContext, mScript.getMusicId(), MusicManager.getFileName(mScript.getMusicId()));
+    				mMux.setVideo(mVideoPath);
+    				mMux.doExport(mOutputPath);
+    			} catch(Exception e) {
+    				result = false;
+    			} finally {
+    				if(mMux != null)
+    					mMux.release();
+    				result = true;
+    			}
                 
                 File oldfile = new File(mVideoPath);
                 if(oldfile.exists()) {
@@ -343,8 +312,7 @@ public class EncodeAndMuxTest implements SurfaceTexture.OnFrameAvailableListener
 	                	callback.onException();
 	                }
                 }
-            }     
-            mContext.unbindService(mConn);
+            }
             clearUselessOutputFiles();
         }
 

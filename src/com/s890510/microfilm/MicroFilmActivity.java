@@ -1,5 +1,6 @@
 package com.s890510.microfilm;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,8 @@ import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.os.Parcelable;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -41,6 +44,25 @@ public class MicroFilmActivity extends Activity {
     private boolean IsPhotoEdit = false;
     private MenuItem mMakeMovie;
     private View mAddItemView;
+    private int mMaxLimit = 20;
+    
+    public static final int MSG_UPDATEINFO = 1;
+    
+    private Handler mHandler = new Handler() {
+    	@Override
+    	public void handleMessage(Message msg) {
+    		switch (msg.what) {
+	            case MSG_UPDATEINFO:
+	                if(((MediaPool)getApplicationContext()).getCount() == 0) {
+	                	if(mMakeMovie != null) {
+	                		mMakeMovie.setEnabled(false);
+	                    	mMakeMovie.getIcon().setAlpha(130);
+	                	}
+	                }
+	                break;
+    		}
+    	}
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,19 +77,12 @@ public class MicroFilmActivity extends Activity {
 
         //mSaveCallback = new SaveCallback();
         
-        if(getIntent().getBooleanExtra("ToEdit", false)) {
-        	PhotoEdit();
-        } else {
-        	PhotoSelect();
-        }
+        PhotoSelect();
         
         mLoadStatus = new LoadStatus();
         
-        //addItem();
-        mAdapter = new MicroFilmAdapter(getApplicationContext());
+        mAdapter = new MicroFilmAdapter(getApplicationContext(), mHandler);
         mGridView.setAdapter(mAdapter);
-        
-        Log.d(TAG, "onCreate done");
     }
     
     @Override
@@ -104,16 +119,6 @@ public class MicroFilmActivity extends Activity {
     public void onBackPressed() {
     	super.onBackPressed();
     }
-
-    private void PhotoEdit() {
-    	IsPhotoEdit = true;
-    	setContentView(R.layout.asus_micromovie_edit);
-
-    	MicroFilmAdapter mAdapter = new MicroFilmAdapter(getApplicationContext());
-    	mGridView = (GridView)findViewById(R.id.asus_micromovie_editshow);
-    	mGridView.setNumColumns(5);
-    	mGridView.setAdapter(mAdapter);
-    }
     
     private void PhotoSelect() {
     	setContentView(R.layout.activity_main);
@@ -131,12 +136,18 @@ public class MicroFilmActivity extends Activity {
     }
     
     private void setImage(Uri uri) {
+    	Log.e(TAG, "uri:" + uri.getPath());
     	if(mUriPath.contains(uri.getPath())) return;
 
     	MediaInfo mInfo = new MediaInfo(this);
 		mInfo.setup(uri, mLoadStatus);
 
 		mInitBitmapCount++;
+    }
+    
+    private boolean checkURI(Uri uri) {
+    	if(mUriPath.contains(uri.getPath())) return true;
+    	else return false;
     }
     
     @Override
@@ -156,6 +167,15 @@ public class MicroFilmActivity extends Activity {
 	            	//Asus Gallery return is very special...
 	            	ArrayList<String> imageList = imageReturnedIntent.getStringArrayListExtra("multi-select-picker");
 		            if (imageList != null) {
+		                for (String imageUriString : imageList) {
+		                	if(checkURI(Uri.parse(imageUriString)))
+		                		imageList.remove(imageUriString);
+		                }
+		                
+		                if(imageList.size() + mUriPath.size() > mMaxLimit) {
+		                	//Random to remove it
+		                }
+		                
 		                for (String imageUriString : imageList) {
 		                	setImage(Uri.parse(imageUriString));
 		                }

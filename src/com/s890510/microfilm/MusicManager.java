@@ -1,146 +1,79 @@
 package com.s890510.microfilm;
 
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
 
 public class MusicManager {
-    public final static int MUISC_ASUS_BEACH            = 0;
-    public final static int MUISC_ASUS_CITY_STREET      = 1;
+    public final static int MUISC_ASUS_CARNIVAL         = 0;
+    public final static int MUISC_ASUS_CITY             = 1;
     public final static int MUISC_ASUS_KIDS             = 2;
     public final static int MUISC_ASUS_LIFE             = 3;
     public final static int MUISC_ASUS_MEMORY           = 4;
-    public final static int MUISC_ASUS_ROMENTIC         = 5;
-    public final static int MUISC_ASUS_VINTAGE          = 6;
-    public final static int MUISC_ASUS_YOUNG            = 7;
-    
-    private final static String PkgName = "com.asus.ephotomusicprovider";
-    
-    public static boolean isMusicProviderAvailable(Context context){
-		PackageManager pm= context.getPackageManager();
-		try {
-			pm.getPackageInfo(PkgName,PackageManager.GET_META_DATA);
-		} catch (NameNotFoundException e) {
-			return false;
-		}  
-		return true;
+    public final static int MUISC_ASUS_LOVER            = 5;
+    public final static int MUISC_ASUS_COUNTRY          = 6;
+    public final static int MUISC_ASUS_SPORTS           = 7;
+
+    public static String getFilePath(int musicId){
+	    switch(musicId){
+            case MUISC_ASUS_CARNIVAL: {
+            	return "themes/Carnival/asus_carnival.mfim";
+            }
+            case MUISC_ASUS_CITY: {
+            	return "themes/City/asus_city.mfim";
+            }
+            case MUISC_ASUS_KIDS: {
+            	return "themes/Kids/asus_kids.mfim";
+            }
+            case MUISC_ASUS_LIFE: {
+            	return "themes/Life/asus_life.mfim";
+            }
+            case MUISC_ASUS_MEMORY: {
+            	return "themes/Memory/asus_memory.mfim";
+            }
+            case MUISC_ASUS_LOVER: {
+            	return "themes/Lover/asus_lover.mfim";
+            }
+            case MUISC_ASUS_COUNTRY: {
+            	return "themes/Country/asus_country.mfim";
+            }
+            case MUISC_ASUS_SPORTS: {
+            	return "themes/Sports/asus_sports.mfim";
+            }
+            default: {
+                throw new IllegalArgumentException(
+                        "Invalid audio track raw resource id");
+            }
+	    }
     }
     
-    public static int getResourceId(Context context, int musicId){
-    	PackageManager pm = context.getPackageManager();
-    	try {
-    	    Resources resources = pm.getResourcesForApplication(PkgName);
-    	    String name;
-    	    switch(musicId){
-	            case MUISC_ASUS_BEACH: {
-	            	name = "asus_beach_new_20140110";
-	            	break;
-	            }
-	            case MUISC_ASUS_CITY_STREET: {
-	            	name = "asus_city_street";
-	            	break;
-	            }
-	            case MUISC_ASUS_KIDS: {
-	            	name = "asus_kids_new_20140113";
-	            	break;
-	            }
-	            case MUISC_ASUS_LIFE: {
-	            	name = "asus_life_new_20130113";
-	            	break;
-	            }
-	            case MUISC_ASUS_MEMORY: {
-	            	name = "asus_memory_new_20130113";
-	            	break;
-	            }
-	            case MUISC_ASUS_ROMENTIC: {
-	            	name = "asus_romentic_new_20140110";
-	            	break;
-	            }
-	            case MUISC_ASUS_VINTAGE: {
-	            	name = "asus_vintage_new_20140110";
-	            	break;
-	            }
-	            case MUISC_ASUS_YOUNG: {
-	            	name = "asus_young_30s_20131213";
-	            	break;
-	            }
-	            default: {
-	                throw new IllegalArgumentException(
-	                        "Invalid audio track raw resource id");
-	            }
-    	    }
-    	    return resources.getIdentifier(name, "raw", PkgName);
-    	} catch (NameNotFoundException e) {
-    	    e.printStackTrace();
-    	}
-    	return 0; // 0 is not a valid resource id
-    }
-    
-    public static String getFileName(Context context, int musicId){
-    	PackageManager pm = context.getPackageManager();
-    	try {
-    	    Resources resources = pm.getResourcesForApplication(PkgName);
-    	    String filename;
-    	    switch(musicId){
-	            case MUISC_ASUS_BEACH: {
-	            	filename = ".asus_beach_new_20140110.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_CITY_STREET: {
-	            	filename = ".asus_city_street.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_KIDS: {
-	            	filename = ".asus_kids_new_20140113.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_LIFE: {
-	            	filename = ".asus_life_new_20130113.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_MEMORY: {
-	            	filename = ".asus_memory_new_20130113.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_ROMENTIC: {
-	            	filename = ".asus_romentic_new_20140110.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_VINTAGE: {
-	            	filename = ".asus_vintage_new_20140110.m4a";
-	            	break;
-	            }
-	            case MUISC_ASUS_YOUNG: {
-	            	filename = ".asus_young_30s_20131213.m4a";
-	            	break;
-	            }
-	            default: {
-	                throw new IllegalArgumentException(
-	                        "Invalid audio track raw resource id");
-	            }
-    	    }
-    	    if(getResourceId(context, musicId) != 0) // check if the resource exists
-    	    	return filename;
-    	    else return null;
-    	} catch (NameNotFoundException e) {
-    	    e.printStackTrace();
-    	}
-    	return null;
-    }
-    
-    public static Resources getResources(Context context){
-    	PackageManager pm = context.getPackageManager();
-    	try {
-    	    Resources resources = pm.getResourcesForApplication(PkgName);
-    	    return resources;
-    	} catch (NameNotFoundException e) {
-    	    e.printStackTrace();
-    	}
-    	return null;
-    }
-    
-    public static String getPackageName(){
-    	return PkgName;
+    public static String getFileName(int musicId){
+	    switch(musicId){
+            case MUISC_ASUS_CARNIVAL: {
+            	return ".asus_carnival.m4a";
+            }
+            case MUISC_ASUS_CITY: {
+            	return ".asus_city.m4a";
+            }
+            case MUISC_ASUS_KIDS: {
+            	return ".asus_kids.m4a";
+            }
+            case MUISC_ASUS_LIFE: {
+            	return ".asus_life.m4a";
+            }
+            case MUISC_ASUS_MEMORY: {
+            	return ".asus_memory.m4a";
+            }
+            case MUISC_ASUS_LOVER: {
+            	return ".asus_lover.m4a";
+            }
+            case MUISC_ASUS_COUNTRY: {
+            	return ".asus_country.m4a";
+            }
+            case MUISC_ASUS_SPORTS: {
+            	return ".asus_sports.m4a";
+            }
+            default: {
+                throw new IllegalArgumentException(
+                        "Invalid audio track raw resource id");
+            }
+	    }
     }
 }

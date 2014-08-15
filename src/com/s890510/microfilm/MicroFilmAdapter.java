@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Handler;
+import android.os.Message;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,9 +19,11 @@ public class MicroFilmAdapter extends BaseAdapter {
 	private final String TAG = "MicroFilmAdapter";
 	private ArrayList<MediaInfo> mMediaInfo;
 	private Context mContext;
+	private Handler mHandler;
 
-	public MicroFilmAdapter(Context context) {
+	public MicroFilmAdapter(Context context, Handler handler) {
 		mContext = context;
+		mHandler = handler;
 		mMediaInfo = ((MediaPool)mContext).getMediaInfo();
 	}
 
@@ -81,9 +85,12 @@ public class MicroFilmAdapter extends BaseAdapter {
 				
 				mMediaInfo = ((MediaPool)mContext).getMediaInfo();
 				mMediaInfo.get(position).Destory();
-				mMediaInfo.remove(position);
 				((MediaPool)mContext).removeInfo(position);
 				notifyDataSetChanged();
+				
+				Message m = new Message();
+		        m.what = MicroFilmActivity.MSG_UPDATEINFO;
+		        mHandler.sendMessage(m);
 			}
 		};
 		

@@ -150,7 +150,7 @@ public class Country extends BasicScript {
 
     @Override
     public int getMusicId() {
-        return MusicManager.MUISC_ASUS_VINTAGE;
+        return MusicManager.MUISC_ASUS_COUNTRY;
     }
 
     @Override

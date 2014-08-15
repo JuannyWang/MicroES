@@ -86,13 +86,14 @@ public class MicroMovieActivity extends Activity {
     private boolean mWindowState = false;
     private int mViewWidth;
     private int mViewHeight;
+    private int mDataVersion = -1;
 
     private static Thread mSaveThread;
 
     private int mInitBitmapCount = 0;
     private int mDoneBitmapCount = 0;
 
-    private EncodeAndMuxTest mEncodeAndMuxTest;
+    private EncodeAndMux mEncodeAndMuxTest;
     public LoadTexture mLoadTexture;
     public MicroMovieOrder mMicroMovieOrder;
 
@@ -312,7 +313,6 @@ public class MicroMovieActivity extends Activity {
         
         //temp
         mFileList = ((MediaPool)getApplicationContext()).getMediaInfo();
-        Log.e(TAG, "mFileList.size:" + mFileList.size());
         mMicroView.setMedia(mFileList);
         mMicroView.InitData();
         mIsLoadBitmapDone = true;
@@ -454,6 +454,12 @@ public class MicroMovieActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+        int versionCode = ((MediaPool)getApplicationContext()).getMediaInfo().hashCode();
+        if(mDataVersion == -1) {
+        	mDataVersion = versionCode;
+        } else if(mDataVersion != versionCode) {
+        	ResetPlay();
+        }
 
         checkSaveWhenLaunch();
 
@@ -538,7 +544,7 @@ public class MicroMovieActivity extends Activity {
     }
 
     private void SaveMicroMovie() {
-        mEncodeAndMuxTest = new EncodeAndMuxTest(this, mFileList, mFileOrder, mScript, mScriptSelect);
+        mEncodeAndMuxTest = new EncodeAndMux(this, mFileList, mFileOrder, mScript, mScriptSelect);
 
         // show progress dialog
         mIsSaving = true;
@@ -601,6 +607,20 @@ public class MicroMovieActivity extends Activity {
 
         if(mStopSaveDialog != null && mStopSaveDialog.isShowing())
             mControlPanel.ControlPause(true);
+    }
+    
+    private void ResetPlay() {
+    	if(isPlaying || isPause) {
+            mMicroView.CanclePlay();
+            mControlPanel.finishPlay();
+            isPause = false;
+            isPlaying = false;
+        }
+    	
+    	mFileList = ((MediaPool)getApplicationContext()).getMediaInfo();
+    	mMicroView.setMedia(mFileList);
+    	mMicroMovieOrder.Reset();
+    	switchTheme();
     }
 
     public void switchTheme() {
