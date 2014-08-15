@@ -26,6 +26,7 @@ public class MicroFilmAdapter extends BaseAdapter {
 	@Override
 	public void notifyDataSetChanged() {
 		super.notifyDataSetChanged();
+		((MediaPool)mContext).setCountId();
 		mMediaInfo = ((MediaPool)mContext).getMediaInfo();
 	}
 

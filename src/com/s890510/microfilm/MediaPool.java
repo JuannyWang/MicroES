@@ -68,6 +68,12 @@ public class MediaPool extends Application {
 		mLongitude.remove(index);
 	}
 	
+	public void setCountId() {
+		for(int i=0; i<mMediaInfo.size(); i++) {
+			mMediaInfo.get(i).CountId = i;
+		}
+	}
+	
 	public void setCount(int count) {
 		ItemCount = count;
 	}

@@ -312,6 +312,7 @@ public class MicroMovieActivity extends Activity {
         
         //temp
         mFileList = ((MediaPool)getApplicationContext()).getMediaInfo();
+        Log.e(TAG, "mFileList.size:" + mFileList.size());
         mMicroView.setMedia(mFileList);
         mMicroView.InitData();
         mIsLoadBitmapDone = true;

@@ -99,6 +99,11 @@ public class MicroFilmActivity extends Activity {
 	        	return super.onOptionsItemSelected(item);
     	}    	
     }
+    
+    @Override
+    public void onBackPressed() {
+    	super.onBackPressed();
+    }
 
     private void PhotoEdit() {
     	IsPhotoEdit = true;
@@ -193,7 +198,6 @@ public class MicroFilmActivity extends Activity {
 	        mDoneBitmapCount++;
 	        
 	        if(mInfo.mIsInitial && mInfo.getImage() != null) {
-	        	mInfo.CountId = ((MediaPool)getApplicationContext()).InfoCounter++;
 	        	((MediaPool)getApplicationContext()).addInfo(mInfo);
 	        	updateAdapter();
 	        	
